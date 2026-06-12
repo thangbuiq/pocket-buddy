@@ -127,13 +127,13 @@ export function SmartInput() {
       {preview && (
         <div className="absolute left-0 right-0 top-full z-50 mt-2 animate-in">
           <div className="rounded-[4px] border border-border bg-card p-6">
-            <p className="mb-3 font-mono text-[0.7rem] uppercase tracking-[0.15em] text-muted">
+            <p className="mb-3 font-mono text-[0.7rem] uppercase tracking-[0.15em] text-foreground">
               {t("previewTitle")}
             </p>
 
             <div className="space-y-3 rounded-[3px] border border-border bg-background p-4">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted">
+                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
                   {t(preview.type === "expense" ? "expense" : "income")}
                 </span>
                 <span
@@ -148,19 +148,19 @@ export function SmartInput() {
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted">
+                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
                   {t("category")}
                 </span>
                 <span className="text-foreground">{preview.category}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted">
+                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
                   Mô tả
                 </span>
                 <span className="text-foreground">{preview.description}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted">
+                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
                   Ngày
                 </span>
                 <span className="font-mono text-[0.8rem] text-foreground">
