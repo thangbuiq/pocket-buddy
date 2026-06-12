@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateText, Output } from "ai";
+import { generateObject } from "ai";
 import { aiModel } from "@/lib/ai";
 import { parsedExpenseSchema } from "@/lib/validations/parse";
 import { z } from "zod";
@@ -31,9 +31,9 @@ export async function POST(request: Request) {
     const today = new Date().toISOString().slice(0, 10);
     const langHint = language === "vi" ? "Vietnamese" : "English";
 
-    const { output } = await generateText({
+    const { object } = await generateObject({
       model: aiModel,
-      output: Output.object({ schema: parsedExpenseSchema }),
+      schema: parsedExpenseSchema,
       prompt: `Parse this ${langHint} text into a financial transaction. Today's date is ${today}.
 
       Text: "${text}"
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       - Return amount as a number (not string)`,
     });
 
-    return NextResponse.json(output);
+    return NextResponse.json(object);
   } catch (error) {
     console.error("AI parse error:", error);
     return NextResponse.json(
