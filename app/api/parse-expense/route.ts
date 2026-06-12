@@ -30,7 +30,9 @@ export async function POST(request: Request) {
     const today = new Date().toISOString().slice(0, 10);
     const langHint = language === "vi" ? "Vietnamese" : "English";
 
-    const structuredModel = aiModel.withStructuredOutput(parsedExpenseSchema);
+    const structuredModel = aiModel.withStructuredOutput(parsedExpenseSchema, {
+      method: "functionCalling",
+    });
 
     const result = await structuredModel.invoke([
       {
