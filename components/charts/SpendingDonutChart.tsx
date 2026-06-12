@@ -31,7 +31,7 @@ export function SpendingDonutChart({
             }
             labelLine={false}
             style={{
-              fontFamily: "var(--font-serif)",
+              fontFamily: "var(--font-mono)",
               fontSize: "0.7rem",
             }}
           >
@@ -43,7 +43,7 @@ export function SpendingDonutChart({
             verticalAlign="bottom"
             height={36}
             wrapperStyle={{
-              fontFamily: "var(--font-serif)",
+              fontFamily: "var(--font-mono)",
               fontSize: "0.75rem",
             }}
             formatter={(value) => (

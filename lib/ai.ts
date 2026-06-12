@@ -1,6 +1,7 @@
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
-const openai = createOpenAI({
+const openai = createOpenAICompatible({
+  name: "openai-compatible",
   baseURL: process.env.OPENAI_BASE_URL || "https://api.openai.com/v1",
 });
 
