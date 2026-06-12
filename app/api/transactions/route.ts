@@ -6,7 +6,11 @@ import { transactionSchema } from "@/lib/validations/transactions";
 export async function GET() {
   const session = await auth();
   const userId = session?.user?.id ?? "user_demo";
-  return NextResponse.json(mockStore.transactions.filter((transaction) => transaction.userId === userId));
+  return NextResponse.json(
+    mockStore.transactions.filter(
+      (transaction) => transaction.userId === userId,
+    ),
+  );
 }
 
 export async function POST(request: Request) {
@@ -16,7 +20,10 @@ export async function POST(request: Request) {
   const payload = await request.json();
   const parsed = transactionSchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const transaction = {

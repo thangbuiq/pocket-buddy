@@ -6,7 +6,9 @@ const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
   // Avoid hard crashes during static builds without env vars.
-  console.warn("DATABASE_URL is not set. Database operations will fail until configured.");
+  console.warn(
+    "DATABASE_URL is not set. Database operations will fail until configured.",
+  );
 }
 
 const sql = neon(databaseUrl || "postgresql://localhost/pocket_buddy");

@@ -16,7 +16,12 @@ async function getDb() {
 
 export async function enqueueTransaction(payload: TransactionInput) {
   const db = await getDb();
-  await db.put(STORE, { id: crypto.randomUUID(), payload, syncStatus: "pending", createdAt: Date.now() });
+  await db.put(STORE, {
+    id: crypto.randomUUID(),
+    payload,
+    syncStatus: "pending",
+    createdAt: Date.now(),
+  });
 }
 
 export async function syncQueuedTransactions() {

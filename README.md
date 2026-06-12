@@ -5,10 +5,12 @@ AI-powered personal finance PWA.
 ## Quick Start
 
 ```bash
-npm install
-cp .env.example .env.local
-# Fill in .env.local
-npm run dev
+bun install
+
+cp .env.example .env
+
+# Fill in .env
+bun dev
 ```
 
 Open http://localhost:3000
@@ -16,8 +18,8 @@ Open http://localhost:3000
 ## Database
 
 ```bash
-npx drizzle-kit generate
-npx drizzle-kit push
+bunx drizzle-kit generate
+bunx drizzle-kit push
 ```
 
 ## Environment Variables
@@ -32,3 +34,16 @@ See `.env.example` for required variables.
 - Drizzle ORM + Neon Postgres
 - Vercel AI SDK
 - Serwist PWA
+
+## Project Structure
+
+```
+app/          # Next.js App Router pages
+components/   # React components
+lib/          # Utilities and shared logic
+db/           # Database schema
+hooks/        # React hooks
+features/     # Feature modules
+types/        # TypeScript types
+public/       # Static assets
+```

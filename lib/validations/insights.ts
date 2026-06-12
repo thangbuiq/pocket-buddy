@@ -22,7 +22,7 @@ export const generatedInsightsSchema = z.object({
         title: z.string().min(5),
         description: z.string().min(20),
         severity: z.enum(["info", "warning", "success"]),
-      })
+      }),
     )
     .max(5),
 });

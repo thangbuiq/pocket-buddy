@@ -6,7 +6,7 @@ export const assistantMessageSchema = z.object({
       id: z.string(),
       role: z.enum(["user", "assistant", "system"]),
       content: z.string().min(1),
-    })
+    }),
   ),
   context: z
     .object({

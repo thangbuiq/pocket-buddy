@@ -1,6 +1,11 @@
 /// <reference lib="webworker" />
 
-import { Serwist, type PrecacheEntry, NetworkFirst, StaleWhileRevalidate } from "serwist";
+import {
+  Serwist,
+  type PrecacheEntry,
+  NetworkFirst,
+  StaleWhileRevalidate,
+} from "serwist";
 import { defaultCache } from "@serwist/next/worker";
 
 declare const self: ServiceWorkerGlobalScope & {
@@ -14,12 +19,18 @@ const serwist = new Serwist({
   runtimeCaching: [
     ...defaultCache,
     {
-      matcher: ({ request }) => request.destination === "style" || request.destination === "script" || request.destination === "image",
+      matcher: ({ request }) =>
+        request.destination === "style" ||
+        request.destination === "script" ||
+        request.destination === "image",
       handler: new StaleWhileRevalidate({ cacheName: "assets" }),
     },
     {
       matcher: ({ url }) => url.pathname.startsWith("/api"),
-      handler: new NetworkFirst({ cacheName: "api-network-first", networkTimeoutSeconds: 5 }),
+      handler: new NetworkFirst({
+        cacheName: "api-network-first",
+        networkTimeoutSeconds: 5,
+      }),
     },
   ],
 });
