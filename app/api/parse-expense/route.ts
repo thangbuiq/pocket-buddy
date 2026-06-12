@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json(
       { error: "AI service not configured", redirect: "/transactions" },
-      { status: 503 },
+      { status: 503 }
     );
   }
 
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const langHint = language === "vi" ? "Vietnamese" : "English";
 
     const structuredModel = aiModel.withStructuredOutput(parsedExpenseSchema, {
-      method: "functionCalling",
+      method: "jsonMode",
     });
 
     const result = await structuredModel.invoke([
@@ -47,7 +47,9 @@ Rules:
 - Categorize into: Ăn uống, Di chuyển, Mua sắm, Giải trí, Hóa đơn, Sức khỏe, Học tập, Lương, Khác
 - Description should be concise
 - Date: use today if not specified, otherwise parse relative dates like "hôm qua" (yesterday)
-- Return amount as a number (not string)`,
+- Return amount as a number (not string)
+- Use field name "transactionDate" for the date (not "date")
+- Respond in JSON format.`,
       },
     ]);
 
@@ -56,7 +58,7 @@ Rules:
     console.error("AI parse error:", error);
     return NextResponse.json(
       { error: "Failed to parse transaction", redirect: "/transactions" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

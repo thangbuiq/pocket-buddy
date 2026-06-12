@@ -1,6 +1,6 @@
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatOpenAICompletions } from "@langchain/openai";
 
-export const aiModel = new ChatOpenAI({
+export const aiModel = new ChatOpenAICompletions({
   model: process.env.OPENAI_MODEL || "gpt-4o-mini",
   apiKey: process.env.OPENAI_API_KEY,
   configuration: {
