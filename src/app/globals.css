@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root {
+  --background: oklch(0.16 0.02 261.325);
+  --foreground: oklch(0.97 0.01 254.61);
+  --card: oklch(0.22 0.03 264.28);
+  --muted: oklch(0.67 0.03 254.11);
+  --primary: oklch(0.62 0.2 280.35);
+}
+
+.light {
+  --background: oklch(0.98 0.01 264.67);
+  --foreground: oklch(0.22 0.03 264.28);
+  --card: oklch(1 0 0);
+  --muted: oklch(0.48 0.02 264.5);
+  --primary: oklch(0.57 0.2 277.1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
