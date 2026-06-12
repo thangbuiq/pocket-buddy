@@ -15,10 +15,6 @@ export const translations = {
     // Navigation
     dashboard: "Tổng quan",
     transactions: "Giao dịch",
-    budgets: "Ngân sách",
-    goals: "Mục tiêu",
-    analytics: "Thống kê",
-    assistant: "Trợ lý AI",
     settings: "Cài đặt",
     signOut: "Đăng xuất",
 
@@ -39,19 +35,12 @@ export const translations = {
     netCashFlow: "Số dư",
     savingsRate: "Tỷ lệ tiết kiệm",
     recentTransactions: "Giao dịch gần đây",
-    budgetUtilization: "Sử dụng ngân sách",
     noTransactions: "Chưa có giao dịch nào",
-    noBudgets: "Chưa có ngân sách nào",
 
     // Transactions page
     addTransaction: "Thêm giao dịch",
     deleteConfirm: "Xóa giao dịch này?",
-
-    // Budgets page
-    addBudget: "Thêm ngân sách",
     category: "Danh mục",
-    limit: "Hạn mức",
-    deleteBudgetConfirm: "Xóa ngân sách này?",
 
     // Settings
     appearance: "Giao diện",
@@ -97,10 +86,6 @@ export const translations = {
     // Navigation
     dashboard: "Dashboard",
     transactions: "Transactions",
-    budgets: "Budgets",
-    goals: "Goals",
-    analytics: "Analytics",
-    assistant: "AI Assistant",
     settings: "Settings",
     signOut: "Sign out",
 
@@ -122,19 +107,12 @@ export const translations = {
     netCashFlow: "Net Cash Flow",
     savingsRate: "Savings Rate",
     recentTransactions: "Recent Transactions",
-    budgetUtilization: "Budget Utilization",
     noTransactions: "No transactions yet",
-    noBudgets: "No budgets yet",
 
     // Transactions page
     addTransaction: "Add Transaction",
     deleteConfirm: "Delete this transaction?",
-
-    // Budgets page
-    addBudget: "Add Budget",
     category: "Category",
-    limit: "Limit",
-    deleteBudgetConfirm: "Delete this budget?",
 
     // Settings
     appearance: "Appearance",

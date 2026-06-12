@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { generateObject } from "ai";
 import { aiModel } from "@/lib/ai";
 import { parsedExpenseSchema } from "@/lib/validations/parse";
 import { z } from "zod";
@@ -31,23 +30,26 @@ export async function POST(request: Request) {
     const today = new Date().toISOString().slice(0, 10);
     const langHint = language === "vi" ? "Vietnamese" : "English";
 
-    const { object } = await generateObject({
-      model: aiModel,
-      schema: parsedExpenseSchema,
-      prompt: `Parse this ${langHint} text into a financial transaction. Today's date is ${today}.
+    const structuredModel = aiModel.withStructuredOutput(parsedExpenseSchema);
 
-      Text: "${text}"
+    const result = await structuredModel.invoke([
+      {
+        role: "user",
+        content: `Parse this ${langHint} text into a financial transaction. Today's date is ${today}.
 
-      Rules:
-      - Default type is "expense" unless words like "lương", "salary", "received", "nhận" indicate income
-      - Extract amount (handle Vietnamese shortcuts: "50k" = 50000, "1tr" = 1000000, "1.5tr" = 1500000)
-      - Categorize into: Ăn uống, Di chuyển, Mua sắm, Giải trí, Hóa đơn, Sức khỏe, Học tập, Lương, Khác
-      - Description should be concise
-      - Date: use today if not specified, otherwise parse relative dates like "hôm qua" (yesterday)
-      - Return amount as a number (not string)`,
-    });
+Text: "${text}"
 
-    return NextResponse.json(object);
+Rules:
+- Default type is "expense" unless words like "lương", "salary", "received", "nhận" indicate income
+- Extract amount (handle Vietnamese shortcuts: "50k" = 50000, "1tr" = 1000000, "1.5tr" = 1500000)
+- Categorize into: Ăn uống, Di chuyển, Mua sắm, Giải trí, Hóa đơn, Sức khỏe, Học tập, Lương, Khác
+- Description should be concise
+- Date: use today if not specified, otherwise parse relative dates like "hôm qua" (yesterday)
+- Return amount as a number (not string)`,
+      },
+    ]);
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("AI parse error:", error);
     return NextResponse.json(
