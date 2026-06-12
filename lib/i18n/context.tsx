@@ -1,6 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useSyncExternalStore,
+  ReactNode,
+} from "react";
 import {
   translations,
   type Language,
@@ -19,41 +24,61 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") return "en";
-  const saved = localStorage.getItem(
-    "pocket-buddy-language",
-  ) as Language | null;
-  if (saved && (saved === "vi" || saved === "en")) {
-    return saved;
-  }
-  return "en";
+// Default values for SSR
+const DEFAULT_LANGUAGE: Language = "en";
+const DEFAULT_CURRENCY: Currency = "VND";
+
+// External store for localStorage
+function createLocalStorageStore<T>(
+  key: string,
+  defaultValue: T,
+  validator: (v: string | null) => T | null,
+) {
+  const listeners = new Set<() => void>();
+
+  return {
+    subscribe(callback: () => void) {
+      listeners.add(callback);
+      return () => listeners.delete(callback);
+    },
+    getSnapshot(): T {
+      if (typeof window === "undefined") return defaultValue;
+      const stored = localStorage.getItem(key);
+      return validator(stored) ?? defaultValue;
+    },
+    set(value: T) {
+      localStorage.setItem(key, String(value));
+      listeners.forEach((cb) => cb());
+    },
+  };
 }
 
-function getInitialCurrency(): Currency {
-  if (typeof window === "undefined") return "VND";
-  const saved = localStorage.getItem(
-    "pocket-buddy-currency",
-  ) as Currency | null;
-  if (saved && (saved === "VND" || saved === "USD")) {
-    return saved;
-  }
-  return "VND";
-}
+const languageStore = createLocalStorageStore<Language>(
+  "pocket-buddy-language",
+  DEFAULT_LANGUAGE,
+  (v) => (v === "vi" || v === "en" ? v : null),
+);
+
+const currencyStore = createLocalStorageStore<Currency>(
+  "pocket-buddy-currency",
+  DEFAULT_CURRENCY,
+  (v) => (v === "VND" || v === "USD" ? v : null),
+);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(getInitialLanguage);
-  const [currency, setCurrencyState] = useState<Currency>(getInitialCurrency);
+  const language = useSyncExternalStore(
+    languageStore.subscribe,
+    languageStore.getSnapshot,
+    languageStore.getSnapshot,
+  );
+  const currency = useSyncExternalStore(
+    currencyStore.subscribe,
+    currencyStore.getSnapshot,
+    currencyStore.getSnapshot,
+  );
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem("pocket-buddy-language", lang);
-  };
-
-  const setCurrency = (curr: Currency) => {
-    setCurrencyState(curr);
-    localStorage.setItem("pocket-buddy-currency", curr);
-  };
+  const setLanguage = (lang: Language) => languageStore.set(lang);
+  const setCurrency = (curr: Currency) => currencyStore.set(curr);
 
   const t = (key: TranslationKey): string => {
     return translations[language][key] || key;

@@ -17,7 +17,7 @@ export function Sidebar() {
   const { t, language, setLanguage, currency, setCurrency } = useI18n();
 
   return (
-    <aside className="hidden min-h-screen w-[220px] border-r border-border bg-card md:flex md:flex-col">
+    <aside className="sticky top-0 hidden h-screen w-[220px] border-r border-border bg-card md:flex md:flex-col">
       {/* Logo area */}
       <div className="px-6 pt-6 pb-4">
         <Link href="/dashboard" className="font-serif text-xl text-foreground">

@@ -30,6 +30,10 @@ export function SpendingDonutChart({
               `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
             }
             labelLine={false}
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "0.7rem",
+            }}
           >
             {data.map((entry, index) => (
               <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
@@ -38,10 +42,12 @@ export function SpendingDonutChart({
           <Legend
             verticalAlign="bottom"
             height={36}
+            wrapperStyle={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "0.75rem",
+            }}
             formatter={(value) => (
-              <span className="font-mono text-[0.7rem] uppercase tracking-[0.08em] text-text-dim">
-                {value}
-              </span>
+              <span className="text-text-dim">{value}</span>
             )}
           />
         </PieChart>
