@@ -7,7 +7,8 @@ import type { TransactionInput } from "@/lib/validations/transactions";
 export function useTransactions() {
   return useQuery({
     queryKey: ["transactions"],
-    queryFn: async () => (await fetch("/api/transactions")).json() as Promise<Transaction[]>,
+    queryFn: async () =>
+      (await fetch("/api/transactions")).json() as Promise<Transaction[]>,
   });
 }
 
@@ -22,6 +23,20 @@ export function useCreateTransaction() {
       });
       if (!res.ok) throw new Error("Failed to create transaction");
       return (await res.json()) as Transaction;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+  });
+}
+
+export function useDeleteTransaction() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/transactions/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete transaction");
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });

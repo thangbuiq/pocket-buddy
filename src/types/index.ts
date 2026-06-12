@@ -27,6 +27,17 @@ export interface Budget {
   createdAt: string;
 }
 
+export interface Goal {
+  id: string;
+  userId: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate: string | null;
+  status: "active" | "completed" | "abandoned";
+  createdAt: string;
+}
+
 export interface Insight {
   id: string;
   userId: string;

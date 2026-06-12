@@ -1,17 +1,56 @@
 "use client";
 
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-export function MonthlyTrendChart({ data }: { data: Array<{ month: string; amount: number }> }) {
+export function MonthlyTrendChart({
+  data,
+}: {
+  data: Array<{ month: string; amount: number }>;
+}) {
   return (
-    <div className="h-72 rounded-xl border border-white/10 bg-white/5 p-3">
+    <div className="h-72 rounded-[4px] border border-border bg-card p-3">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis dataKey="month" stroke="#94a3b8" />
-          <YAxis stroke="#94a3b8" />
-          <Tooltip />
-          <Line type="monotone" dataKey="amount" stroke="#818cf8" strokeWidth={2} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+          <XAxis
+            dataKey="month"
+            stroke="var(--muted)"
+            tick={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: "0.7rem",
+            }}
+          />
+          <YAxis
+            stroke="var(--muted)"
+            tick={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: "0.7rem",
+            }}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: "3px",
+              color: "var(--foreground)",
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: "0.75rem",
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="amount"
+            stroke="var(--primary)"
+            strokeWidth={2}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

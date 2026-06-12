@@ -1,19 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: oklch(0.16 0.02 261.325);
-  --foreground: oklch(0.97 0.01 254.61);
-  --card: oklch(0.22 0.03 264.28);
-  --muted: oklch(0.67 0.03 254.11);
-  --primary: oklch(0.62 0.2 280.35);
-}
+  /* Editorial Technical Brutalism - Dark theme only */
+  --background: oklch(0.1 0.01 170); /* #080f10 - near-black green tint */
+  --foreground: oklch(0.94 0.01 190); /* #e8f0f0 - primary text */
+  --card: oklch(0.15 0.015 175); /* #0d1a1c - surface */
+  --muted: oklch(0.4 0.03 185); /* #3a5255 - disabled, placeholder */
+  --muted-background: oklch(0.15 0.015 175); /* same as card */
+  --border: oklch(0.25 0.02 180); /* #1e2f31 - subtle dividers */
+  --primary: oklch(0.88 0.16 165); /* #4fffb0 - accent green-mint */
+  --primary-foreground: oklch(0.1 0.01 170); /* bg color for contrast */
+  --accent: oklch(0.88 0.16 165); /* same as primary */
+  --accent-foreground: oklch(0.1 0.01 170);
+  --destructive: oklch(0.65 0.22 25); /* #ff4d4d */
+  --success: oklch(0.75 0.15 155); /* green variant */
+  --warning: oklch(0.78 0.17 80); /* #ffaa00 */
 
-.light {
-  --background: oklch(0.98 0.01 264.67);
-  --foreground: oklch(0.22 0.03 264.28);
-  --card: oklch(1 0 0);
-  --muted: oklch(0.48 0.02 264.5);
-  --primary: oklch(0.57 0.2 277.1);
+  /* Extended palette */
+  --text-dim: oklch(0.65 0.03 195); /* #7a9ea0 - secondary text */
+  --accent-dim: oklch(0.3 0.06 165); /* #1a4a3a - accent tint bg */
 }
 
 @theme inline {
@@ -21,12 +26,152 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-muted: var(--muted);
+  --color-muted-background: var(--muted-background);
+  --color-border: var(--border);
   --color-primary: var(--primary);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-text-dim: var(--text-dim);
+  --color-accent-dim: var(--accent-dim);
+
+  /* Typography */
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
 }
 
+/* Base styles */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* Typography scale */
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+}
+
+h2 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-weight: 500;
+}
+
+/* Mono labels / eyebrows / metadata */
+.eyebrow,
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+/* Global transitions - minimal & purposeful */
+* {
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    opacity 0.15s;
+}
+
+/* Entry animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeUp 0.4s ease both;
+}
+
+/* Legacy animation support */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-top-2 {
+  from {
+    transform: translateY(-0.5rem);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation-name: fade-in;
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: forwards;
+}
+
+.slide-in-from-top-2 {
+  animation-name: slide-in-from-top-2;
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: forwards;
+}
+
+/* Dividers */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

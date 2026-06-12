@@ -1,62 +1,137 @@
-import { InsightBanner } from "@/components/shared/InsightBanner";
+"use client";
+
 import { TransactionCard } from "@/components/shared/TransactionCard";
-import { BudgetMeter } from "@/components/shared/BudgetMeter";
 import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";
 import { SpendingDonutChart } from "@/components/charts/SpendingDonutChart";
-import { mockStore } from "@/lib/mock-db";
+import { SmartInput } from "@/components/shared/SmartInput";
+import { useTransactions } from "@/hooks/use-transactions";
+import { useI18n, useCurrency } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
 
 export default function DashboardPage() {
-  const transactions = mockStore.transactions.slice(0, 5);
-  const expenses = mockStore.transactions.filter((item) => item.type === "expense");
-  const income = mockStore.transactions.filter((item) => item.type === "income");
+  const { t } = useI18n();
+  const { currency } = useCurrency();
+  const { data: transactions = [] } = useTransactions();
+
+  const recentTransactions = transactions.slice(0, 5);
+  const expenses = transactions.filter((item) => item.type === "expense");
+  const income = transactions.filter((item) => item.type === "income");
   const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
   const totalIncome = income.reduce((sum, item) => sum + item.amount, 0);
   const net = totalIncome - totalExpenses;
 
+  const categoryTotals = expenses.reduce(
+    (acc, t) => {
+      acc[t.category] = (acc[t.category] || 0) + t.amount;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+  const donutData = Object.entries(categoryTotals).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  const monthlyData: Array<{ month: string; amount: number }> = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthLabel = d.toLocaleString("default", { month: "short" });
+    const monthExpenses = expenses.filter((t) => {
+      const td = new Date(t.transactionDate);
+      return (
+        td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear()
+      );
+    });
+    monthlyData.push({
+      month: monthLabel,
+      amount: monthExpenses.reduce((s, t) => s + t.amount, 0),
+    });
+  }
+
   return (
-    <div className="space-y-6">
-      <InsightBanner
-        title="Spending spike detected in dining"
-        description="Dining expenses increased by 18% month-over-month. Reducing two restaurant visits can recover about $85 this month."
-      />
+    <div className="space-y-16 animate-in">
+      {/* Page Heading */}
+      <div>
+        <span className="eyebrow mb-3 block">Dashboard</span>
+        <h1 className="font-serif text-[2.5rem] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+          {t("dashboard")}
+        </h1>
+      </div>
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {["Total Income", "Total Expenses", "Net Cash Flow", "Savings Rate"].map((item, index) => {
-          const value =
-            index === 0
-              ? formatCurrency(totalIncome)
-              : index === 1
-                ? formatCurrency(totalExpenses)
-                : index === 2
-                  ? formatCurrency(net)
-                  : `${totalIncome > 0 ? Math.max(Math.round((net / totalIncome) * 100), 0) : 0}%`;
-          return (
-            <article key={item} className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-              <p className="text-sm text-slate-400">{item}</p>
-              <p className="mt-1 text-xl font-semibold">{value}</p>
+      {/* Smart Input - Primary feature */}
+      <section>
+        <span className="eyebrow mb-4 block">01 — Input</span>
+        <SmartInput />
+      </section>
+
+      {/* Summary Stats */}
+      <section>
+        <span className="eyebrow mb-6 block">02 — Overview</span>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              label: t("totalIncome"),
+              value: formatCurrency(totalIncome, currency),
+            },
+            {
+              label: t("totalExpenses"),
+              value: formatCurrency(totalExpenses, currency),
+            },
+            { label: t("netCashFlow"), value: formatCurrency(net, currency) },
+            {
+              label: t("savingsRate"),
+              value: `${totalIncome > 0 ? Math.max(Math.round((net / totalIncome) * 100), 0) : 0}%`,
+            },
+          ].map((item) => (
+            <article
+              key={item.label}
+              className="rounded-[4px] border border-border bg-card p-5 transition-colors hover:border-muted"
+            >
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted">
+                {item.label}
+              </p>
+              <p className="mt-2 font-mono text-xl font-medium text-foreground">
+                {item.value}
+              </p>
             </article>
-          );
-        })}
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <SpendingDonutChart data={[{ name: "Food", value: 420 }, { name: "Transport", value: 160 }, { name: "Utilities", value: 120 }]} />
-        <MonthlyTrendChart data={[{ month: "Jan", amount: 900 }, { month: "Feb", amount: 1020 }, { month: "Mar", amount: 980 }, { month: "Apr", amount: 1100 }, { month: "May", amount: 990 }, { month: "Jun", amount: 1060 }]} />
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <h2 className="font-semibold">Recent transactions</h2>
-          {transactions.map((transaction) => (
-            <TransactionCard key={transaction.id} transaction={transaction} />
           ))}
         </div>
-        <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <h2 className="font-semibold">Budget utilization</h2>
-          <BudgetMeter category="Food" used={420} limit={600} />
-          <BudgetMeter category="Transport" used={160} limit={250} />
-          <BudgetMeter category="Entertainment" used={220} limit={250} />
+      </section>
+
+      {/* Charts */}
+      <section>
+        <span className="eyebrow mb-6 block">03 — Analytics</span>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <SpendingDonutChart
+            data={
+              donutData.length > 0 ? donutData : [{ name: "No data", value: 1 }]
+            }
+          />
+          <MonthlyTrendChart data={monthlyData} />
+        </div>
+      </section>
+
+      {/* Recent Transactions */}
+      <section>
+        <span className="eyebrow mb-6 block">04 — Recent</span>
+        <div className="space-y-4 rounded-[4px] border border-border bg-card p-6">
+          <h2 className="font-serif text-[1.5rem] text-foreground">
+            {t("recentTransactions")}
+          </h2>
+          {recentTransactions.length === 0 ? (
+            <p className="font-sans text-sm text-muted">
+              {t("noTransactions")}
+            </p>
+          ) : (
+            recentTransactions.map((transaction) => (
+              <TransactionCard
+                key={transaction.id}
+                transaction={transaction}
+                currency={currency}
+              />
+            ))
+          )}
         </div>
       </section>
     </div>

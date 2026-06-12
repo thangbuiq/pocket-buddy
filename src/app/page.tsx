@@ -2,24 +2,47 @@ import Link from "next/link";
 
 export default function LandingPage() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-10 px-6 py-16">
-      <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/20 to-violet-500/10 p-8 shadow-2xl backdrop-blur">
-        <p className="text-sm uppercase tracking-[0.2em] text-indigo-200">Pocket Buddy</p>
-        <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-tight text-white md:text-5xl">
-          Smarter budgeting with AI insights and offline-ready expense tracking.
-        </h1>
-        <p className="mt-4 max-w-xl text-slate-300">
-          Track transactions, stay on budget, and get practical recommendations tailored to your real spending behavior.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/register" className="min-h-11 rounded-xl bg-indigo-600 px-5 py-3 font-medium text-white hover:bg-indigo-500">
-            Start free
-          </Link>
-          <Link href="/login" className="min-h-11 rounded-xl border border-white/20 px-5 py-3 font-medium text-slate-100 hover:bg-white/10">
-            Sign in
+    <main className="relative flex min-h-screen w-full flex-col justify-center px-6 py-12">
+      {/* Subtle radial glow behind content */}
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute left-1/2 top-1/3 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.04]"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, #4fffb0 0%, transparent 70%)",
+          }}
+        />
+      </div>
+
+      <div className="relative mx-auto w-full max-w-[680px]">
+        {/* Header */}
+        <div className="mb-16">
+          <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
+            Pocket Buddy
+          </span>
+          <h1 className="mt-6 font-serif text-[clamp(2.5rem,5vw,4rem)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+            Smarter budgeting with AI insights and offline-ready expense
+            tracking.
+          </h1>
+          <p className="mt-6 font-sans text-lg leading-[1.7] text-text-dim max-w-[560px]">
+            Track transactions, stay on budget, and get practical
+            recommendations tailored to your real spending behavior.
+          </p>
+        </div>
+
+        {/* CTAs */}
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/login"
+            className="inline-flex min-h-12 items-center justify-center rounded-[3px] bg-primary px-6 font-mono text-[0.8rem] uppercase tracking-[0.08em] text-primary-foreground transition-opacity hover:opacity-85 cursor-pointer"
+          >
+            Try Demo
           </Link>
         </div>
-      </section>
+      </div>
     </main>
   );
 }

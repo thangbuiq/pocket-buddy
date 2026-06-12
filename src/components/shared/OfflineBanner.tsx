@@ -20,9 +20,8 @@ export function OfflineBanner() {
   if (online) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 bg-amber-500/20 px-4 py-2 text-sm text-amber-200">
-      <WifiOff className="h-4 w-4" />
-      Offline mode: changes are queued and will sync when you reconnect.
+    <div className="flex items-center justify-center gap-2 border-b border-primary bg-accent-dim/50 px-4 py-2 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-primary">
+      <WifiOff className="h-3.5 w-3.5" />[ offline mode ]
     </div>
   );
 }
