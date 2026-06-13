@@ -83,6 +83,8 @@ pre-commit run --all-files
 
 ## Deployment
 
+![deployment](./assets/deployment.png)
+
 - **Frontend**: Vercel (walletmate-pwa-app)
 - **Backend**: Vercel (walletmate-api)
 

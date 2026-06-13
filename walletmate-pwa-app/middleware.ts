@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
+import { jwtDecrypt } from "jose";
 
 const protectedRoutes = ["/dashboard", "/transactions"];
 
@@ -11,13 +11,21 @@ export async function middleware(req: NextRequest) {
   );
 
   if (requiresAuth) {
-    // Use getToken which is Edge-compatible (doesn't import bcryptjs/drizzle)
-    const token = await getToken({
-      req,
-      secret: process.env.AUTH_SECRET,
-    });
+    // Get session token from cookies
+    const token = req.cookies.get("next-auth.session-token")?.value;
 
     if (!token) {
+      const loginUrl = new URL("/login", req.nextUrl.origin);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Decrypt JWE token (NextAuth v5 uses encrypted JWTs)
+    try {
+      const secret = new TextEncoder().encode(process.env.AUTH_SECRET || "");
+      await jwtDecrypt(token, secret);
+    } catch {
+      // Invalid/expired token - redirect to login
       const loginUrl = new URL("/login", req.nextUrl.origin);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
