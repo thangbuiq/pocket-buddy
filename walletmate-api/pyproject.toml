@@ -1,7 +1,7 @@
 [project]
 name = "walletmate-api"
 version = "0.1.0"
-description = "Walletmate AI backend for expense/income parsing"
+description = "walletmate AI backend for expense/income parsing"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-APP_TITLE = "Walletmate AI API"
+APP_TITLE = "walletmate AI API"
 
 ALLOWED_CATEGORIES = [
     "Ăn uống",

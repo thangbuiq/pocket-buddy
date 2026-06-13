@@ -1,7 +1,7 @@
 export const translations = {
   vi: {
     // Common
-    appName: "Walletmate",
+    appName: "walletmate",
     appTagline: "Quản lý chi tiêu thông minh",
     save: "Lưu",
     cancel: "Hủy",
@@ -80,7 +80,7 @@ export const translations = {
   },
   en: {
     // Common
-    appName: "Walletmate",
+    appName: "walletmate",
     appTagline: "Smart expense tracking",
     save: "Save",
     cancel: "Cancel",

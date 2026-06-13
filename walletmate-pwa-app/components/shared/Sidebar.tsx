@@ -23,7 +23,7 @@ export function Sidebar() {
       {/* Logo area */}
       <div className="px-6 pt-6 pb-4">
         <Link href="/dashboard" className="font-serif text-xl text-foreground">
-          Walletmate
+          walletmate
         </Link>
         <p className="mt-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted">
           AI Finance

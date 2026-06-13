@@ -1,6 +1,6 @@
-# Walletmate
+# walletmate
 
-A monorepo containing the Walletmate expense tracking application with AI-powered receipt parsing.
+A monorepo containing the walletmate expense tracking application with AI-powered receipt parsing.
 
 ## Structure
 

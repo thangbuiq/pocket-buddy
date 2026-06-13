@@ -1,4 +1,4 @@
-"""Routes package for the Walletmate AI API."""
+"""Routes package for the walletmate AI API."""
 
 from .health import router as health_router
 from .parse_image import router as parse_image_router

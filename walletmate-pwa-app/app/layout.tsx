@@ -25,9 +25,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Walletmate",
+  title: "walletmate",
   description: "Your AI-powered personal finance companion",
-  applicationName: "Walletmate",
+  applicationName: "walletmate",
 };
 
 export default function RootLayout({
