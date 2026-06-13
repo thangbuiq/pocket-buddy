@@ -24,6 +24,14 @@ export const translations = {
     previewTitle: "Xác nhận giao dịch",
     approve: "Đồng ý",
     reject: "Hủy bỏ",
+    cameraButtonAria: "Chụp ảnh hóa đơn",
+    uploadButtonAria: "Tải ảnh lên",
+    removeImage: "Xóa ảnh",
+    imagePreviewAlt: "Ảnh xem trước",
+    invalidFileType: "Định dạng ảnh không hợp lệ. Vui lòng chọn file ảnh.",
+    fileTooLarge: "Ảnh quá lớn (tối đa 4MB)",
+    parseError: "Có lỗi xảy ra khi xử lý. Vui lòng thử lại.",
+    imageAttachedPlaceholder: "Ảnh đã được chọn. Nhấn Gửi để xử lý.",
 
     // Transaction types
     expense: "Chi tiêu",
@@ -96,6 +104,14 @@ export const translations = {
     previewTitle: "Confirm transaction",
     approve: "Approve",
     reject: "Cancel",
+    cameraButtonAria: "Take photo of receipt",
+    uploadButtonAria: "Upload image",
+    removeImage: "Remove image",
+    imagePreviewAlt: "Image preview",
+    invalidFileType: "Invalid file format. Please select an image.",
+    fileTooLarge: "Image too large (max 4MB)",
+    parseError: "An error occurred while processing. Please try again.",
+    imageAttachedPlaceholder: "Image attached. Press Send to process.",
 
     // Transaction types
     expense: "Expense",

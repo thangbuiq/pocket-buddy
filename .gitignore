@@ -1,47 +1,47 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 .tmp/
-drizzle/
-.husky/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Frontend (walletmate-pwa-app)
+walletmate-pwa-app/.tmp/
+walletmate-pwa-app/drizzle/
+walletmate-pwa-app/.husky/
+walletmate-pwa-app/node_modules/
+walletmate-pwa-app/.pnp
+walletmate-pwa-app/.pnp.*
+walletmate-pwa-app/.yarn/*
+!walletmate-pwa-app/.yarn/patches
+!walletmate-pwa-app/.yarn/plugins
+!walletmate-pwa-app/.yarn/releases
+!walletmate-pwa-app/.yarn/versions
+walletmate-pwa-app/coverage/
+walletmate-pwa-app/.next/
+walletmate-pwa-app/out/
+walletmate-pwa-app/build/
+walletmate-pwa-app/.DS_Store
+walletmate-pwa-app/*.pem
+walletmate-pwa-app/npm-debug.log*
+walletmate-pwa-app/yarn-debug.log*
+walletmate-pwa-app/yarn-error.log*
+walletmate-pwa-app/.pnpm-debug.log*
+walletmate-pwa-app/.env*
+!walletmate-pwa-app/.env.example
+walletmate-pwa-app/.vercel
+walletmate-pwa-app/*.tsbuildinfo
+walletmate-pwa-app/next-env.d.ts
+walletmate-pwa-app/public/sw.js
 
-# testing
-/coverage
+# Python backend (walletmate-api)
+walletmate-api/.venv/
+walletmate-api/**/__pycache__/
+walletmate-api/*.pyc
+walletmate-api/.env*
+!walletmate-api/.env.example
+walletmate-api/.DS_Store
+walletmate-api/.ruff_cache/
+walletmate-api/.mypy_cache/
 
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
+# Root
 .DS_Store
 *.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
 .env*
 !.env.example
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-public/sw.js

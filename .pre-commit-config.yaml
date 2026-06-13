@@ -1,0 +1,48 @@
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^walletmate-pwa-app/node_modules/|^walletmate-api/.venv/
+      - id: end-of-file-fixer
+        exclude: ^walletmate-pwa-app/node_modules/|^walletmate-api/.venv/
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  # Python backend hooks
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.17
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        files: ^walletmate-api/
+      - id: ruff-format
+        files: ^walletmate-api/
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+      - id: mypy
+        files: ^walletmate-api/src/
+        additional_dependencies: [fastapi, pydantic, openai, python-dotenv, langchain, langchain-openai]
+        args: [--config-file=walletmate-api/pyproject.toml]
+
+  # Frontend hooks
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint (frontend)
+        entry: bash -c 'cd walletmate-pwa-app && bun run lint --fix'
+        language: system
+        files: ^walletmate-pwa-app/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+
+      - id: prettier
+        name: prettier (frontend)
+        entry: bash -c 'cd walletmate-pwa-app && bunx prettier --write "app/**/*.{ts,tsx,json,css}" "components/**/*.{ts,tsx,json}" "lib/**/*.{ts,tsx,json}"'
+        language: system
+        files: ^walletmate-pwa-app/.*\.(ts|tsx|js|jsx|json|css)$
+        pass_filenames: false
