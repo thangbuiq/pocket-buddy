@@ -21,7 +21,7 @@ export default function LandingPage() {
         {/* Header */}
         <div className="mb-16">
           <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
-            Pocket Buddy
+            Walletmate
           </span>
           <h1 className="mt-6 font-serif text-[clamp(2.5rem,5vw,4rem)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
             Smarter budgeting with AI insights and offline-ready expense

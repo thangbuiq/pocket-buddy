@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LogOut } from "lucide-react";
+import { useTheme } from "next-themes";
+import { LogOut, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n, type TranslationKey } from "@/lib/i18n";
 
@@ -14,14 +15,15 @@ const links = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { t, language, setLanguage, currency, setCurrency } = useI18n();
+  const { t, language, setLanguage } = useI18n();
+  const { theme, setTheme } = useTheme();
 
   return (
     <aside className="sticky top-0 hidden h-screen w-[220px] border-r border-border bg-card md:flex md:flex-col">
       {/* Logo area */}
       <div className="px-6 pt-6 pb-4">
         <Link href="/dashboard" className="font-serif text-xl text-foreground">
-          Pocket Buddy
+          Walletmate
         </Link>
         <p className="mt-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted">
           AI Finance
@@ -46,7 +48,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Language & Currency toggles */}
+      {/* Language & Theme toggles */}
       <div className="space-y-4 px-3 pb-4">
         {/* Language toggle */}
         <div className="space-y-1.5">
@@ -79,33 +81,35 @@ export function Sidebar() {
           </div>
         </div>
 
-        {/* Currency toggle */}
+        {/* Theme toggle */}
         <div className="space-y-1.5">
           <span className="font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted">
-            Currency
+            {t("appearance")}
           </span>
           <div className="flex gap-1">
             <button
-              onClick={() => setCurrency("VND")}
+              onClick={() => setTheme("light")}
               className={cn(
-                "flex-1 rounded-[3px] px-2 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer",
-                currency === "VND"
+                "flex-1 flex items-center justify-center gap-1 rounded-[3px] px-2 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer",
+                theme === "light"
                   ? "bg-primary/15 text-primary"
                   : "text-text-dim hover:text-foreground",
               )}
             >
-              VND
+              <Sun className="h-3 w-3" />
+              {t("themeLight")}
             </button>
             <button
-              onClick={() => setCurrency("USD")}
+              onClick={() => setTheme("dark")}
               className={cn(
-                "flex-1 rounded-[3px] px-2 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer",
-                currency === "USD"
+                "flex-1 flex items-center justify-center gap-1 rounded-[3px] px-2 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer",
+                theme === "dark"
                   ? "bg-primary/15 text-primary"
                   : "text-text-dim hover:text-foreground",
               )}
             >
-              USD
+              <Moon className="h-3 w-3" />
+              {t("themeDark")}
             </button>
           </div>
         </div>

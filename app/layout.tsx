@@ -25,16 +25,16 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pocket Buddy",
+  title: "Walletmate",
   description: "Your AI-powered personal finance companion",
-  applicationName: "Pocket Buddy",
+  applicationName: "Walletmate",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${playfair.variable} ${dmSans.variable} ${ibmPlexMono.variable} min-h-screen bg-background text-foreground antialiased font-sans`}
       >

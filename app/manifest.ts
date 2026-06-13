@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Pocket Buddy",
-    short_name: "Pocket Buddy",
+    name: "Walletmate",
+    short_name: "Walletmate",
     description: "Your AI-powered personal finance companion",
     start_url: "/dashboard",
     display: "standalone",

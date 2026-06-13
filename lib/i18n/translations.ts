@@ -1,7 +1,7 @@
 export const translations = {
   vi: {
     // Common
-    appName: "Pocket Buddy",
+    appName: "Walletmate",
     appTagline: "Quản lý chi tiêu thông minh",
     save: "Lưu",
     cancel: "Hủy",
@@ -13,7 +13,7 @@ export const translations = {
     send: "Gửi",
 
     // Navigation
-    dashboard: "Tổng quan",
+    dashboard: "Ví của bạn",
     transactions: "Giao dịch",
     settings: "Cài đặt",
     signOut: "Đăng xuất",
@@ -72,7 +72,7 @@ export const translations = {
   },
   en: {
     // Common
-    appName: "Pocket Buddy",
+    appName: "Walletmate",
     appTagline: "Smart expense tracking",
     save: "Save",
     cancel: "Cancel",
@@ -84,7 +84,7 @@ export const translations = {
     send: "Send",
 
     // Navigation
-    dashboard: "Dashboard",
+    dashboard: "Your Wallet",
     transactions: "Transactions",
     settings: "Settings",
     signOut: "Sign out",

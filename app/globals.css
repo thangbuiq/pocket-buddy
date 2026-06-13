@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* Editorial Technical Brutalism - Dark theme only */
+  /* Editorial Technical Brutalism - Dark theme */
   --background: oklch(0.1 0.01 170); /* #080f10 - near-black green tint */
   --foreground: oklch(0.94 0.01 190); /* #e8f0f0 - primary text */
   --card: oklch(0.15 0.015 175); /* #0d1a1c - surface */
@@ -19,6 +19,46 @@
   /* Extended palette */
   --text-dim: oklch(0.65 0.03 195); /* #7a9ea0 - secondary text */
   --accent-dim: oklch(0.3 0.06 165); /* #1a4a3a - accent tint bg */
+}
+
+.dark {
+  /* Editorial Technical Brutalism - Dark theme */
+  --background: oklch(0.1 0.01 170);
+  --foreground: oklch(0.94 0.01 190);
+  --card: oklch(0.15 0.015 175);
+  --muted: oklch(0.4 0.03 185);
+  --muted-background: oklch(0.15 0.015 175);
+  --border: oklch(0.25 0.02 180);
+  --primary: oklch(0.88 0.16 165);
+  --primary-foreground: oklch(0.1 0.01 170);
+  --accent: oklch(0.88 0.16 165);
+  --accent-foreground: oklch(0.1 0.01 170);
+  --destructive: oklch(0.65 0.22 25);
+  --success: oklch(0.75 0.15 155);
+  --warning: oklch(0.78 0.17 80);
+  --text-dim: oklch(0.65 0.03 195);
+  --accent-dim: oklch(0.3 0.06 165);
+}
+
+.light {
+  /* Editorial Technical Brutalism - Light theme */
+  --background: oklch(0.97 0.005 190); /* #f4f7f7 - near-white green tint */
+  --foreground: oklch(0.15 0.015 175); /* #0d1a1c - primary text */
+  --card: oklch(0.99 0.003 190); /* #fbfdfd - surface */
+  --muted: oklch(0.55 0.03 185); /* #6a8a8d - disabled, placeholder */
+  --muted-background: oklch(0.93 0.008 185); /* light tint */
+  --border: oklch(0.87 0.015 180); /* #d5dede - subtle dividers */
+  --primary: oklch(0.45 0.14 165); /* #0d8f5f - deeper green-mint for contrast */
+  --primary-foreground: oklch(0.99 0.003 190); /* white text on primary */
+  --accent: oklch(0.45 0.14 165);
+  --accent-foreground: oklch(0.99 0.003 190);
+  --destructive: oklch(0.55 0.2 25); /* #cc3333 */
+  --success: oklch(0.55 0.13 155);
+  --warning: oklch(0.65 0.15 80);
+
+  /* Extended palette */
+  --text-dim: oklch(0.45 0.025 195); /* #4a6a6d - secondary text */
+  --accent-dim: oklch(0.92 0.04 165); /* #d8f0e5 - accent tint bg */
 }
 
 @theme inline {

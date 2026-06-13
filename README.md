@@ -1,4 +1,4 @@
-# Pocket Buddy
+# Walletmate
 
 ```bash
 bun install

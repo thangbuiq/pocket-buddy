@@ -3,6 +3,8 @@ import { aiModel } from "@/lib/ai";
 import { parsedExpenseSchema } from "@/lib/validations/parse";
 import { z } from "zod";
 
+export const maxDuration = 30;
+
 const requestSchema = z.object({
   text: z.string().min(1).max(500),
   language: z.enum(["vi", "en"]).default("vi"),
@@ -31,7 +33,7 @@ export async function POST(request: Request) {
     const langHint = language === "vi" ? "Vietnamese" : "English";
 
     const structuredModel = aiModel.withStructuredOutput(parsedExpenseSchema, {
-      method: "jsonMode",
+      method: "functionCalling",
     });
 
     const result = await structuredModel.invoke([
