@@ -2,7 +2,7 @@
 
 import { TransactionCard } from "@/components/shared/TransactionCard";
 import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";
-import { SpendingDonutChart } from "@/components/charts/SpendingDonutChart";
+import { CategoryBreakdown } from "@/components/charts/CategoryBreakdown";
 import { SmartInput } from "@/components/shared/SmartInput";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useI18n, useCurrency } from "@/lib/i18n";
@@ -27,7 +27,7 @@ export default function DashboardPage() {
     },
     {} as Record<string, number>,
   );
-  const donutData = Object.entries(categoryTotals).map(([name, value]) => ({
+  const categoryData = Object.entries(categoryTotals).map(([name, value]) => ({
     name,
     value,
   }));
@@ -86,7 +86,7 @@ export default function DashboardPage() {
           ].map((item) => (
             <article
               key={item.label}
-              className="rounded-[4px] border border-border bg-card p-5 transition-colors hover:border-muted"
+              className="card-shadow rounded-[4px] border border-border bg-card p-5 transition-colors hover:border-muted"
             >
               <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted">
                 {item.label}
@@ -103,11 +103,7 @@ export default function DashboardPage() {
       <section>
         <span className="eyebrow mb-6 block">03 — Analytics</span>
         <div className="grid gap-6 lg:grid-cols-2">
-          <SpendingDonutChart
-            data={
-              donutData.length > 0 ? donutData : [{ name: "No data", value: 1 }]
-            }
-          />
+          <CategoryBreakdown data={categoryData} currency={currency} />
           <MonthlyTrendChart data={monthlyData} />
         </div>
       </section>
@@ -115,7 +111,7 @@ export default function DashboardPage() {
       {/* Recent Transactions */}
       <section>
         <span className="eyebrow mb-6 block">04 — Recent</span>
-        <div className="space-y-4 rounded-[4px] border border-border bg-card p-6">
+        <div className="card-shadow space-y-4 rounded-[4px] border border-border bg-card p-6">
           <h2 className="font-serif text-[1.5rem] text-foreground">
             {t("recentTransactions")}
           </h2>

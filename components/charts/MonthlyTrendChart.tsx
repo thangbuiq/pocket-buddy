@@ -16,7 +16,7 @@ export function MonthlyTrendChart({
   data: Array<{ month: string; amount: number }>;
 }) {
   return (
-    <div className="h-72 rounded-[4px] border border-border bg-card p-3">
+    <div className="card-shadow h-72 rounded-[4px] border border-border bg-card p-3">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
