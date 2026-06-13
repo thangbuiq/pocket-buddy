@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const langHint = language === "vi" ? "Vietnamese" : "English";
 
     const structuredModel = aiModel.withStructuredOutput(parsedExpenseSchema, {
-      method: "functionCalling",
+      method: "jsonMode",
     });
 
     const result = await structuredModel.invoke([
