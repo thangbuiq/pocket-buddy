@@ -1,5 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 .tmp/
+design-system/
 
 # Frontend (walletmate-pwa-app)
 walletmate-pwa-app/.tmp/

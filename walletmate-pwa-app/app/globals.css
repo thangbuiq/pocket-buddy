@@ -32,6 +32,14 @@
 
   /* Surface shadow (dark: none) */
   --shadow: 0 0 0 transparent;
+
+  /* Futuristic glassmorphism tokens */
+  --glass: rgba(19, 19, 31, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(99, 102, 241, 0.3);
+  --glow: rgba(99, 102, 241, 0.4);
+  --glow-subtle: rgba(99, 102, 241, 0.15);
+  --backdrop-blur: blur(20px) saturate(180%);
 }
 
 .dark {
@@ -125,6 +133,12 @@
   --color-chart-6: var(--chart-6);
   --color-chart-7: var(--chart-7);
   --color-chart-8: var(--chart-8);
+
+  /* Futuristic design system tokens */
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+  --color-glow: var(--glow);
+  --color-glow-subtle: var(--glow-subtle);
 
   /* Typography */
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
@@ -259,6 +273,236 @@ hr {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted);
+}
+
+/* ============================================
+   FUTURISTIC DESIGN SYSTEM UTILITIES
+   Inspired by remocn.dev — Cinematic Motion
+   ============================================ */
+
+/* Glassmorphism */
+.glass {
+  background: var(--glass);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-hover:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow:
+    0 0 40px var(--glow-subtle),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Neon Glow */
+.glow {
+  box-shadow:
+    0 0 20px var(--glow),
+    0 0 40px var(--glow-subtle);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px var(--glow);
+}
+
+.glow-border {
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 0 20px var(--glow-subtle);
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+}
+
+/* Blur Reveal */
+@keyframes blurReveal {
+  0% {
+    filter: blur(10px);
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.blur-reveal {
+  animation: blurReveal 0.6s ease-out forwards;
+}
+
+/* Float Animation */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Glow Pulse */
+@keyframes glowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px var(--glow-subtle);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--glow);
+  }
+}
+
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* Slide Up Entrance */
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+/* Scale In */
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.4s ease-out forwards;
+}
+
+/* Button Shimmer Sweep */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.btn-shimmer:hover::before {
+  left: 100%;
+}
+
+/* Gradient Border */
+.gradient-border {
+  position: relative;
+  background: var(--card);
+  border-radius: 16px;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--primary), transparent 50%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Transaction Amount Styling */
+.amount-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Stagger Animation Delays */
+.stagger-1 {
+  animation-delay: 0.1s;
+}
+.stagger-2 {
+  animation-delay: 0.2s;
+}
+.stagger-3 {
+  animation-delay: 0.3s;
+}
+.stagger-4 {
+  animation-delay: 0.4s;
+}
+.stagger-5 {
+  animation-delay: 0.5s;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer,
+  .float,
+  .glow-pulse,
+  .blur-reveal,
+  .slide-up,
+  .scale-in {
+    animation: none !important;
+  }
 }
 
 /* Respect reduced motion */

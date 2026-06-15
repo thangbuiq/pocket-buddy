@@ -20,7 +20,6 @@ export function SmartInput() {
   const [preview, setPreview] = useState<ParsedExpense | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Refs
@@ -85,7 +84,6 @@ export function SmartInput() {
         imageUrlRef.current = null;
       }
       setSelectedImage(null);
-      setImagePreviewUrl(null);
     },
   });
 
@@ -126,7 +124,6 @@ export function SmartInput() {
         }
         imageUrlRef.current = objectUrl;
         setSelectedImage(file);
-        setImagePreviewUrl(objectUrl);
       };
       img.onerror = () => {
         URL.revokeObjectURL(objectUrl);
@@ -179,7 +176,6 @@ export function SmartInput() {
       imageUrlRef.current = null;
     }
     setSelectedImage(null);
-    setImagePreviewUrl(null);
     setError(null);
     inputRef.current?.focus();
   };
@@ -335,19 +331,18 @@ export function SmartInput() {
         </div>
       </form>
 
-      {/* Image preview thumbnail */}
-      {imagePreviewUrl && (
+      {/* Image attached indicator */}
+      {selectedImage && (
         <div className="mt-2">
-          <div className="relative inline-block">
-            <img
-              src={imagePreviewUrl}
-              alt={t("imagePreviewAlt")}
-              className="h-20 w-20 rounded-[4px] border border-border object-cover"
-            />
+          <div className="relative inline-flex items-center gap-2 rounded-[4px] border border-border bg-card px-3 py-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-primary/10 text-primary">
+              <Check className="h-4 w-4" />
+            </div>
+            <span className="text-sm text-foreground">Image attached</span>
             <button
               type="button"
               onClick={handleRemoveImage}
-              className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-sm transition-opacity hover:opacity-85 cursor-pointer"
+              className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-sm transition-opacity hover:opacity-85 cursor-pointer"
               aria-label={t("removeImage")}
             >
               <X className="h-3 w-3" />
