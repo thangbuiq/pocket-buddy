@@ -74,37 +74,51 @@
 }
 
 .light {
-  /* Editorial Technical Brutalism - Light theme */
-  --background: oklch(0.94 0.008 190);
-  --foreground: oklch(0.15 0.015 175);
-  --card: oklch(0.99 0.003 190);
-  --muted: oklch(0.48 0.025 185);
-  --muted-background: oklch(0.91 0.01 185);
-  --border: oklch(0.82 0.02 180);
-  --primary: oklch(0.45 0.14 165);
-  --primary-foreground: oklch(0.99 0.003 190);
-  --accent: oklch(0.45 0.14 165);
-  --accent-foreground: oklch(0.99 0.003 190);
-  --destructive: oklch(0.55 0.2 25);
-  --success: oklch(0.55 0.13 155);
-  --warning: oklch(0.65 0.15 80);
+  /* Claude-inspired warm palette */
+
+  /* Base */
+  --background: #f4f3ee; /* Pampas - warm off-white */
+  --foreground: #2d2b26; /* warm charcoal */
+  --card: #ffffff;
+  --muted: #b1ada1; /* Cloudy */
+  --muted-background: #edebe5; /* slightly darker Pampas */
+  --border: #d9d6ce; /* warm light border */
+
+  /* Accent */
+  --primary: #d97757; /* Claude Orange */
+  --primary-foreground: #ffffff;
+  --accent: #c15f3c; /* deeper Claude Orange */
+  --accent-foreground: #ffffff;
+
+  /* Semantic */
+  --destructive: #c0403a; /* warm red */
+  --success: #5c8b62; /* sage green */
+  --warning: #d9a84e; /* warm amber */
 
   /* Extended palette */
-  --text-dim: oklch(0.4 0.02 195);
-  --accent-dim: oklch(0.92 0.04 165);
+  --text-dim: #8c887e; /* warm readable grey */
+  --accent-dim: #fdf0e8; /* pale orange tint */
 
-  /* Chart palette - slightly deeper for light bg */
-  --chart-1: oklch(0.6 0.13 165);
-  --chart-2: oklch(0.58 0.12 250);
-  --chart-3: oklch(0.62 0.12 80);
-  --chart-4: oklch(0.58 0.12 330);
-  --chart-5: oklch(0.58 0.1 190);
-  --chart-6: oklch(0.58 0.12 300);
-  --chart-7: oklch(0.6 0.1 130);
-  --chart-8: oklch(0.58 0.1 50);
+  /* Chart palette */
+  --chart-1: #d97757; /* Claude Orange */
+  --chart-2: #c15f3c; /* deeper orange */
+  --chart-3: #d9a84e; /* warm amber */
+  --chart-4: #c07a6b; /* rose terracotta */
+  --chart-5: #8c887e; /* warm grey */
+  --chart-6: #a8988c; /* warm taupe */
+  --chart-7: #7b9e82; /* sage green */
+  --chart-8: #b8a590; /* warm sand */
 
-  /* Surface shadow - depth for light mode */
-  --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.06), 0 1px 2px -1px oklch(0 0 0 / 0.06);
+  /* Surface shadow */
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  /* Glassmorphism - warm light */
+  --glass: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-border-hover: rgba(217, 119, 87, 0.25);
+  --glow: rgba(217, 119, 87, 0.25);
+  --glow-subtle: rgba(217, 119, 87, 0.08);
+  --backdrop-blur: blur(20px) saturate(180%);
 }
 
 @theme inline {
@@ -352,7 +366,8 @@ hr {
 }
 
 .blur-reveal {
-  animation: blurReveal 0.6s ease-out forwards;
+  animation: blurReveal 0.6s ease-out both;
+  will-change: transform, opacity, filter;
 }
 
 /* Float Animation */
@@ -511,4 +526,59 @@ hr {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* ── Lenis Smooth Scroll ── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* ── Scroll Indicator Animation ── */
+@keyframes scrollBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+@keyframes scrollPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+.scroll-indicator {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+.scroll-dot {
+  animation: scrollPulse 2s ease-in-out infinite;
 }

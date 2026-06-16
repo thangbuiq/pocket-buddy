@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, X, Loader2, Camera, Upload } from "lucide-react";
+import { Check, X, Loader2, Camera, Upload, ImageIcon } from "lucide-react";
 import { useI18n, useCurrency } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
 import { parseText, parseImage } from "@/lib/api";
@@ -242,35 +242,56 @@ export function SmartInput() {
             isFocused ? "border-primary" : "border-border"
           }`}
         >
-          {/* Camera button — opens camera directly on mobile */}
-          <button
-            type="button"
-            onClick={handleCameraClick}
-            disabled={isLoading}
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer disabled:opacity-50 ${
-              isFocused
-                ? "border-primary text-primary"
-                : "border-border text-muted hover:border-primary hover:text-primary"
-            }`}
-            aria-label={t("cameraButtonAria")}
-          >
-            <Camera className="h-4 w-4" />
-          </button>
+          {/* Camera / Upload buttons — hidden when image is attached */}
+          {!hasImage && (
+            <>
+              <button
+                type="button"
+                onClick={handleCameraClick}
+                disabled={isLoading}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer disabled:opacity-50 ${
+                  isFocused
+                    ? "border-primary text-primary"
+                    : "border-border text-muted hover:border-primary hover:text-primary"
+                }`}
+                aria-label={t("cameraButtonAria")}
+              >
+                <Camera className="h-4 w-4" />
+              </button>
 
-          {/* Upload button — opens file picker (gallery on mobile) */}
-          <button
-            type="button"
-            onClick={handleUploadClick}
-            disabled={isLoading}
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer disabled:opacity-50 ${
-              isFocused
-                ? "border-primary text-primary"
-                : "border-border text-muted hover:border-primary hover:text-primary"
-            }`}
-            aria-label={t("uploadButtonAria")}
-          >
-            <Upload className="h-4 w-4" />
-          </button>
+              <button
+                type="button"
+                onClick={handleUploadClick}
+                disabled={isLoading}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer disabled:opacity-50 ${
+                  isFocused
+                    ? "border-primary text-primary"
+                    : "border-border text-muted hover:border-primary hover:text-primary"
+                }`}
+                aria-label={t("uploadButtonAria")}
+              >
+                <Upload className="h-4 w-4" />
+              </button>
+            </>
+          )}
+
+          {/* Inline image attached indicator — fills input width, replaces camera + upload */}
+          {hasImage && (
+            <div className="flex flex-1 items-center gap-2 rounded-[3px] border border-primary/30 bg-primary/5 px-3 py-2.5">
+              <ImageIcon className="h-4 w-4 shrink-0 text-primary" />
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-primary">
+                Image attached
+              </span>
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-destructive/10 text-muted hover:text-destructive cursor-pointer"
+                aria-label={t("removeImage")}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
 
           {/* Hidden file inputs — one for camera, one for upload */}
           <input
@@ -293,27 +314,23 @@ export function SmartInput() {
             tabIndex={-1}
           />
 
-          {/* Text input — disabled when image is attached */}
-          <input
-            ref={inputRef}
-            type="text"
-            value={hasImage ? "" : text}
-            onChange={(e) => {
-              if (!hasImage) {
+          {/* Text input — hidden when image is attached */}
+          {!hasImage && (
+            <input
+              ref={inputRef}
+              type="text"
+              value={text}
+              onChange={(e) => {
                 setText(e.target.value);
                 if (error) setError(null);
-              }
-            }}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder={
-              hasImage
-                ? t("imageAttachedPlaceholder")
-                : t("smartInputPlaceholder")
-            }
-            className="flex-1 bg-transparent px-1 py-3 font-sans text-foreground placeholder:text-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={isLoading || hasImage}
-          />
+              }}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder={t("smartInputPlaceholder")}
+              className="flex-1 bg-transparent px-1 py-3 font-sans text-foreground placeholder:text-muted focus:outline-none"
+              disabled={isLoading}
+            />
+          )}
 
           {/* Submit button */}
           <button
@@ -330,26 +347,6 @@ export function SmartInput() {
           </button>
         </div>
       </form>
-
-      {/* Image attached indicator */}
-      {selectedImage && (
-        <div className="mt-2">
-          <div className="relative inline-flex items-center gap-2 rounded-[4px] border border-border bg-card px-3 py-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-primary/10 text-primary">
-              <Check className="h-4 w-4" />
-            </div>
-            <span className="text-sm text-foreground">Image attached</span>
-            <button
-              type="button"
-              onClick={handleRemoveImage}
-              className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-sm transition-opacity hover:opacity-85 cursor-pointer"
-              aria-label={t("removeImage")}
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Error message */}
       {error && (
