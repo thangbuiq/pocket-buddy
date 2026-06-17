@@ -7,7 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
  */
 export async function parseText(
   text: string,
-  language: "vi" | "en"
+  language: "vi" | "en",
 ): Promise<ParsedExpense> {
   const res = await fetch(`${API_URL}/api/parse-text`, {
     method: "POST",
@@ -19,7 +19,7 @@ export async function parseText(
     const error = await res.json();
     if (error.redirect) {
       throw new Error(
-        JSON.stringify({ message: error.error, redirect: error.redirect })
+        JSON.stringify({ message: error.error, redirect: error.redirect }),
       );
     }
     throw new Error(error.error || "Failed to parse text");
@@ -50,7 +50,7 @@ export async function parseImage(file: File): Promise<ParsedExpense> {
   } catch (err) {
     console.error("[parseImage] Fetch failed:", err);
     throw new Error(
-      `Network error: ${err instanceof Error ? err.message : "Unknown error"}`
+      `Network error: ${err instanceof Error ? err.message : "Unknown error"}`,
     );
   }
 
@@ -61,7 +61,7 @@ export async function parseImage(file: File): Promise<ParsedExpense> {
       const error = await res.json();
       if (error.redirect) {
         throw new Error(
-          JSON.stringify({ message: error.error, redirect: error.redirect })
+          JSON.stringify({ message: error.error, redirect: error.redirect }),
         );
       }
       errorMessage = error.error || errorMessage;

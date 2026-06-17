@@ -3,21 +3,32 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, X, Loader2, Camera, Upload, ImageIcon } from "lucide-react";
-import { useI18n, useCurrency } from "@/lib/i18n";
-import { formatCurrency } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 import { parseText, parseImage } from "@/lib/api";
 import type { ParsedExpense } from "@/lib/validations/parse";
+
+const CATEGORIES = [
+  "Ăn uống",
+  "Di chuyển",
+  "Mua sắm",
+  "Giải trí",
+  "Hóa đơn",
+  "Sức khỏe",
+  "Học tập",
+  "Lương",
+  "Khác",
+];
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB (matches Groq backend limit)
 
 export function SmartInput() {
   const { t, language } = useI18n();
-  const { currency } = useCurrency();
   const queryClient = useQueryClient();
 
   // State
   const [text, setText] = useState("");
   const [preview, setPreview] = useState<ParsedExpense | null>(null);
+  const [editedData, setEditedData] = useState<ParsedExpense | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +40,7 @@ export function SmartInput() {
   const imageUrlRef = useRef<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Parse mutation — handles both text and image input
+  // Parse mutation - handles both text and image input
   const parseMutation = useMutation({
     mutationFn: async (): Promise<ParsedExpense | null> => {
       try {
@@ -47,13 +58,16 @@ export function SmartInput() {
             return null;
           }
         } catch {
-          // Not a redirect error — re-throw
+          // Not a redirect error - re-throw
         }
         throw err;
       }
     },
     onSuccess: (data) => {
-      if (data) setPreview(data);
+      if (data) {
+        setPreview(data);
+        setEditedData({ ...data });
+      }
     },
     onError: (err) => {
       // Show actual error message for debugging
@@ -63,7 +77,7 @@ export function SmartInput() {
     },
   });
 
-  // Save mutation (unchanged — still uses Next.js API route)
+  // Save mutation (unchanged - still uses Next.js API route)
   const saveMutation = useMutation({
     mutationFn: async (data: ParsedExpense) => {
       const res = await fetch("/api/transactions", {
@@ -78,6 +92,7 @@ export function SmartInput() {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       setText("");
       setPreview(null);
+      setEditedData(null);
       // Clear image state
       if (imageUrlRef.current) {
         URL.revokeObjectURL(imageUrlRef.current);
@@ -144,14 +159,22 @@ export function SmartInput() {
   };
 
   const handleApprove = () => {
-    if (preview) {
-      saveMutation.mutate(preview);
+    if (editedData) {
+      saveMutation.mutate(editedData);
     }
   };
 
   const handleReject = () => {
     setPreview(null);
+    setEditedData(null);
     inputRef.current?.focus();
+  };
+
+  const updateField = <K extends keyof ParsedExpense>(
+    field: K,
+    value: ParsedExpense[K],
+  ) => {
+    setEditedData((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
   const handleCameraClick = () => {
@@ -180,7 +203,7 @@ export function SmartInput() {
     inputRef.current?.focus();
   };
 
-  // Paste handler — extract image from clipboard
+  // Paste handler - extract image from clipboard
   const handlePaste = useCallback(
     (e: React.ClipboardEvent) => {
       const items = e.clipboardData?.items;
@@ -242,7 +265,7 @@ export function SmartInput() {
             isFocused ? "border-primary" : "border-border"
           }`}
         >
-          {/* Camera / Upload buttons — hidden when image is attached */}
+          {/* Camera / Upload buttons - hidden when image is attached */}
           {!hasImage && (
             <>
               <button
@@ -275,7 +298,7 @@ export function SmartInput() {
             </>
           )}
 
-          {/* Inline image attached indicator — fills input width, replaces camera + upload */}
+          {/* Inline image attached indicator - fills input width, replaces camera + upload */}
           {hasImage && (
             <div className="flex flex-1 items-center gap-2 rounded-[3px] border border-primary/30 bg-primary/5 px-3 py-2.5">
               <ImageIcon className="h-4 w-4 shrink-0 text-primary" />
@@ -293,7 +316,7 @@ export function SmartInput() {
             </div>
           )}
 
-          {/* Hidden file inputs — one for camera, one for upload */}
+          {/* Hidden file inputs - one for camera, one for upload */}
           <input
             ref={cameraInputRef}
             type="file"
@@ -314,7 +337,7 @@ export function SmartInput() {
             tabIndex={-1}
           />
 
-          {/* Text input — hidden when image is attached */}
+          {/* Text input - hidden when image is attached */}
           {!hasImage && (
             <input
               ref={inputRef}
@@ -355,8 +378,8 @@ export function SmartInput() {
         </p>
       )}
 
-      {/* Preview popup — identical for both text and image parsing results */}
-      {preview && (
+      {/* Preview popup - identical for both text and image parsing results */}
+      {preview && editedData && (
         <div className="absolute left-0 right-0 top-full z-50 mt-2 animate-in">
           <div className="rounded-[4px] border border-border bg-card p-6">
             <p className="mb-3 font-mono text-[0.7rem] uppercase tracking-[0.15em] text-foreground">
@@ -364,40 +387,118 @@ export function SmartInput() {
             </p>
 
             <div className="space-y-3 rounded-[3px] border border-border bg-background p-4">
+              {/* Row 1: Type toggle */}
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
-                  {t(preview.type === "expense" ? "expense" : "income")}
+                  {t("type")}
                 </span>
-                <span
-                  className={`font-mono text-lg font-medium ${
-                    preview.type === "expense"
+                <div className="flex gap-1 rounded-[3px] border border-border p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => updateField("type", "expense")}
+                    className={`rounded-[2px] px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer ${
+                      editedData.type === "expense"
+                        ? "bg-destructive/15 text-destructive"
+                        : "text-muted hover:text-foreground"
+                    }`}
+                  >
+                    {t("expense")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateField("type", "income")}
+                    className={`rounded-[2px] px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer ${
+                      editedData.type === "income"
+                        ? "bg-success/15 text-success"
+                        : "text-muted hover:text-foreground"
+                    }`}
+                  >
+                    {t("income")}
+                  </button>
+                </div>
+              </div>
+
+              {/* Row 2: Amount */}
+              <div className="flex items-center justify-between text-sm">
+                <label
+                  htmlFor="edit-amount"
+                  className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
+                >
+                  {t("amount")}
+                </label>
+                <input
+                  id="edit-amount"
+                  type="number"
+                  min={0}
+                  step="any"
+                  value={editedData.amount}
+                  onChange={(e) =>
+                    updateField("amount", parseFloat(e.target.value) || 0)
+                  }
+                  className={`w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm focus:border-primary focus:outline-none ${
+                    editedData.type === "expense"
                       ? "text-destructive"
                       : "text-success"
                   }`}
+                />
+              </div>
+
+              {/* Row 3: Category */}
+              <div className="flex items-center justify-between text-sm">
+                <label
+                  htmlFor="edit-category"
+                  className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
                 >
-                  {preview.type === "expense" ? "-" : "+"}
-                  {formatCurrency(preview.amount, currency)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
                   {t("category")}
-                </span>
-                <span className="text-foreground">{preview.category}</span>
+                </label>
+                <select
+                  id="edit-category"
+                  value={editedData.category}
+                  onChange={(e) => updateField("category", e.target.value)}
+                  className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
+                >
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
               </div>
+
+              {/* Row 4: Description */}
               <div className="flex items-center justify-between text-sm">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
-                  Mô tả
-                </span>
-                <span className="text-foreground">{preview.description}</span>
+                <label
+                  htmlFor="edit-description"
+                  className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
+                >
+                  {t("description")}
+                </label>
+                <input
+                  id="edit-description"
+                  type="text"
+                  value={editedData.description}
+                  onChange={(e) => updateField("description", e.target.value)}
+                  className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
+                />
               </div>
+
+              {/* Row 5: Date */}
               <div className="flex items-center justify-between text-sm">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
-                  Ngày
-                </span>
-                <span className="font-mono text-[0.8rem] text-foreground">
-                  {preview.transactionDate}
-                </span>
+                <label
+                  htmlFor="edit-date"
+                  className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
+                >
+                  {t("date")}
+                </label>
+                <input
+                  id="edit-date"
+                  type="date"
+                  value={editedData.transactionDate}
+                  onChange={(e) =>
+                    updateField("transactionDate", e.target.value)
+                  }
+                  className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
+                />
               </div>
             </div>
 
