@@ -1,77 +1,43 @@
 import NextAuth from "next-auth";
+import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import md5 from "blueimp-md5";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 
+const DEMO_USER_ID = "demo-user";
 const DEMO_EMAIL = "demo@pocketbuddy.app";
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+interface GitHubProfile {
+  id: number;
+  login: string;
+  name?: string | null;
+  email?: string | null;
+  avatar_url?: string | null;
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   providers: [
-    // Demo provider - no auth, just bypass
+    // Demo provider - no auth, uses in-memory mockStore for data.
     Credentials({
       id: "demo",
       name: "demo",
       credentials: {},
       authorize: async () => {
         return {
-          id: "demo-user",
+          id: DEMO_USER_ID,
           email: DEMO_EMAIL,
           name: "Demo User",
           image: `https://www.gravatar.com/avatar/${md5(DEMO_EMAIL.trim().toLowerCase())}?d=identicon`,
         };
       },
     }),
-    // Regular credentials login
-    Credentials({
-      id: "credentials",
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      authorize: async (credentials) => {
-        const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
-
-        const { email, password } = parsed.data;
-
-        try {
-          const user = await db
-            .select()
-            .from(users)
-            .where(eq(users.email, email))
-            .limit(1);
-
-          if (user.length === 0) return null;
-
-          // Check if user has password hash stored
-          const dbUser = user[0];
-          if (!dbUser.passwordHash) return null;
-
-          const valid = await bcrypt.compare(password, dbUser.passwordHash);
-          if (!valid) return null;
-
-          return {
-            id: dbUser.id,
-            email: dbUser.email,
-            name: dbUser.name,
-            image: dbUser.image,
-          };
-        } catch (error) {
-          console.error("[auth] Login error:", error);
-          return null;
-        }
-      },
+    // GitHub OAuth - real users are persisted to the database and unique by GitHub username.
+    GitHub({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
     }),
   ],
   pages: {
@@ -89,6 +55,55 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   callbacks: {
+    signIn: async ({ account, profile }) => {
+      if (account?.provider === "demo") return true;
+
+      if (account?.provider === "github" && profile) {
+        const githubProfile = profile as unknown as GitHubProfile;
+        const githubId = String(githubProfile.id);
+        const githubUsername = githubProfile.login;
+
+        if (!githubUsername) {
+          console.error("[auth] GitHub profile missing login username");
+          return false;
+        }
+
+        try {
+          const existing = await db
+            .select()
+            .from(users)
+            .where(eq(users.githubUsername, githubUsername))
+            .limit(1);
+
+          if (existing.length > 0) {
+            await db
+              .update(users)
+              .set({
+                name: githubProfile.name ?? existing[0].name,
+                email: githubProfile.email ?? existing[0].email,
+                image: githubProfile.avatar_url ?? existing[0].image,
+                updatedAt: new Date(),
+              })
+              .where(eq(users.id, existing[0].id));
+          } else {
+            await db.insert(users).values({
+              id: githubId,
+              name: githubProfile.name,
+              email: githubProfile.email,
+              githubUsername,
+              image: githubProfile.avatar_url,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+          }
+        } catch (error) {
+          console.error("[auth] Failed to sync GitHub user:", error);
+          return false;
+        }
+      }
+
+      return true;
+    },
     jwt: async ({ token, user }) => {
       if (user?.id) token.sub = user.id;
       return token;

@@ -1,21 +1,27 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { mockStore } from "@/lib/mock-db";
+import { createTransaction, getTransactions } from "@/lib/transactions-store";
 import { transactionSchema } from "@/lib/validations/transactions";
 
 export async function GET() {
   const session = await auth();
-  const userId = session?.user?.id ?? "user_demo";
-  return NextResponse.json(
-    mockStore.transactions.filter(
-      (transaction) => transaction.userId === userId,
-    ),
-  );
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const data = await getTransactions(userId);
+  return NextResponse.json(data);
 }
 
 export async function POST(request: Request) {
   const session = await auth();
-  const userId = session?.user?.id ?? "user_demo";
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const payload = await request.json();
   const parsed = transactionSchema.safeParse(payload);
@@ -26,14 +32,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const transaction = {
-    id: crypto.randomUUID(),
-    userId,
-    ...parsed.data,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  mockStore.transactions.unshift(transaction);
+  const transaction = await createTransaction(userId, parsed.data);
   return NextResponse.json(transaction, { status: 201 });
 }
