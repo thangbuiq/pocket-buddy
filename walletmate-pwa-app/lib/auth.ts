@@ -17,8 +17,10 @@ interface GitHubProfile {
   avatar_url?: string | null;
 }
 
+const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: THIRTY_DAYS_IN_SECONDS },
   providers: [
     // Demo provider - no auth, uses in-memory mockStore for data.
     Credentials({
@@ -67,7 +69,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           console.error("[auth] GitHub profile missing login username");
           return false;
         }
-
+  
         try {
           const existing = await db
             .select()
@@ -104,13 +106,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return true;
     },
-    jwt: async ({ token, user }) => {
+    jwt: async ({ token, user, profile, trigger }) => {
       if (user?.id) token.sub = user.id;
+
+      if (trigger === "signIn" && profile && "login" in profile) {
+        const githubProfile = profile as unknown as GitHubProfile;
+        token.githubUsername = githubProfile.login;
+      }
+
+      // Fallback: if token is missing githubUsername but user id matches a DB user,
+      // hydrate it from the database. This keeps existing sessions working after
+      // this feature is deployed.
+      if (!token.githubUsername && token.sub && token.sub !== DEMO_USER_ID) {
+        try {
+          const rows = await db
+            .select({ githubUsername: users.githubUsername })
+            .from(users)
+            .where(eq(users.id, token.sub))
+            .limit(1);
+          if (rows.length > 0) {
+            token.githubUsername = rows[0].githubUsername;
+          }
+        } catch (error) {
+          console.error("[auth] Failed to hydrate githubUsername:", error);
+        }
+      }
+
       return token;
     },
     session: async ({ session, token }) => {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+        session.user.githubUsername =
+          (token.githubUsername as string | null | undefined) ?? null;
       }
       return session;
     },

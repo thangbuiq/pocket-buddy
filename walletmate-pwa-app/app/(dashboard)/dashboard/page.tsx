@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { TransactionCard } from "@/components/shared/TransactionCard";
 import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";
 import { CategoryBreakdown } from "@/components/charts/CategoryBreakdown";
@@ -11,7 +12,12 @@ import { formatCurrency } from "@/lib/utils";
 export default function DashboardPage() {
   const { t } = useI18n();
   const { currency } = useCurrency();
+  const { data: session } = useSession();
   const { data: transactions = [] } = useTransactions();
+
+  const walletLabel = session?.user?.githubUsername
+    ? `Ví của "${session.user.githubUsername}"`
+    : t("dashboard");
 
   const recentTransactions = transactions.slice(0, 5);
   const expenses = transactions.filter((item) => item.type === "expense");
@@ -55,7 +61,7 @@ export default function DashboardPage() {
       <div>
         <span className="eyebrow mb-3 block">Dashboard</span>
         <h1 className="font-serif text-[2.5rem] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
-          {t("dashboard")}
+          {walletLabel}
         </h1>
       </div>
 
