@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  Sparkles,
+  Camera,
+  Lightbulb,
+  RefreshCw,
+} from "lucide-react";
 import Scene3D from "@/components/scene-3d";
 import { SmoothScrollProvider } from "@/components/smooth-scroll-provider";
 import { AnimatedContainer } from "@/components/ui/animated-container";
@@ -91,13 +98,15 @@ function LandingContent() {
                 duration={0.5}
               >
                 <div className="border-t border-border pt-6">
-                  <h3 className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                  <h3 className="flex items-center gap-2 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                    <Sparkles className="h-4 w-4 text-primary" />
                     AI-Powered Parsing
                   </h3>
                   <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
                     Type naturally in Vietnamese or English. Our AI understands
-                    slang like &quot;1 củ&quot;, &quot;50k&quot;, and grabs the
-                    amount, category, and date.
+                    whatever money slang you use:{" "}
+                    <em>&quot;nay đi ăn buffet 5 xị&quot;</em> and automatically
+                    categorizes it.
                   </p>
                 </div>
               </AnimatedContainer>
@@ -108,7 +117,8 @@ function LandingContent() {
                 duration={0.5}
               >
                 <div className="border-t border-border pt-6">
-                  <h3 className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                  <h3 className="flex items-center gap-2 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                    <Camera className="h-4 w-4 text-primary" />
                     Receipt Snapshot
                   </h3>
                   <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
@@ -125,7 +135,8 @@ function LandingContent() {
                 duration={0.5}
               >
                 <div className="border-t border-border pt-6">
-                  <h3 className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                  <h3 className="flex items-center gap-2 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                    <Lightbulb className="h-4 w-4 text-primary" />
                     Smart Insights
                   </h3>
                   <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
@@ -141,7 +152,8 @@ function LandingContent() {
                 duration={0.5}
               >
                 <div className="border-t border-border pt-6">
-                  <h3 className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                  <h3 className="flex items-center gap-2 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                    <RefreshCw className="h-4 w-4 text-primary" />
                     Always in Sync
                   </h3>
                   <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">

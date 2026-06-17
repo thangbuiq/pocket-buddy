@@ -7,31 +7,30 @@ import type { SpendingStreak } from "@/types";
 export function SpendingStreakCard({ streak }: { streak: SpendingStreak }) {
   const { t } = useI18n();
 
-  return (
-    <article className="card-shadow rounded-[4px] border border-border bg-card p-5 transition-colors hover:border-muted">
-      <div className="mb-3 flex items-center gap-2">
-        <Flame className="h-4 w-4 text-primary" />
-        <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted">
-          {t("streakTitle")}
-        </p>
-      </div>
+  if (streak.currentStreak === 0 && streak.longestStreak === 0) {
+    return null;
+  }
 
+  return (
+    <div className="flex items-center gap-2 px-1 py-2">
+      <Flame className="h-3.5 w-3.5 text-primary shrink-0" />
       {streak.currentStreak > 0 ? (
-        <>
-          <p className="font-serif text-[1.75rem] leading-none text-foreground">
+        <p className="font-sans text-xs text-muted leading-relaxed">
+          <span className="text-foreground font-medium tabular-nums">
             {streak.currentStreak}
-            <span className="ml-1 font-sans text-sm text-muted">
-              {t("streakCurrent")}
-            </span>
-          </p>
-          <p className="mt-3 font-sans text-sm text-foreground">
-            {t("streakCurrent")}: {streak.currentStreak} · {t("streakLongest")}:{" "}
+          </span>{" "}
+          {t("streakCurrent").toLowerCase()}
+          <span className="mx-1.5 text-border">·</span>
+          {t("streakLongest").toLowerCase()}{" "}
+          <span className="text-foreground font-medium tabular-nums">
             {streak.longestStreak}
-          </p>
-        </>
+          </span>
+        </p>
       ) : (
-        <p className="font-sans text-sm text-muted">{t("streakEmpty")}</p>
+        <p className="font-sans text-xs text-muted leading-relaxed italic">
+          {t("streakEmpty")}
+        </p>
       )}
-    </article>
+    </div>
   );
 }

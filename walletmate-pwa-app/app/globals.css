@@ -74,50 +74,50 @@
 }
 
 .light {
-  /* Claude-inspired warm palette */
+  /* Clean Blue / White palette */
 
   /* Base */
-  --background: #f4f3ee; /* Pampas - warm off-white */
-  --foreground: #2d2b26; /* warm charcoal */
+  --background: #f7f8fc; /* cool off-white */
+  --foreground: #1a1d2e; /* deep navy charcoal */
   --card: #ffffff;
-  --muted: #b1ada1; /* Cloudy */
-  --muted-background: #edebe5; /* slightly darker Pampas */
-  --border: #d9d6ce; /* warm light border */
+  --muted: #9ba3b5; /* cool slate grey */
+  --muted-background: #eef0f6; /* light blue-grey */
+  --border: #dde1ec; /* soft blue-grey border */
 
   /* Accent */
-  --primary: #d97757; /* Claude Orange */
+  --primary: #4f6df5; /* vibrant slate blue */
   --primary-foreground: #ffffff;
-  --accent: #c15f3c; /* deeper Claude Orange */
+  --accent: #3b56d4; /* deeper blue */
   --accent-foreground: #ffffff;
 
   /* Semantic */
-  --destructive: #c0403a; /* warm red */
-  --success: #5c8b62; /* sage green */
-  --warning: #d9a84e; /* warm amber */
+  --destructive: #e04848; /* clean red */
+  --success: #2da562; /* fresh green */
+  --warning: #e6a832; /* warm amber */
 
   /* Extended palette */
-  --text-dim: #8c887e; /* warm readable grey */
-  --accent-dim: #fdf0e8; /* pale orange tint */
+  --text-dim: #7c839a; /* readable blue-grey */
+  --accent-dim: #eef1ff; /* pale blue tint */
 
   /* Chart palette */
-  --chart-1: #d97757; /* Claude Orange */
-  --chart-2: #c15f3c; /* deeper orange */
-  --chart-3: #d9a84e; /* warm amber */
-  --chart-4: #c07a6b; /* rose terracotta */
-  --chart-5: #8c887e; /* warm grey */
-  --chart-6: #a8988c; /* warm taupe */
-  --chart-7: #7b9e82; /* sage green */
-  --chart-8: #b8a590; /* warm sand */
+  --chart-1: #4f6df5; /* slate blue */
+  --chart-2: #7c5cf2; /* soft violet */
+  --chart-3: #e6a832; /* amber */
+  --chart-4: #f06595; /* rose pink */
+  --chart-5: #2da562; /* green */
+  --chart-6: #36b5c4; /* teal */
+  --chart-7: #f5894f; /* soft orange */
+  --chart-8: #9ba3b5; /* cool grey */
 
   /* Surface shadow */
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
 
-  /* Glassmorphism - warm light */
-  --glass: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(0, 0, 0, 0.06);
-  --glass-border-hover: rgba(217, 119, 87, 0.25);
-  --glow: rgba(217, 119, 87, 0.25);
-  --glow-subtle: rgba(217, 119, 87, 0.08);
+  /* Glassmorphism - cool light */
+  --glass: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-border-hover: rgba(79, 109, 245, 0.25);
+  --glow: rgba(79, 109, 245, 0.2);
+  --glow-subtle: rgba(79, 109, 245, 0.08);
   --backdrop-blur: blur(20px) saturate(180%);
 }
 

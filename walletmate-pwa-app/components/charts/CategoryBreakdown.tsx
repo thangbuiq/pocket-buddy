@@ -33,14 +33,14 @@ export function CategoryBreakdown({
   const sorted = [...data].sort((a, b) => b.value - a.value);
 
   return (
-    <div className="h-72 rounded-[4px] border border-border bg-card p-5">
-      <div className="mb-4 flex items-baseline justify-between">
+    <div className="flex h-72 flex-col rounded-[4px] border border-border bg-card p-5">
+      <div className="mb-4 flex shrink-0 items-baseline justify-between">
         <h3 className="font-serif text-lg text-foreground">By Category</h3>
         <span className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted">
           {sorted.length} {sorted.length === 1 ? "category" : "categories"}
         </span>
       </div>
-      <div className="space-y-3 overflow-y-auto">
+      <div className="flex-1 space-y-3 overflow-y-auto pr-2">
         {sorted.map((item, i) => {
           const pct = total > 0 ? (item.value / total) * 100 : 0;
           const color = CATEGORY_COLORS[i % CATEGORY_COLORS.length];

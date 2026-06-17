@@ -106,6 +106,7 @@ export function AddTransactionSheet({
         clearTimeout(debounceRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     watchedDescription,
     watchedAmount,
@@ -113,8 +114,6 @@ export function AddTransactionSheet({
     watchedCategory,
     watchedType,
     language,
-    transactions,
-    suggestMutation,
   ]);
 
   const applySuggestion = () => {
@@ -142,7 +141,9 @@ export function AddTransactionSheet({
       <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
         New Transaction
       </span>
-      <h3 className="font-serif text-[1.25rem] text-foreground">Quick Add</h3>
+      <h3 className="font-serif text-[1.25rem] text-foreground">
+        Manual Input
+      </h3>
 
       <select
         {...register("type")}

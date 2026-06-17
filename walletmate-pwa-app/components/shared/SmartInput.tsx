@@ -2,15 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Check,
-  X,
-  Loader2,
-  Camera,
-  Upload,
-  ImageIcon,
-  Sparkles,
-} from "lucide-react";
+import { Check, X, Loader2, Camera, ImageIcon, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { formatNumberInput, parseNumberInput } from "@/lib/utils";
@@ -64,7 +56,6 @@ export function SmartInput() {
 
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const imageUrlRef = useRef<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -260,10 +251,6 @@ export function SmartInput() {
     setEditedData((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
-  const handleCameraClick = () => {
-    cameraInputRef.current?.click();
-  };
-
   const handleUploadClick = () => {
     uploadInputRef.current?.click();
   };
@@ -344,48 +331,32 @@ export function SmartInput() {
       {/* Input row */}
       <form onSubmit={handleSubmit}>
         <div
-          className={`flex items-center gap-2 rounded-[4px] border bg-card p-2 transition-colors ${
+          className={`flex items-center gap-2 overflow-hidden rounded-[4px] border bg-card p-2 transition-colors ${
             isFocused ? "border-primary" : "border-border"
           }`}
         >
-          {/* Camera / Upload buttons - hidden when image is attached */}
+          {/* Upload button (using Camera icon) - hidden when image is attached */}
           {!hasImage && (
-            <>
-              <button
-                type="button"
-                onClick={handleCameraClick}
-                disabled={isLoading}
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer disabled:opacity-50 ${
-                  isFocused
-                    ? "border-primary text-primary"
-                    : "border-border text-muted hover:border-primary hover:text-primary"
-                }`}
-                aria-label={t("cameraButtonAria")}
-              >
-                <Camera className="h-4 w-4" />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleUploadClick}
-                disabled={isLoading}
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer disabled:opacity-50 ${
-                  isFocused
-                    ? "border-primary text-primary"
-                    : "border-border text-muted hover:border-primary hover:text-primary"
-                }`}
-                aria-label={t("uploadButtonAria")}
-              >
-                <Upload className="h-4 w-4" />
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={handleUploadClick}
+              disabled={isLoading}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer disabled:opacity-50 ${
+                isFocused
+                  ? "border-primary text-primary"
+                  : "border-border text-muted hover:border-primary hover:text-primary"
+              }`}
+              aria-label={t("uploadButtonAria")}
+            >
+              <Camera className="h-4 w-4" />
+            </button>
           )}
 
           {/* Inline image attached indicator - fills input width, replaces camera + upload */}
           {hasImage && (
-            <div className="flex flex-1 items-center gap-2 rounded-[3px] border border-primary/30 bg-primary/5 px-3 py-2.5">
+            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[3px] border border-primary/30 bg-primary/5 px-3 py-2.5">
               <ImageIcon className="h-4 w-4 shrink-0 text-primary" />
-              <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-primary">
+              <span className="truncate font-mono text-[0.7rem] uppercase tracking-[0.1em] text-primary">
                 Image attached
               </span>
               <button
@@ -399,17 +370,7 @@ export function SmartInput() {
             </div>
           )}
 
-          {/* Hidden file inputs - one for camera, one for upload */}
-          <input
-            ref={cameraInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileSelect}
-            className="hidden"
-            aria-hidden="true"
-            tabIndex={-1}
-          />
+          {/* Hidden file input for upload */}
           <input
             ref={uploadInputRef}
             type="file"
@@ -433,7 +394,7 @@ export function SmartInput() {
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               placeholder={t("smartInputPlaceholder")}
-              className="flex-1 bg-transparent px-1 py-3 font-sans text-foreground placeholder:text-muted focus:outline-none"
+              className="min-w-0 flex-1 bg-transparent px-1 py-3 font-sans text-foreground placeholder:text-muted focus:outline-none"
               disabled={isLoading}
             />
           )}

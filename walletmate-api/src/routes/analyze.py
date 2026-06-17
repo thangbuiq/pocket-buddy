@@ -19,8 +19,9 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 ANALYZE_PROMPT = """\
-You are a proactive personal-finance assistant. Given a user's recent \
-transaction history, generate 3 to 5 concise, actionable insights.
+You are a proactive personal-finance coach focused on helping users SAVE MORE \
+MONEY. Given a user's recent transaction history, generate 3 to 5 concise, \
+actionable insights with a strong bias toward practical savings advice.
 
 Input language: {lang_hint}
 Today's date: {today}
@@ -32,7 +33,7 @@ Transaction history:
 INSIGHT TYPES (use exactly one per insight):
 - "trend": spending or income trend (e.g. "chi tiêu tăng 20% so với tháng trước")
 - "anomaly": unusual spike or drop in a category
-- "savings": concrete opportunity to save money
+- "savings": concrete opportunity to save money - THIS IS THE MOST IMPORTANT TYPE
 - "recurring": reminder about recurring expenses or subscriptions
 - "budget": observation about budget adherence
 
@@ -42,37 +43,50 @@ SEVERITY:
 - "success" for positive trends (savings increased, spending decreased)
 
 RULES:
-1. Generate 3 to 5 insights. Less is better than low-quality filler.
+1. Generate 3 to 5 insights. PRIORITIZE at least 1-2 "savings" type insights.
 2. Titles should be short (under 60 characters).
 3. Descriptions should be 1-2 sentences, specific, and in the input language.
 4. Only include insights backed by the provided data.
 5. If the history is empty or too sparse, return an empty insights array.
 6. category: the affected category name, if any.
-7. amount_impact: estimated monthly financial impact in the user's currency, \
-if quantifiable.
-8. Use the user's local currency format in all titles and descriptions. \
-For Vietnamese (vi) use VND/₫ (e.g., "1.000.000 ₫"), never $ or USD. \
+7. amount_impact: estimated monthly financial impact as a RAW NUMBER (e.g. \
+5000000, not "5.000.000 ₫"). No currency symbols, no formatting. Set to null \
+if not quantifiable.
+8. Use the user's local currency format in titles and descriptions. \
+For Vietnamese (vi) use VND/₫ (e.g., "500.000 ₫" for 500000), never $ or USD. \
 For English (en) use $.
+9. CRITICAL: The "amount" field in each transaction is a RAW NUMBER. \
+Do NOT multiply, inflate, or misread the amounts. \
+500000 means five hundred thousand (500k). \
+Use the exact numbers from the data in your calculations and descriptions.
+
+SAVINGS-FOCUSED GUIDANCE:
+- Look for categories where spending can be reduced (eating out, entertainment, \
+shopping sprees).
+- Identify subscriptions or recurring charges the user may have forgotten about.
+- Compare current month spending vs previous months and highlight if it's going up.
+- If there's a high-frequency small expense (daily coffee, snacks), calculate \
+the monthly total and suggest how much could be saved by cutting back even \
+partially (e.g. "Skipping coffee 2 days/week saves ~X/month").
+- If savings rate is below 20%, explicitly recommend a target.
+- Praise the user when spending decreases or savings improve (use "success" severity).
+- Be specific with numbers, not generic. "You spent 2.5M₫ on Food this month, \
+up 30% from last month" is better than "You spent a lot on food."
 
 Respond in JSON format."""
 
 
-def _format_amount(amount: float, language: str) -> str:
-    """Format amount for prompt display."""
-    if language == "vi":
-        return f"{amount:,.0f} VND".replace(",", ".")
-    return f"${amount:,.2f}"
-
-
 def _serialize_transaction(transaction: dict) -> dict:
-    """Normalize a transaction for the prompt."""
+    """Normalize a transaction for the prompt.
+
+    Amounts are sent as raw numbers so the LLM can do arithmetic
+    without misinterpreting locale-specific formatting (e.g. dots
+    as decimal separators vs thousands separators).
+    """
     return {
         "date": transaction.get("transactionDate"),
         "description": transaction.get("description"),
-        "amount": _format_amount(
-            float(transaction.get("amount", 0)),
-            transaction.get("language", "vi"),
-        ),
+        "amount": float(transaction.get("amount", 0)),
         "category": transaction.get("category"),
         "type": transaction.get("type"),
     }

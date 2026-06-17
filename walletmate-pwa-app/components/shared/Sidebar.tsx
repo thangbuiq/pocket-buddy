@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -16,7 +17,13 @@ const links = [
 export function Sidebar() {
   const pathname = usePathname();
   const { t, language, setLanguage } = useI18n();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <aside className="sticky top-0 hidden h-screen w-[220px] border-r border-border bg-card md:flex md:flex-col">
@@ -91,7 +98,7 @@ export function Sidebar() {
               onClick={() => setTheme("light")}
               className={cn(
                 "flex-1 flex items-center justify-center gap-1 rounded-[3px] px-2 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer",
-                theme === "light"
+                mounted && resolvedTheme === "light"
                   ? "bg-primary/15 text-primary"
                   : "text-text-dim hover:text-foreground",
               )}
@@ -103,7 +110,7 @@ export function Sidebar() {
               onClick={() => setTheme("dark")}
               className={cn(
                 "flex-1 flex items-center justify-center gap-1 rounded-[3px] px-2 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer",
-                theme === "dark"
+                mounted && resolvedTheme === "dark"
                   ? "bg-primary/15 text-primary"
                   : "text-text-dim hover:text-foreground",
               )}

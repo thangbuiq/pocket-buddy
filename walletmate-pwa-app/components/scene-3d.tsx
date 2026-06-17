@@ -2,12 +2,14 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import { useRef, useEffect } from "react";
 import * as THREE from "three";
 
 function SceneContent() {
   const wireframeRef = useRef<THREE.Mesh>(null);
   const { invalidate } = useThree();
+  const { resolvedTheme } = useTheme();
 
   useFrame((_, delta) => {
     if (wireframeRef.current) {
@@ -23,10 +25,10 @@ function SceneContent() {
       <mesh ref={wireframeRef} position={[0, 0, 0]}>
         <icosahedronGeometry args={[0.7, 1]} />
         <meshBasicMaterial
-          color="#ffffff"
+          color={resolvedTheme === "light" ? "#4f6df5" : "#ffffff"}
           wireframe
           transparent
-          opacity={0.06}
+          opacity={resolvedTheme === "light" ? 0.15 : 0.06}
         />
       </mesh>
     </>

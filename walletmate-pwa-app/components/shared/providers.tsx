@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 import { I18nProvider } from "@/lib/i18n";
+import { ConfirmDialogProvider } from "@/components/ui/confirm-dialog";
 
 function createQueryClient() {
   return new QueryClient({
@@ -28,7 +29,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <SessionProvider>
         <I18nProvider>
           <QueryClientProvider client={queryClient}>
-            {children}
+            <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
           </QueryClientProvider>
         </I18nProvider>
       </SessionProvider>

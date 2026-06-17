@@ -10,6 +10,7 @@ import {
 } from "@/hooks/use-transactions";
 import { useI18n } from "@/lib/i18n";
 import { Trash2 } from "lucide-react";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import type { Transaction } from "@/types";
 
 export default function TransactionsPage() {
@@ -18,9 +19,17 @@ export default function TransactionsPage() {
   const createTransaction = useCreateTransaction();
   const deleteTransaction = useDeleteTransaction();
   const updateTransaction = useUpdateTransaction();
+  const { confirm } = useConfirm();
 
-  const handleCancelRecurring = (transaction: Transaction) => {
-    if (!confirm(t("recurringCancel"))) return;
+  const handleCancelRecurring = async (transaction: Transaction) => {
+    if (
+      !(await confirm({
+        title: "Cancel Recurring",
+        description: t("recurringCancel") as string,
+        confirmText: "Stop Recurring",
+      }))
+    )
+      return;
 
     updateTransaction.mutate({
       id: transaction.id,
@@ -65,11 +74,16 @@ export default function TransactionsPage() {
               />
               <button
                 onClick={async () => {
-                  if (confirm(t("deleteConfirm"))) {
+                  if (
+                    await confirm({
+                      title: "Delete Transaction",
+                      description: t("deleteConfirm") as string,
+                    })
+                  ) {
                     deleteTransaction.mutate(transaction.id);
                   }
                 }}
-                className="absolute right-2 top-2 rounded p-2 text-muted opacity-0 transition hover:bg-destructive/20 hover:text-destructive group-hover:opacity-100 cursor-pointer"
+                className="absolute right-2 bottom-2 rounded p-2 text-muted transition hover:bg-destructive/20 hover:text-destructive cursor-pointer opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 aria-label="Delete transaction"
               >
                 <Trash2 className="h-4 w-4" />
