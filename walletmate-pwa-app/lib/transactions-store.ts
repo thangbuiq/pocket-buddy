@@ -35,6 +35,7 @@ function mapDbTransaction(row: typeof transactions.$inferSelect): Transaction {
     transactionDate: row.transactionDate,
     recurring: row.recurring ?? false,
     recurringFreq: (row.recurringFreq as RecurringFrequency) ?? undefined,
+    recurringEndDate: row.recurringEndDate ?? undefined,
     syncStatus: (row.syncStatus as SyncStatus) ?? "synced",
     createdAt: row.createdAt?.toISOString() ?? new Date().toISOString(),
     updatedAt: row.updatedAt?.toISOString() ?? new Date().toISOString(),
@@ -78,6 +79,7 @@ export async function createTransaction(
       transactionDate: input.transactionDate,
       recurring: input.recurring ?? false,
       recurringFreq: input.recurringFreq,
+      recurringEndDate: input.recurringEndDate,
       syncStatus: input.syncStatus ?? "synced",
       createdAt: now,
       updatedAt: now,
@@ -97,6 +99,7 @@ export async function createTransaction(
       transactionDate: input.transactionDate,
       recurring: input.recurring,
       recurringFreq: input.recurringFreq,
+      recurringEndDate: input.recurringEndDate,
       syncStatus: input.syncStatus,
     })
     .returning();
@@ -133,6 +136,7 @@ export async function updateTransaction(
       transactionDate: input.transactionDate,
       recurring: input.recurring,
       recurringFreq: input.recurringFreq,
+      recurringEndDate: input.recurringEndDate,
       syncStatus: input.syncStatus,
       updatedAt: new Date(),
     })

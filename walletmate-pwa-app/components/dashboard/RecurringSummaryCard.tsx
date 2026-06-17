@@ -3,7 +3,10 @@
 import { Repeat } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
-import { getMonthlyRecurringTotal } from "@/lib/transaction-helpers";
+import {
+  getMonthlyRecurringTotal,
+  isActiveRecurring,
+} from "@/lib/transaction-helpers";
 import type { Transaction } from "@/types";
 
 export function RecurringSummaryCard({
@@ -15,6 +18,7 @@ export function RecurringSummaryCard({
 }) {
   const { t } = useI18n();
   const total = getMonthlyRecurringTotal(transactions);
+  const activeCount = transactions.filter(isActiveRecurring).length;
 
   return (
     <article className="card-shadow rounded-[4px] border border-border bg-card p-5 transition-colors hover:border-muted">
@@ -28,8 +32,7 @@ export function RecurringSummaryCard({
         {formatCurrency(total, currency)}
       </p>
       <p className="mt-2 font-sans text-xs text-muted">
-        {transactions.filter((t) => t.recurring).length}{" "}
-        {t("recurringTransactions")}
+        {activeCount} {t("recurringTransactions")}
       </p>
     </article>
   );

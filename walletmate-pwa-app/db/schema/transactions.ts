@@ -18,6 +18,7 @@ export const transactions = pgTable("transactions", {
   transactionDate: date("transaction_date").notNull(),
   recurring: boolean("recurring").default(false),
   recurringFreq: text("recurring_freq"),
+  recurringEndDate: date("recurring_end_date"),
   syncStatus: text("sync_status").default("synced"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),

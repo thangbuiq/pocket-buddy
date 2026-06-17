@@ -8,6 +8,7 @@ export const transactionSchema = z.object({
   transactionDate: z.string().date(),
   recurring: z.boolean().default(false),
   recurringFreq: z.enum(["daily", "weekly", "monthly", "yearly"]).optional(),
+  recurringEndDate: z.string().date().optional(),
   syncStatus: z.enum(["synced", "pending"]).default("synced"),
 });
 

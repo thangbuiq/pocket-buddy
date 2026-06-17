@@ -92,7 +92,7 @@ export default function DashboardPage() {
       {/* Summary Stats */}
       <section>
         <span className="eyebrow mb-6 block">03 - Overview</span>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {[
             {
               label: t("totalIncome"),

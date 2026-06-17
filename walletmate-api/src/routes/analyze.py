@@ -50,6 +50,9 @@ RULES:
 6. category: the affected category name, if any.
 7. amount_impact: estimated monthly financial impact in the user's currency, \
 if quantifiable.
+8. Use the user's local currency format in all titles and descriptions. \
+For Vietnamese (vi) use VND/₫ (e.g., "1.000.000 ₫"), never $ or USD. \
+For English (en) use $.
 
 Respond in JSON format."""
 
@@ -113,6 +116,14 @@ def analyze(body: AnalyzeRequest) -> AnalyzeResponse | JSONResponse:
             history_json=history_json,
         )
         result = structured_llm.invoke(prompt)
+
+        # Guard against LLMs that fall back to $ even when the input is VND.
+        if body.language == "vi" and hasattr(result, "insights"):
+            for insight in result.insights:
+                if hasattr(insight, "title"):
+                    insight.title = insight.title.replace("$", "₫")
+                if hasattr(insight, "description"):
+                    insight.description = insight.description.replace("$", "₫")
 
         return cast(AnalyzeResponse, result)
 

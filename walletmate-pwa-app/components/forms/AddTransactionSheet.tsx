@@ -48,6 +48,7 @@ export function AddTransactionSheet({
         amount: 0,
         transactionDate: new Date().toISOString().slice(0, 10),
         recurring: false,
+        recurringFreq: "monthly",
         syncStatus: "synced",
       },
     });
@@ -239,18 +240,29 @@ export function AddTransactionSheet({
       </label>
 
       {watchedRecurring && (
-        <select
-          {...register("recurringFreq")}
-          className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
-        >
-          {RECURRING_FREQUENCIES.map((freq) => (
-            <option key={freq} value={freq}>
-              {t(
-                `recurring${freq.charAt(0).toUpperCase() + freq.slice(1)}` as TranslationKey,
-              )}
-            </option>
-          ))}
-        </select>
+        <>
+          <select
+            {...register("recurringFreq")}
+            className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
+          >
+            {RECURRING_FREQUENCIES.map((freq) => (
+              <option key={freq} value={freq}>
+                {t(
+                  `recurring${freq.charAt(0).toUpperCase() + freq.slice(1)}` as TranslationKey,
+                )}
+              </option>
+            ))}
+          </select>
+
+          <label className="block font-sans text-xs text-muted">
+            {t("recurringEndDate")}
+            <input
+              {...register("recurringEndDate")}
+              type="date"
+              className="mt-1.5 min-h-11 w-full rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
+            />
+          </label>
+        </>
       )}
 
       <button

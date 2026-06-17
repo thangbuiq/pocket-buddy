@@ -658,6 +658,30 @@ export function SmartInput() {
                   </select>
                 </div>
               )}
+
+              {/* Row 8: Recurring end date */}
+              {editedData.recurring && (
+                <div className="flex items-center justify-between text-sm">
+                  <label
+                    htmlFor="edit-recurring-end"
+                    className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
+                  >
+                    {t("recurringEndDate")}
+                  </label>
+                  <input
+                    id="edit-recurring-end"
+                    type="date"
+                    value={editedData.recurringEndDate ?? ""}
+                    onChange={(e) =>
+                      updateField(
+                        "recurringEndDate",
+                        e.target.value || undefined,
+                      )
+                    }
+                    className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="mt-4 flex gap-2">

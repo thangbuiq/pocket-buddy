@@ -96,9 +96,20 @@ const FREQUENCY_MULTIPLIER: Record<RecurringFrequency, number> = {
   yearly: 1 / 12,
 };
 
+export function isActiveRecurring(transaction: Transaction): boolean {
+  if (!transaction.recurring || !transaction.recurringFreq) return false;
+  if (transaction.type !== "expense") return false;
+  if (!transaction.recurringEndDate) return true;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = parseLocalDate(transaction.recurringEndDate);
+  return end.getTime() >= today.getTime();
+}
+
 export function getMonthlyRecurringTotal(transactions: Transaction[]): number {
   return transactions.reduce((sum, t) => {
-    if (!t.recurring || !t.recurringFreq) return sum;
+    if (!isActiveRecurring(t) || !t.recurringFreq) return sum;
     return sum + t.amount * FREQUENCY_MULTIPLIER[t.recurringFreq];
   }, 0);
 }

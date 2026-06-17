@@ -12,6 +12,7 @@ export interface Transaction {
   transactionDate: string;
   recurring: boolean;
   recurringFreq?: RecurringFrequency;
+  recurringEndDate?: string;
   syncStatus: SyncStatus;
   createdAt: string;
   updatedAt: string;

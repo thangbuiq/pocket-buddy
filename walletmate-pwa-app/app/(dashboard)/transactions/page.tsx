@@ -6,15 +6,35 @@ import {
   useCreateTransaction,
   useTransactions,
   useDeleteTransaction,
+  useUpdateTransaction,
 } from "@/hooks/use-transactions";
 import { useI18n } from "@/lib/i18n";
 import { Trash2 } from "lucide-react";
+import type { Transaction } from "@/types";
 
 export default function TransactionsPage() {
   const { t } = useI18n();
   const { data = [], isLoading } = useTransactions();
   const createTransaction = useCreateTransaction();
   const deleteTransaction = useDeleteTransaction();
+  const updateTransaction = useUpdateTransaction();
+
+  const handleCancelRecurring = (transaction: Transaction) => {
+    if (!confirm(t("recurringCancel"))) return;
+
+    updateTransaction.mutate({
+      id: transaction.id,
+      payload: {
+        type: transaction.type,
+        amount: transaction.amount,
+        category: transaction.category,
+        description: transaction.description,
+        transactionDate: transaction.transactionDate,
+        recurring: false,
+        syncStatus: transaction.syncStatus,
+      },
+    });
+  };
 
   return (
     <div className="space-y-8 animate-in">
@@ -39,7 +59,10 @@ export default function TransactionsPage() {
         <div className="space-y-3">
           {data.map((transaction) => (
             <div key={transaction.id} className="relative group">
-              <TransactionCard transaction={transaction} />
+              <TransactionCard
+                transaction={transaction}
+                onCancelRecurring={handleCancelRecurring}
+              />
               <button
                 onClick={async () => {
                   if (confirm(t("deleteConfirm"))) {
