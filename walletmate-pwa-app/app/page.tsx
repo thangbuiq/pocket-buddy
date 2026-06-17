@@ -22,7 +22,7 @@ function LandingContent() {
     <>
       <Scene3D />
 
-      {/* Fixed top bar — logo center, theme toggle */}
+      {/* Fixed top bar - logo center, theme toggle */}
       <header className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4">
         <div /> {/* spacer */}
         <span className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-text-dim/70">
@@ -78,7 +78,7 @@ function LandingContent() {
 
           <div className="mx-auto w-full max-w-[680px]">
             <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
-              02 — Features
+              02 - Features
             </span>
             <h2 className="mt-4 font-serif text-[clamp(1.75rem,3vw,2.5rem)] font-normal leading-[1.2] tracking-[-0.01em] text-foreground">
               Built for clarity.
@@ -96,7 +96,7 @@ function LandingContent() {
                   </h3>
                   <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
                     Paste a receipt or type a transaction. Our AI extracts the
-                    details instantly — amount, category, merchant.
+                    details instantly - amount, category, merchant.
                   </p>
                 </div>
               </AnimatedContainer>
@@ -128,7 +128,7 @@ function LandingContent() {
                   </h3>
                   <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
                     Practical recommendations based on your real spending
-                    patterns — not generic financial advice.
+                    patterns - not generic financial advice.
                   </p>
                 </div>
               </AnimatedContainer>
@@ -145,7 +145,7 @@ function LandingContent() {
             className="mx-auto w-full max-w-[560px] text-center"
           >
             <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
-              03 — Start
+              03 - Start
             </span>
             <h2 className="mt-8 font-serif text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
               Take control of your spending.

@@ -36,7 +36,7 @@ types/               # TypeScript types
 
 ## Key Files
 
-- `components/shared/SmartInput.tsx` — AI text/image input
-- `lib/api.ts` — Python backend API client
-- `lib/i18n/translations.ts` — Vietnamese/English strings
-- `app/(dashboard)/dashboard/page.tsx` — Main dashboard
+- `components/shared/SmartInput.tsx` - AI text/image input
+- `lib/api.ts` - Python backend API client
+- `lib/i18n/translations.ts` - Vietnamese/English strings
+- `app/(dashboard)/dashboard/page.tsx` - Main dashboard

@@ -61,13 +61,13 @@ export default function DashboardPage() {
 
       {/* Smart Input - Primary feature */}
       <section>
-        <span className="eyebrow mb-4 block">01 — Input</span>
+        <span className="eyebrow mb-4 block">01 - Input</span>
         <SmartInput />
       </section>
 
       {/* Summary Stats */}
       <section>
-        <span className="eyebrow mb-6 block">02 — Overview</span>
+        <span className="eyebrow mb-6 block">02 - Overview</span>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
@@ -101,7 +101,7 @@ export default function DashboardPage() {
 
       {/* Charts */}
       <section>
-        <span className="eyebrow mb-6 block">03 — Analytics</span>
+        <span className="eyebrow mb-6 block">03 - Analytics</span>
         <div className="grid gap-6 lg:grid-cols-2">
           <CategoryBreakdown data={categoryData} currency={currency} />
           <MonthlyTrendChart data={monthlyData} />
@@ -110,7 +110,7 @@ export default function DashboardPage() {
 
       {/* Recent Transactions */}
       <section>
-        <span className="eyebrow mb-6 block">04 — Recent</span>
+        <span className="eyebrow mb-6 block">04 - Recent</span>
         <div className="card-shadow space-y-4 rounded-[4px] border border-border bg-card p-6">
           <h2 className="font-serif text-[1.5rem] text-foreground">
             {t("recentTransactions")}
