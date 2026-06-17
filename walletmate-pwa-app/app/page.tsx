@@ -95,8 +95,9 @@ function LandingContent() {
                     AI-Powered Parsing
                   </h3>
                   <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
-                    Paste a receipt or type a transaction. Our AI extracts the
-                    details instantly - amount, category, merchant.
+                    Type naturally in Vietnamese or English. Our AI understands
+                    slang like &quot;1 củ&quot;, &quot;50k&quot;, and grabs the
+                    amount, category, and date.
                   </p>
                 </div>
               </AnimatedContainer>
@@ -108,11 +109,44 @@ function LandingContent() {
               >
                 <div className="border-t border-border pt-6">
                   <h3 className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                    Receipt Snapshot
+                  </h3>
+                  <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
+                    Snap a photo of any receipt or bill. The vision model reads
+                    the total, merchant, and items, then saves a
+                    ready-to-approve transaction.
+                  </p>
+                </div>
+              </AnimatedContainer>
+
+              <AnimatedContainer
+                animation="blur-reveal"
+                delay={0.24}
+                duration={0.5}
+              >
+                <div className="border-t border-border pt-6">
+                  <h3 className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
                     Smart Insights
                   </h3>
                   <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
                     Practical recommendations based on your real spending
                     patterns - not generic financial advice.
+                  </p>
+                </div>
+              </AnimatedContainer>
+
+              <AnimatedContainer
+                animation="blur-reveal"
+                delay={0.36}
+                duration={0.5}
+              >
+                <div className="border-t border-border pt-6">
+                  <h3 className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
+                    Always in Sync
+                  </h3>
+                  <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
+                    Sign in once with GitHub and your wallet follows you across
+                    phone, laptop, and tablet. No manual exports or lost data.
                   </p>
                 </div>
               </AnimatedContainer>
