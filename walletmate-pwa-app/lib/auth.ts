@@ -69,7 +69,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           console.error("[auth] GitHub profile missing login username");
           return false;
         }
-  
+
         try {
           const existing = await db
             .select()

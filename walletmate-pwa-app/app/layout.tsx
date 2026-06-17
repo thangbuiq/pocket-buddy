@@ -28,6 +28,15 @@ export const metadata: Metadata = {
   title: "walletmate",
   description: "Your AI-powered personal finance companion",
   applicationName: "walletmate",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "walletmate",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
