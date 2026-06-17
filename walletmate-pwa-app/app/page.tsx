@@ -49,7 +49,7 @@ function LandingContent() {
               walletmate
             </span>
             <h1 className="blur-reveal stagger-2 mt-8 font-serif text-[clamp(2.5rem,5vw,4rem)] font-normal leading-[1.08] tracking-[-0.02em] text-foreground">
-              Smarter budgeting with AI insights and offline-ready expense
+              Smarter budgeting with AI insights and effortless expense
               tracking.
             </h1>
             <p className="blur-reveal stagger-3 mt-8 font-sans text-lg leading-relaxed text-text-dim max-w-[580px]">
@@ -104,22 +104,6 @@ function LandingContent() {
               <AnimatedContainer
                 animation="blur-reveal"
                 delay={0.12}
-                duration={0.5}
-              >
-                <div className="border-t border-border pt-6">
-                  <h3 className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-foreground">
-                    Offline-First
-                  </h3>
-                  <p className="mt-2 font-sans text-base leading-relaxed text-text-dim max-w-[480px]">
-                    Works without internet. Data syncs when you&apos;re back
-                    online. Your finances, always accessible.
-                  </p>
-                </div>
-              </AnimatedContainer>
-
-              <AnimatedContainer
-                animation="blur-reveal"
-                delay={0.24}
                 duration={0.5}
               >
                 <div className="border-t border-border pt-6">

@@ -106,30 +106,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return true;
     },
-    jwt: async ({ token, user, profile, trigger }) => {
-      if (user?.id) token.sub = user.id;
-
-      if (trigger === "signIn" && profile && "login" in profile) {
+    jwt: async ({ token, user, account, profile }) => {
+      if (account?.provider === "github" && profile && "login" in profile) {
         const githubProfile = profile as unknown as GitHubProfile;
+        // Use GitHub's numeric id as the canonical user id so transactions
+        // are always linked to the same DB user across logins/devices.
+        token.sub = String(githubProfile.id);
         token.githubUsername = githubProfile.login;
-      }
-
-      // Fallback: if token is missing githubUsername but user id matches a DB user,
-      // hydrate it from the database. This keeps existing sessions working after
-      // this feature is deployed.
-      if (!token.githubUsername && token.sub && token.sub !== DEMO_USER_ID) {
-        try {
-          const rows = await db
-            .select({ githubUsername: users.githubUsername })
-            .from(users)
-            .where(eq(users.id, token.sub))
-            .limit(1);
-          if (rows.length > 0) {
-            token.githubUsername = rows[0].githubUsername;
-          }
-        } catch (error) {
-          console.error("[auth] Failed to hydrate githubUsername:", error);
-        }
+      } else if (user?.id) {
+        token.sub = user.id;
       }
 
       return token;
