@@ -9,7 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import APP_TITLE
-from .routes import health_router, parse_image_router, parse_text_router
+from .routes import (
+    analyze_router,
+    health_router,
+    parse_image_router,
+    parse_text_router,
+    suggest_recurring_router,
+)
 
 load_dotenv()
 
@@ -34,6 +40,8 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(parse_text_router)
 app.include_router(parse_image_router)
+app.include_router(suggest_recurring_router)
+app.include_router(analyze_router)
 
 
 @app.exception_handler(RequestValidationError)

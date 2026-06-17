@@ -5,15 +5,25 @@ import { TransactionCard } from "@/components/shared/TransactionCard";
 import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";
 import { CategoryBreakdown } from "@/components/charts/CategoryBreakdown";
 import { SmartInput } from "@/components/shared/SmartInput";
+import { SpendingStreakCard } from "@/components/dashboard/SpendingStreakCard";
+import { RecurringSummaryCard } from "@/components/dashboard/RecurringSummaryCard";
 import { useTransactions } from "@/hooks/use-transactions";
+import { useSpendingStreak } from "@/hooks/use-streaks";
+import { InsightsList } from "@/components/dashboard/InsightsList";
+import { useInsights } from "@/hooks/use-insights";
 import { useI18n, useCurrency } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
 
 export default function DashboardPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { currency } = useCurrency();
   const { data: session } = useSession();
   const { data: transactions = [] } = useTransactions();
+  const { data: streak } = useSpendingStreak();
+  const { data: insightsData, isLoading: isInsightsLoading } = useInsights({
+    transactions,
+    language,
+  });
 
   const walletLabel = session?.user?.githubUsername
     ? `Ví của "${session.user.githubUsername}"`
@@ -71,10 +81,18 @@ export default function DashboardPage() {
         <SmartInput />
       </section>
 
+      {/* Streaks */}
+      {streak && (
+        <section>
+          <span className="eyebrow mb-4 block">02 - Streaks</span>
+          <SpendingStreakCard streak={streak} />
+        </section>
+      )}
+
       {/* Summary Stats */}
       <section>
-        <span className="eyebrow mb-6 block">02 - Overview</span>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <span className="eyebrow mb-6 block">03 - Overview</span>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
           {[
             {
               label: t("totalIncome"),
@@ -102,21 +120,38 @@ export default function DashboardPage() {
               </p>
             </article>
           ))}
+          <RecurringSummaryCard
+            transactions={transactions}
+            currency={currency}
+          />
         </div>
       </section>
 
       {/* Charts */}
       <section>
-        <span className="eyebrow mb-6 block">03 - Analytics</span>
+        <span className="eyebrow mb-6 block">04 - Analytics</span>
         <div className="grid gap-6 lg:grid-cols-2">
           <CategoryBreakdown data={categoryData} currency={currency} />
           <MonthlyTrendChart data={monthlyData} />
         </div>
       </section>
 
+      {/* Insights */}
+      <section>
+        <span className="eyebrow mb-6 block">05 - Insights</span>
+        {isInsightsLoading ? (
+          <p className="font-sans text-sm text-muted">{t("loading")}</p>
+        ) : (
+          <InsightsList
+            insights={insightsData?.insights ?? []}
+            currency={currency}
+          />
+        )}
+      </section>
+
       {/* Recent Transactions */}
       <section>
-        <span className="eyebrow mb-6 block">04 - Recent</span>
+        <span className="eyebrow mb-6 block">06 - Recent</span>
         <div className="card-shadow space-y-4 rounded-[4px] border border-border bg-card p-6">
           <h2 className="font-serif text-[1.5rem] text-foreground">
             {t("recentTransactions")}

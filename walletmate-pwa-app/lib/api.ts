@@ -1,4 +1,11 @@
 import type { ParsedExpense } from "@/lib/validations/parse";
+import type {
+  AnalyzeRequest,
+  AnalyzeResponse,
+  CandidateTransaction,
+  HistoricalTransaction,
+  RecurringSuggestion,
+} from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -73,4 +80,47 @@ export async function parseImage(file: File): Promise<ParsedExpense> {
   }
 
   return res.json() as Promise<ParsedExpense>;
+}
+
+/**
+ * Ask the Python backend whether a candidate transaction should be recurring.
+ * Sends the candidate plus a limited history (previous + current month).
+ */
+export async function suggestRecurring(
+  candidate: CandidateTransaction,
+  history: HistoricalTransaction[],
+  language: "vi" | "en",
+): Promise<RecurringSuggestion> {
+  const res = await fetch(`${API_URL}/api/suggest-recurring`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ candidate, history, language }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || "Failed to suggest recurrence");
+  }
+
+  return res.json() as Promise<RecurringSuggestion>;
+}
+
+/**
+ * Ask the Python backend to generate proactive insights from transaction history.
+ */
+export async function analyzeTransactions(
+  request: AnalyzeRequest,
+): Promise<AnalyzeResponse> {
+  const res = await fetch(`${API_URL}/api/analyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || "Failed to analyze transactions");
+  }
+
+  return res.json() as Promise<AnalyzeResponse>;
 }

@@ -43,7 +43,7 @@ export default function LoginPage() {
           <button
             onClick={handleGitHubLogin}
             disabled={loading !== null}
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-4 py-3 font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-4 py-3 font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50 cursor-pointer"
           >
             <GitHubIcon className="h-5 w-5" />
             {loading === "github" ? "Connecting..." : "Continue with GitHub"}
@@ -52,22 +52,16 @@ export default function LoginPage() {
           <button
             onClick={handleDemoLogin}
             disabled={loading !== null}
-            className="w-full rounded-md border border-border bg-background px-4 py-3 font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+            className="w-full rounded-md border border-border bg-background px-4 py-3 font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50 cursor-pointer"
           >
             {loading === "demo" ? "Loading..." : "Try Demo"}
           </button>
         </div>
 
-        {/* Closed App Notice */}
+        {/* Welcome Notice */}
         <div className="rounded-md border border-border bg-card p-4 text-center">
           <p className="text-sm text-muted-foreground">
-            This is a closed application. To request access, contact{" "}
-            <a
-              href="mailto:buiquangthangtv@gmail.com"
-              className="text-primary hover:underline"
-            >
-              buiquangthangtv@gmail.com
-            </a>
+            Sign in to access your workspace and continue where you left off.
           </p>
         </div>
       </div>

@@ -1,18 +1,45 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Sparkles } from "lucide-react";
 import {
   transactionSchema,
   type TransactionInput,
 } from "@/lib/validations/transactions";
+import { useI18n } from "@/lib/i18n";
+import type { TranslationKey } from "@/lib/i18n";
+import { useTransactions } from "@/hooks/use-transactions";
+import { useSuggestRecurring } from "@/hooks/use-suggest-recurring";
+import {
+  buildCandidateTransaction,
+  getRecentHistoryForSuggestion,
+} from "@/lib/transaction-helpers";
+import type { RecurringFrequency, RecurringSuggestion } from "@/types";
+
+const RECURRING_FREQUENCIES: RecurringFrequency[] = [
+  "daily",
+  "weekly",
+  "monthly",
+  "yearly",
+];
 
 export function AddTransactionSheet({
   onSubmit,
 }: {
   onSubmit: (data: TransactionInput) => Promise<void> | void;
 }) {
-  const { register, handleSubmit, formState, reset } =
+  const { t, language } = useI18n();
+  const { data: transactions = [] } = useTransactions();
+  const suggestMutation = useSuggestRecurring();
+
+  const [suggestion, setSuggestion] = useState<RecurringSuggestion | null>(
+    null,
+  );
+  const [showSuggestion, setShowSuggestion] = useState(false);
+
+  const { register, handleSubmit, formState, reset, setValue, control } =
     useForm<TransactionInput>({
       resolver: zodResolver(transactionSchema),
       defaultValues: {
@@ -25,12 +52,90 @@ export function AddTransactionSheet({
       },
     });
 
+  const watchedDescription = useWatch({ control, name: "description" });
+  const watchedAmount = useWatch({ control, name: "amount" });
+  const watchedDate = useWatch({ control, name: "transactionDate" });
+  const watchedCategory = useWatch({ control, name: "category" });
+  const watchedType = useWatch({ control, name: "type" });
+  const watchedRecurring = useWatch({ control, name: "recurring" });
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const description = watchedDescription?.trim();
+    const amount = Number(watchedAmount);
+    const date = watchedDate;
+
+    if (!description || !amount || amount <= 0 || !date) {
+      const timeout = setTimeout(() => {
+        setSuggestion(null);
+        setShowSuggestion(false);
+      }, 0);
+      return () => clearTimeout(timeout);
+    }
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      const candidate = buildCandidateTransaction({
+        type: watchedType,
+        amount,
+        category: watchedCategory ?? "Ăn uống",
+        description,
+        transactionDate: date,
+      });
+
+      const history = getRecentHistoryForSuggestion(transactions, date);
+
+      suggestMutation.mutate(
+        { candidate, history, language },
+        {
+          onSuccess: (data) => {
+            setSuggestion(data);
+            setShowSuggestion(data.recurring && data.confidence !== "low");
+          },
+        },
+      );
+    }, 500);
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, [
+    watchedDescription,
+    watchedAmount,
+    watchedDate,
+    watchedCategory,
+    watchedType,
+    language,
+    transactions,
+    suggestMutation,
+  ]);
+
+  const applySuggestion = () => {
+    if (suggestion?.recurring && suggestion.recurringFreq) {
+      setValue("recurring", true);
+      setValue("recurringFreq", suggestion.recurringFreq);
+      setShowSuggestion(false);
+    }
+  };
+
+  const dismissSuggestion = () => {
+    setShowSuggestion(false);
+  };
+
   return (
     <form
       className="grid gap-3 rounded-[4px] border border-border bg-card p-6"
       onSubmit={handleSubmit(async (data) => {
         await onSubmit(data);
         reset();
+        setSuggestion(null);
+        setShowSuggestion(false);
       })}
     >
       <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
@@ -80,6 +185,73 @@ export function AddTransactionSheet({
         type="date"
         className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
       />
+
+      {/* Recurring suggestion banner */}
+      {showSuggestion && suggestion && (
+        <div className="rounded-[3px] border border-primary/30 bg-primary/5 p-3">
+          <div className="flex items-start gap-2">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <div className="flex-1">
+              <p className="font-sans text-sm text-foreground">
+                {t("recurringSuggestion")}
+              </p>
+              <p className="mt-1 font-sans text-xs text-muted">
+                {suggestion.reason}
+              </p>
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={applySuggestion}
+                  className="rounded-[3px] bg-primary px-3 py-1.5 font-mono text-[0.65rem] uppercase tracking-[0.08em] text-primary-foreground transition-opacity hover:opacity-85 cursor-pointer"
+                >
+                  {t("apply")}
+                </button>
+                <button
+                  type="button"
+                  onClick={dismissSuggestion}
+                  className="rounded-[3px] border border-border px-3 py-1.5 font-mono text-[0.65rem] uppercase tracking-[0.08em] text-muted transition-colors hover:border-primary hover:text-primary cursor-pointer"
+                >
+                  {t("dismiss")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {suggestMutation.isPending && (
+        <div className="flex items-center gap-2 text-muted">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <span className="font-sans text-xs">{t("analyzingPattern")}</span>
+        </div>
+      )}
+
+      {/* Recurring toggle */}
+      <label className="flex cursor-pointer items-center gap-3 rounded-[3px] border border-border bg-background p-3 transition-colors hover:border-muted">
+        <input
+          type="checkbox"
+          {...register("recurring")}
+          className="h-4 w-4 accent-primary"
+        />
+        <span className="font-sans text-sm text-foreground">
+          {t("recurring")}
+        </span>
+      </label>
+
+      {watchedRecurring && (
+        <select
+          {...register("recurringFreq")}
+          className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
+        >
+          {RECURRING_FREQUENCIES.map((freq) => (
+            <option key={freq} value={freq}>
+              {t(
+                `recurring${freq.charAt(0).toUpperCase() + freq.slice(1)}` as TranslationKey,
+              )}
+            </option>
+          ))}
+        </select>
+      )}
 
       <button
         disabled={formState.isSubmitting}

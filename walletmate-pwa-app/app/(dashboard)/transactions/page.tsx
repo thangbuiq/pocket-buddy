@@ -46,7 +46,7 @@ export default function TransactionsPage() {
                     deleteTransaction.mutate(transaction.id);
                   }
                 }}
-                className="absolute right-2 top-2 rounded p-2 text-muted opacity-0 transition hover:bg-destructive/20 hover:text-destructive group-hover:opacity-100"
+                className="absolute right-2 top-2 rounded p-2 text-muted opacity-0 transition hover:bg-destructive/20 hover:text-destructive group-hover:opacity-100 cursor-pointer"
                 aria-label="Delete transaction"
               >
                 <Trash2 className="h-4 w-4" />

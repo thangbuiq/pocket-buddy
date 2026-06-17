@@ -48,3 +48,59 @@ export interface Insight {
   dismissed: boolean;
   createdAt: string;
 }
+
+export interface HistoricalTransaction {
+  type: TransactionType;
+  amount: number;
+  category: string;
+  description: string;
+  transactionDate: string;
+}
+
+export interface CandidateTransaction {
+  type: TransactionType;
+  amount: number;
+  category: string;
+  description: string;
+  transactionDate: string;
+}
+
+export interface RecurringSuggestion {
+  recurring: boolean;
+  recurringFreq?: RecurringFrequency;
+  confidence: "high" | "medium" | "low";
+  reason: string;
+}
+
+export interface SpendingStreak {
+  currentStreak: number;
+  longestStreak: number;
+  lastTransactionDate?: string;
+}
+
+export interface AnalyzeRequest {
+  transactions: HistoricalTransaction[];
+  language: "vi" | "en";
+  period_days?: number;
+}
+
+export type InsightType =
+  | "trend"
+  | "anomaly"
+  | "savings"
+  | "recurring"
+  | "budget";
+export type InsightSeverity = "info" | "warning" | "success";
+
+export interface AnalyzeInsight {
+  type: InsightType;
+  title: string;
+  description: string;
+  severity: InsightSeverity;
+  category?: string;
+  amount_impact?: number;
+}
+
+export interface AnalyzeResponse {
+  insights: AnalyzeInsight[];
+}

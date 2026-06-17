@@ -49,6 +49,36 @@ export const translations = {
     recentTransactions: "Giao dịch gần đây",
     noTransactions: "Chưa có giao dịch nào",
 
+    // Recurring
+    recurring: "Định kỳ",
+    recurringFrequency: "Tần suất",
+    recurringDaily: "Hàng ngày",
+    recurringWeekly: "Hàng tuần",
+    recurringMonthly: "Hàng tháng",
+    recurringYearly: "Hàng năm",
+    recurringSummaryTitle: "Chi phí cố định/tháng",
+    recurringTransactions: "giao dịch định kỳ",
+    recurringSuggestion: "Giao dịch này có vẻ lặp lại thường xuyên",
+    analyzingPattern: "Đang phân tích mẫu giao dịch...",
+    apply: "Áp dụng",
+    dismiss: "Bỏ qua",
+
+    // Streaks
+    streakTitle: "Chuỗi ghi chép",
+    streakCurrent: "Hiện tại",
+    streakLongest: "Dài nhất",
+    streakEmpty: "Bắt đầu ghi chép để tạo chuỗi",
+
+    // Insights
+    insightsTitle: "Thông tin chi tiêu",
+    insightsEmpty: "Chưa đủ dữ liệu để phân tích",
+    insightsError: "Không thể tải thông tin chi tiêu",
+    insightTypeTrend: "Xu hướng",
+    insightTypeAnomaly: "Bất thường",
+    insightTypeSavings: "Tiết kiệm",
+    insightTypeRecurring: "Định kỳ",
+    insightTypeBudget: "Ngân sách",
+
     // Transactions page
     addTransaction: "Thêm giao dịch",
     deleteConfirm: "Xóa giao dịch này?",
@@ -132,6 +162,36 @@ export const translations = {
     savingsRate: "Savings Rate",
     recentTransactions: "Recent Transactions",
     noTransactions: "No transactions yet",
+
+    // Recurring
+    recurring: "Recurring",
+    recurringFrequency: "Frequency",
+    recurringDaily: "Daily",
+    recurringWeekly: "Weekly",
+    recurringMonthly: "Monthly",
+    recurringYearly: "Yearly",
+    recurringSummaryTitle: "Fixed monthly expenses",
+    recurringTransactions: "recurring transactions",
+    recurringSuggestion: "This transaction looks like it repeats often",
+    analyzingPattern: "Analyzing transaction pattern...",
+    apply: "Apply",
+    dismiss: "Dismiss",
+
+    // Streaks
+    streakTitle: "Logging streak",
+    streakCurrent: "Current",
+    streakLongest: "Longest",
+    streakEmpty: "Start logging to build a streak",
+
+    // Insights
+    insightsTitle: "Spending insights",
+    insightsEmpty: "Not enough data to analyze yet",
+    insightsError: "Could not load spending insights",
+    insightTypeTrend: "Trend",
+    insightTypeAnomaly: "Anomaly",
+    insightTypeSavings: "Savings",
+    insightTypeRecurring: "Recurring",
+    insightTypeBudget: "Budget",
 
     // Transactions page
     addTransaction: "Add Transaction",

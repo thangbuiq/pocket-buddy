@@ -1,9 +1,11 @@
 import { db } from "@/db";
 import { transactions } from "@/db/schema";
 import { mockStore } from "@/lib/mock-db";
+import { computeSpendingStreak } from "@/lib/transaction-helpers";
 import type { TransactionInput } from "@/lib/validations/transactions";
 import type {
   RecurringFrequency,
+  SpendingStreak,
   SyncStatus,
   Transaction,
   TransactionType,
@@ -172,4 +174,11 @@ export async function deleteTransaction(
   if (row.userId !== userId) return null;
 
   return mapDbTransaction(row);
+}
+
+export async function getSpendingStreak(
+  userId: string,
+): Promise<SpendingStreak> {
+  const userTransactions = await getTransactions(userId);
+  return computeSpendingStreak(userTransactions);
 }

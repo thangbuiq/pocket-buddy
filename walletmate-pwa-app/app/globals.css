@@ -169,6 +169,17 @@ body {
   line-height: 1.7;
 }
 
+/* Text selection uses the theme accent */
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+::-moz-selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
 /* Typography scale */
 h1,
 h2,

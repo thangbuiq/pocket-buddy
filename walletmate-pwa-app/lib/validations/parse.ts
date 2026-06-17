@@ -6,6 +6,8 @@ export const parsedExpenseSchema = z.object({
   category: z.string(),
   description: z.string(),
   transactionDate: z.string(),
+  recurring: z.boolean().default(false),
+  recurringFreq: z.enum(["daily", "weekly", "monthly", "yearly"]).optional(),
 });
 
 export type ParsedExpense = z.infer<typeof parsedExpenseSchema>;
