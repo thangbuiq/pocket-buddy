@@ -44,7 +44,31 @@ export function ActiveRecurringList({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dateValue, setDateValue] = useState("");
 
-  const activeRecurring = transactions.filter(isActiveRecurring);
+  const recurringCandidates = transactions.filter(
+    (t) => t.recurringFreq && t.type === "expense",
+  );
+
+  // Group by recurring pattern
+  const uniqueRecurringMap = new Map<string, Transaction>();
+  for (const txn of recurringCandidates) {
+    const key = `${txn.category}-${txn.description || ""}-${txn.amount}-${txn.recurringFreq}`;
+    const existing = uniqueRecurringMap.get(key);
+    if (!existing) {
+      uniqueRecurringMap.set(key, txn);
+    } else {
+      if (new Date(txn.transactionDate) > new Date(existing.transactionDate)) {
+        uniqueRecurringMap.set(key, txn);
+      }
+    }
+  }
+
+  const activeRecurring = Array.from(uniqueRecurringMap.values())
+    .filter(isActiveRecurring)
+    .sort(
+      (a, b) =>
+        new Date(b.transactionDate).getTime() -
+        new Date(a.transactionDate).getTime(),
+    );
 
   if (activeRecurring.length === 0) {
     return (
