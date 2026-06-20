@@ -1,0 +1,21 @@
+name: Keep-Alive API
+
+on:
+  schedule:
+    # Vietnam Time (UTC+7) is 7 hours ahead of UTC.
+    # Active pinging: 7am - 12am VN (00:00 - 17:00 UTC)
+    # Tier 1 (Peak hours): 7am - 10pm VN (00:00 - 15:00 UTC) - every 9 mins
+    - cron: '*/9 0-14 * * *'
+    # Tier 2 (Late night active): 10pm - 12am VN (15:00 - 17:00 UTC) - every 14 mins
+    - cron: '*/14 15-16 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API Health Endpoint
+        run: |
+          curl -X 'GET' \
+            'https://walletmate-api.vercel.app/api/health' \
+            -H 'accept: application/json'

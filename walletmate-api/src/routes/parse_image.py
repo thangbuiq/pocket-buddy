@@ -1,63 +1,62 @@
+# ruff: noqa: E501
 """Parse image endpoint - Groq vision-powered expense extraction from receipts."""
 
 from __future__ import annotations
 
 import base64
-import logging
 from datetime import date
 from typing import cast
 
 from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 from langchain_core.messages import HumanMessage
+from loguru import logger
 
 from ..config import ALLOWED_CATEGORIES, OPENAI_API_KEY
 from ..schemas import ParseResponse
 from ..services.ai import llm
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 MAX_IMAGE_SIZE = 4 * 1024 * 1024  # 4 MB
 
-PARSING_PROMPT = """\
-You are a receipt/bill analyzer. Analyze this receipt/bill image and extract \
-the transaction data.
+PARSING_PROMPT = """
+<identity>
+You are a receipt/bill analyzer. Analyze this receipt/bill image and extract the transaction data.
+</identity>
 
+<context>
 Today's date: {today}
 Valid categories: {categories_list}
+</context>
 
-RULES:
-
+<rules>
 1. Transaction type:
    - Default to "expense"
-   - Only set "income" when clearly a receipt voucher / money-in document
+   - Only set "income" when clearly a receipt voucher or money-in document
 
 2. Amount:
    - Extract the FINAL TOTAL (TOTAL / THÀNH TIỀN / TỔNG CỘNG /...) from the receipt
    - Handle Vietnamese number formatting on receipts:
-     + Dots (.) separate thousands: "150.000" = 150000
-     + Commas (,) separate decimals: "50,5" = 50.5
-     + Example: "1.500.000" = 1500000; "1.500.000,50" = 1500000.50
-   - If the receipt includes tax/VAT, use the post-tax total (largest number, \
-usually the grand total)
-   - If multiple amounts exist, prioritize labels: "TOTAL", "TỔNG CỘNG", \
-"THÀNH TIỀN", "PHẢI TRẢ", "THANH TOÁN"
+     + Dots (.) separate thousands: "150.000" -> 150000
+     + Commas (,) separate decimals: "50,5" -> 50.5
+     + Example: "1.500.000" -> 1500000; "1.500.000,50" -> 1500000.50
+   - If the receipt includes tax/VAT, use the post-tax total (largest number, usually the grand total)
+   - If multiple amounts exist, prioritize labels: "TOTAL", "TỔNG CỘNG", "THÀNH TIỀN", "PHẢI TRẢ", "THANH TOÁN"
    - Return amount as a number (float), never a string
 
 3. Category:
    - Pick exactly ONE from: {categories_list}
    - Categorize by what was purchased:
-     + Food, restaurants, cafe, bubble tea → "Ăn uống"
-     + Taxi, Grab, fuel, bus tickets → "Di chuyển"
-     + Clothing, household items, electronics → "Mua sắm"
-     + Movies, karaoke, travel → "Giải trí"
-     + Electricity, water, internet, rent → "Hóa đơn"
-     + Medicine, hospital, clinic → "Sức khỏe"
-     + Books, courses → "Học tập"
-     + Payroll, receipt vouchers → "Lương"
+     + Food, restaurants, cafe, bubble tea -> "Ăn uống"
+     + Taxi, Grab, fuel, bus tickets -> "Di chuyển"
+     + Clothing, household items, electronics -> "Mua sắm"
+     + Movies, karaoke, travel -> "Giải trí"
+     + Electricity, water, internet, rent -> "Hóa đơn"
+     + Medicine, hospital, clinic -> "Sức khỏe"
+     + Books, courses -> "Học tập"
+     + Payroll, receipt vouchers -> "Lương"
    - Use "Khác" (Other) if uncertain
 
 4. Description:
@@ -72,7 +71,9 @@ usually the grand total)
    - Format: YYYY-MM-DD
    - Field name in JSON: "transactionDate" (NOT "date")
 
-Respond in JSON format."""
+Respond in JSON format.
+</rules>
+"""
 
 
 @router.post("/api/parse-image", response_model=ParseResponse)

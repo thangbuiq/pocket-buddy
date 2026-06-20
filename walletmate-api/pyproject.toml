@@ -11,6 +11,7 @@ dependencies = [
     "langchain-openai>=0.3.0",
     "python-dotenv>=1.1.0",
     "pydantic>=2.11.0",
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]
@@ -57,3 +58,7 @@ warn_unused_ignores = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+
+[[tool.mypy.overrides]]
+module = "loguru"
+ignore_missing_imports = true

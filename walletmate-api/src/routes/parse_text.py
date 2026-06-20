@@ -1,38 +1,40 @@
+# ruff: noqa: E501
 """Parse text endpoint - AI-powered expense extraction from text input."""
 
 from __future__ import annotations
 
-import logging
 from datetime import date
 from typing import cast
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
+from loguru import logger
 
 from ..config import ALLOWED_CATEGORIES, OPENAI_API_KEY
 from ..schemas import ParseTextRequest, ParseTextResponse
 from ..services.ai import llm
 
-logger = logging.getLogger(__name__)
-
 router = APIRouter()
 
-PARSING_PROMPT = """\
-You are a financial transaction parser. Parse the following text into a \
-structured JSON transaction.
+PARSING_PROMPT = """
+<identity>
+You are a financial transaction parser. Parse the following text into a structured JSON transaction.
+</identity>
 
+<context>
 Today's date: {today}
 Input language: {lang_hint}
 Valid categories: {categories_list}
+</context>
 
-Text to parse: "{text}"
+<text_to_parse>
+"{text}"
+</text_to_parse>
 
-RULES:
-
+<rules>
 1. Transaction type:
    - Default to "expense"
-   - Only set "income" if keywords present: lương, nhận, thưởng, thu nhập, \
-kiếm được, tiền về, tiền vào, salary, received, income; or justify with context.
+   - Only set "income" if keywords present: lương, nhận, thưởng, thu nhập, kiếm được, tiền về, tiền vào, salary, received, income; or justify with context.
 
 2. Amount - VIETNAMESE TEEN SLANG & SHORTHAND HANDLING:
    BASE UNITS:
@@ -52,8 +54,7 @@ kiếm được, tiền về, tiền vào, salary, received, income; or justify 
 
    SLANG FOR HUNDRED THOUSAND (100,000 VND):
    - lít / lốp / sọi - nationwide (e.g. "3 lít" = 300000, "5 lốp" = 500000)
-   - trăm - when "2 trăm", "3 trăm" standalone (no "ngàn") means \
-200000, 300000
+   - trăm - when "2 trăm", "3 trăm" standalone (no "ngàn") means 200000, 300000
      BUT "2 trăm nghìn" / "2 trăm ngàn" = 200000 (explicit)
 
    SLANG FOR TEN THOUSAND (10,000 VND):
@@ -61,12 +62,11 @@ kiếm được, tiền về, tiền vào, salary, received, income; or justify 
      NOTE: "5 xị" = 50000, "10 xị" = 100000 = "1 lít"
 
    SLANG FOR THOUSAND (1,000 VND):
-   - cành (e.g. "5 cành" = 5000; "500 cành" = 500000 -
-     scale depends on context)
+   - cành (e.g. "5 cành" = 5000; "500 cành" = 500000 - scale depends on context)
 
    USD-BASED SLANG (exchange-rate dependent, ~25,000 VND per USD):
-   - vé = 100 USD ≈ 2,500,000 VND (e.g. "1 vé" ≈ 2500000)
-   - lá = 10,000 JPY ≈ 1,600,000 VND
+   - vé = 100 USD -> 2,500,000 VND (e.g. "1 vé" -> 2500000)
+   - lá = 10,000 JPY -> 1,600,000 VND
 
    COMBINED & COMPOUND FORMS:
    - "1tr5" / "1.5tr" / "1tr rưỡi" = 1500000
@@ -101,7 +101,9 @@ kiếm được, tiền về, tiền vào, salary, received, income; or justify 
    - Format: YYYY-MM-DD (string)
    - Field name in JSON: "transactionDate" (NOT "date")
 
-Respond in JSON format."""
+Respond in JSON format.
+</rules>
+"""
 
 
 @router.post("/api/parse-text", response_model=ParseTextResponse)

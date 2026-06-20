@@ -1,42 +1,43 @@
+# ruff: noqa: E501
 """Recurring suggestion endpoint - AI-powered recurrence detection."""
 
 from __future__ import annotations
 
 import json
-import logging
 from datetime import date
 from typing import cast
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
+from loguru import logger
 
 from ..config import OPENAI_API_KEY
 from ..schemas import SuggestRecurringRequest, SuggestRecurringResponse
 from ..services.ai import llm
 
-logger = logging.getLogger(__name__)
-
 router = APIRouter()
 
-SUGGEST_RECURRING_PROMPT = """\
-You are a financial-pattern assistant. Given a candidate transaction the user \
-is about to save and a limited history of their recent transactions, decide \
-whether the candidate is likely a recurring transaction.
+SUGGEST_RECURRING_PROMPT = """
+<identity>
+You are a financial-pattern assistant. Given a candidate transaction the user is about to save and a limited history of their recent transactions, decide whether the candidate is likely a recurring transaction.
+</identity>
 
+<context>
 Input language: {lang_hint}
 Today's date: {today}
+</context>
 
-Candidate transaction:
+<candidate_transaction>
 {candidate_json}
+</candidate_transaction>
 
+<transaction_history>
 Recent transaction history (previous + current month only):
 {history_json}
+</transaction_history>
 
-RULES:
-
-1. Mark "recurring": true only when the candidate strongly resembles a \
-transaction that has appeared multiple times in the history with a similar \
-amount, description, or category.
+<rules>
+1. Mark "recurring": true only when the candidate strongly resembles a transaction that has appeared multiple times in the history with a similar amount, description, or category.
 
 2. Use "recurringFreq" to indicate the most likely interval:
    - "daily" - e.g. commute, daily coffee, subscription trials
@@ -49,10 +50,11 @@ amount, description, or category.
    - "medium" - similar description or similar amount appears 2+ times
    - "low" - weak or no pattern
 
-4. "reason": A concise, human-readable explanation in the input language. \
-If not recurring, briefly say why.
+4. "reason": A concise, human-readable explanation in the input language. If not recurring, briefly say why.
 
-Respond in JSON format."""
+Respond in JSON format.
+</rules>
+"""
 
 
 def _format_amount(amount: float, language: str) -> str:

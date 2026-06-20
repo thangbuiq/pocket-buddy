@@ -1,10 +1,16 @@
-# WalletMate
+<div align="center">
 
-> Tired of typing out every coffee or meal you buy? `WalletMate` makes tracking your spending easy. Just take a picture of your receipt or type something like "bought coffee 50k today" and our AI will do the rest.
+# walletmate
 
-`WalletMate` will also give you daily advice on how to save money, automatic tracking of your regular bills, and an app that works perfectly even without internet.
+> Tired of typing out every coffee or meal you buy? `walletmate` makes tracking your spending easy. Just take a picture of your receipt or type something like "bought coffee 50k today" and our AI will do the rest.
 
-## Why use WalletMate
+![walletmate App UI](./assets/app-ui.png)
+
+</div>
+
+`walletmate` will also give you daily advice on how to save money, automatic tracking of your regular bills, and an app that works perfectly even without internet.
+
+## Why use walletmate
 
 - **Smart input**: easy receipt scan with AI or natural text input.
 - **Daily spending advice**: get simple tips on how to manage your money better.

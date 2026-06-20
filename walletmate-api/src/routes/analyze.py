@@ -1,79 +1,76 @@
+# ruff: noqa: E501
 """Analyze endpoint - AI-powered proactive insights from transaction history."""
 
 from __future__ import annotations
 
 import json
-import logging
 from datetime import date
 from typing import cast
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
+from loguru import logger
 
 from ..config import OPENAI_API_KEY
 from ..schemas import AnalyzeRequest, AnalyzeResponse
 from ..services.ai import llm
 
-logger = logging.getLogger(__name__)
-
 router = APIRouter()
 
-ANALYZE_PROMPT = """\
-You are a proactive personal-finance coach focused on helping users SAVE MORE \
-MONEY. Given a user's recent transaction history, generate 3 to 5 concise, \
-actionable insights with a strong bias toward practical savings advice.
+ANALYZE_PROMPT = """
+<identity>
+You are a proactive personal-finance coach focused on helping users SAVE MORE MONEY. Given a user's recent transaction history, generate 3 to 5 concise, actionable insights with a strong bias toward practical savings advice.
+</identity>
 
+<context>
 Input language: {lang_hint}
 Today's date: {today}
 Analysis period: last {period_days} days
+</context>
 
-Transaction history:
+<transaction_history>
 {history_json}
+</transaction_history>
 
-INSIGHT TYPES (use exactly one per insight):
+<insight_types>
+Use exactly one per insight:
 - "trend": spending or income trend (e.g. "chi tiêu tăng 20% so với tháng trước")
 - "anomaly": unusual spike or drop in a category
 - "savings": concrete opportunity to save money - THIS IS THE MOST IMPORTANT TYPE
 - "recurring": reminder about recurring expenses or subscriptions
 - "budget": observation about budget adherence
+</insight_types>
 
-SEVERITY:
+<severity>
 - "info" for neutral observations
 - "warning" for concerning trends or overspending
 - "success" for positive trends (savings increased, spending decreased)
+</severity>
 
-RULES:
+<rules>
 1. Generate 3 to 5 insights. PRIORITIZE at least 1-2 "savings" type insights.
 2. Titles should be short (under 60 characters).
 3. Descriptions should be 1-2 sentences, specific, and in the input language.
 4. Only include insights backed by the provided data.
 5. If the history is empty or too sparse, return an empty insights array.
 6. category: the affected category name, if any.
-7. amount_impact: estimated monthly financial impact as a RAW NUMBER (e.g. \
-5000000, not "5.000.000 ₫"). No currency symbols, no formatting. Set to null \
-if not quantifiable.
-8. Use the user's local currency format in titles and descriptions. \
-For Vietnamese (vi) use VND/₫ (e.g., "500.000 ₫" for 500000), never $ or USD. \
-For English (en) use $.
-9. CRITICAL: The "amount" field in each transaction is a RAW NUMBER. \
-Do NOT multiply, inflate, or misread the amounts. \
-500000 means five hundred thousand (500k). \
-Use the exact numbers from the data in your calculations and descriptions.
+7. amount_impact: estimated monthly financial impact as a RAW NUMBER (e.g. 5000000, not "5.000.000 ₫"). No currency symbols, no formatting. Set to null if not quantifiable.
+8. Use the user's local currency format in titles and descriptions. For Vietnamese (vi) use VND/₫ (e.g., "500.000 ₫" for 500000), never $ or USD. For English (en) use $.
+9. CRITICAL: The "amount" field in each transaction is a RAW NUMBER. Do NOT multiply, inflate, or misread the amounts. 500000 means five hundred thousand (500k). Use the exact numbers from the data in your calculations and descriptions.
+</rules>
 
-SAVINGS-FOCUSED GUIDANCE:
-- Look for categories where spending can be reduced (eating out, entertainment, \
-shopping sprees).
+<savings_focused_guidance>
+- Look for categories where spending can be reduced (eating out, entertainment, shopping sprees).
 - Identify subscriptions or recurring charges the user may have forgotten about.
 - Compare current month spending vs previous months and highlight if it's going up.
-- If there's a high-frequency small expense (daily coffee, snacks), calculate \
-the monthly total and suggest how much could be saved by cutting back even \
-partially (e.g. "Skipping coffee 2 days/week saves ~X/month").
+- If there's a high-frequency small expense (daily coffee, snacks), calculate the monthly total and suggest how much could be saved by cutting back even partially (e.g. "Skipping coffee 2 days/week saves ~X/month").
 - If savings rate is below 20%, explicitly recommend a target.
 - Praise the user when spending decreases or savings improve (use "success" severity).
-- Be specific with numbers, not generic. "You spent 2.5M₫ on Food this month, \
-up 30% from last month" is better than "You spent a lot on food."
+- Be specific with numbers, not generic. "You spent 2.5M₫ on Food this month, up 30% from last month" is better than "You spent a lot on food."
+</savings_focused_guidance>
 
-Respond in JSON format."""
+Respond in JSON format.
+"""
 
 
 def _serialize_transaction(transaction: dict) -> dict:
