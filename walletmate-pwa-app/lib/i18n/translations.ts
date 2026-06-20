@@ -79,9 +79,9 @@ export const translations = {
     streakEmpty: "Bắt đầu ghi chép để tạo chuỗi",
 
     // Insights
-    insightsTitle: "Thông tin chi tiêu",
+    insightsTitle: "Lời khuyên",
     insightsEmpty: "Chưa đủ dữ liệu để phân tích",
-    insightsError: "Không thể tải thông tin chi tiêu",
+    insightsError: "Không thể tải lời khuyên",
     insightTypeTrend: "Xu hướng",
     insightTypeAnomaly: "Bất thường",
     insightTypeSavings: "Tiết kiệm",
@@ -202,9 +202,9 @@ export const translations = {
     streakEmpty: "Start logging to build a streak",
 
     // Insights
-    insightsTitle: "Spending insights",
+    insightsTitle: "Spending advice",
     insightsEmpty: "Not enough data to analyze yet",
-    insightsError: "Could not load spending insights",
+    insightsError: "Could not load spending advice",
     insightTypeTrend: "Trend",
     insightTypeAnomaly: "Anomaly",
     insightTypeSavings: "Savings",

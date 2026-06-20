@@ -308,9 +308,9 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Insights */}
+      {/* Advice */}
       <section>
-        <span className="eyebrow mb-6 block">05 - Insights</span>
+        <span className="eyebrow mb-6 block">05 - Advice</span>
         {isInsightsLoading ? (
           <p className="font-sans text-sm text-muted">{t("loading")}</p>
         ) : (

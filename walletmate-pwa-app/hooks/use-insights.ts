@@ -18,13 +18,23 @@ export function useInsights({
     queryKey: ["insights", language, periodDays, transactions.length],
     queryFn: async () => {
       const history = buildRecurringHistory(transactions);
-      return analyzeTransactions({
-        transactions: history,
-        language,
-        period_days: periodDays,
+      const res = await fetch("/api/insights", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          transactions: history,
+          language,
+          period_days: periodDays,
+        }),
       });
+      if (!res.ok) {
+        throw new Error("Failed to fetch insights");
+      }
+      return res.json();
     },
-    enabled: transactions.length > 0,
+    enabled: transactions.length >= 3,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
