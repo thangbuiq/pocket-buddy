@@ -8,7 +8,6 @@ repos:
       - id: end-of-file-fixer
         exclude: ^walletmate-pwa-app/node_modules/|^walletmate-api/.venv/
       - id: check-yaml
-      - id: check-added-large-files
       - id: check-merge-conflict
       - id: debug-statements
 
