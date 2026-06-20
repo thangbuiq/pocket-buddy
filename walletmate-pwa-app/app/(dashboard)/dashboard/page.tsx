@@ -107,7 +107,10 @@ export default function DashboardPage() {
   const monthlyData: Array<{ month: string; amount: number }> = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthLabel = d.toLocaleString("default", { month: "short" });
+    const monthLabel =
+      language === "vi"
+        ? `T${d.getMonth() + 1}`
+        : d.toLocaleString("en-US", { month: "short" });
     const monthExpenses = allExpenses.filter((t) => {
       const td = new Date(t.transactionDate);
       return (
@@ -180,22 +183,22 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => navigatePeriod(-1)}
-                className="rounded p-0.5 text-muted hover:text-foreground transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-[3px] text-muted hover:bg-muted/10 hover:text-foreground transition-colors"
                 aria-label="Previous period"
               >
-                <ChevronLeft className="h-3.5 w-3.5" />
+                <ChevronLeft className="h-5 w-5" />
               </button>
-              <span className="font-sans text-xs text-muted capitalize min-w-[120px] text-center">
+              <span className="font-sans text-sm text-muted capitalize min-w-[120px] text-center">
                 {overviewPeriodLabel}
               </span>
               <button
                 type="button"
                 onClick={() => navigatePeriod(1)}
                 disabled={isCurrentPeriod}
-                className="rounded p-0.5 text-muted hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex h-10 w-10 items-center justify-center rounded-[3px] text-muted hover:bg-muted/10 hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Next period"
               >
-                <ChevronRight className="h-3.5 w-3.5" />
+                <ChevronRight className="h-5 w-5" />
               </button>
             </div>
           </div>
