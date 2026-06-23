@@ -12,6 +12,7 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "pydantic>=2.11.0",
     "loguru>=0.7.3",
+    "openpyxl>=3.1.0",
 ]
 
 [dependency-groups]
@@ -61,4 +62,8 @@ pythonpath = ["."]
 
 [[tool.mypy.overrides]]
 module = "loguru"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "openpyxl"
 ignore_missing_imports = true

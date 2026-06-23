@@ -130,7 +130,7 @@ export function AddTransactionSheet({
 
   return (
     <form
-      className="grid gap-3 rounded-[4px] border border-border bg-card p-6"
+      className="grid gap-4 rounded-[4px] border border-border bg-card p-4 sm:p-6"
       onSubmit={handleSubmit(async (data) => {
         await onSubmit(data);
         reset();
@@ -138,16 +138,16 @@ export function AddTransactionSheet({
         setShowSuggestion(false);
       })}
     >
-      <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
+      <span className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-primary">
         New Transaction
       </span>
-      <h3 className="font-serif text-[1.25rem] text-foreground">
-        Manual Input
+      <h3 className="font-serif text-[1.7rem] leading-tight text-foreground sm:text-[2rem]">
+        <span className="serif-accent">Manual</span> Input
       </h3>
 
       <select
         {...register("type")}
-        className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
+        className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
       >
         <option value="expense">Expense</option>
         <option value="income">Income</option>
@@ -158,12 +158,12 @@ export function AddTransactionSheet({
         type="number"
         step="0.01"
         placeholder="Amount"
-        className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
+        className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
       />
 
       <select
         {...register("category")}
-        className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
+        className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
       >
         <option value="Ăn uống">Ăn uống</option>
         <option value="Di chuyển">Di chuyển</option>
@@ -179,13 +179,13 @@ export function AddTransactionSheet({
       <input
         {...register("description")}
         placeholder="Description"
-        className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
+        className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
       />
 
       <input
         {...register("transactionDate")}
         type="date"
-        className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
+        className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
       />
 
       {/* Recurring suggestion banner */}
@@ -229,13 +229,13 @@ export function AddTransactionSheet({
       )}
 
       {/* Recurring toggle */}
-      <label className="flex cursor-pointer items-center gap-3 rounded-[3px] border border-border bg-background p-3 transition-colors hover:border-muted">
+      <label className="flex min-h-14 cursor-pointer items-center gap-3 rounded-[3px] border border-border bg-background p-4 transition-colors hover:border-muted">
         <input
           type="checkbox"
           {...register("recurring")}
-          className="h-4 w-4 accent-primary"
+          className="h-5 w-5 accent-primary"
         />
-        <span className="font-sans text-sm text-foreground">
+        <span className="font-sans text-base text-foreground">
           {t("recurring")}
         </span>
       </label>
@@ -244,7 +244,7 @@ export function AddTransactionSheet({
         <>
           <select
             {...register("recurringFreq")}
-            className="min-h-11 rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
+            className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
           >
             {RECURRING_FREQUENCIES.map((freq) => (
               <option key={freq} value={freq}>
@@ -260,7 +260,7 @@ export function AddTransactionSheet({
             <input
               {...register("recurringEndDate")}
               type="date"
-              className="mt-1.5 min-h-11 w-full rounded-[3px] border border-border bg-background px-3.5 font-sans text-[0.9rem] text-foreground focus:border-primary focus:outline-none"
+              className="mt-1.5 min-h-14 w-full rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
             />
           </label>
         </>
@@ -268,7 +268,7 @@ export function AddTransactionSheet({
 
       <button
         disabled={formState.isSubmitting}
-        className="min-h-11 rounded-[3px] bg-primary px-4 font-mono text-[0.8rem] uppercase tracking-[0.08em] text-primary-foreground transition-opacity hover:opacity-85 disabled:opacity-50 cursor-pointer"
+        className="min-h-14 rounded-[3px] bg-primary px-4 font-mono text-[0.8rem] uppercase tracking-[0.08em] text-primary-foreground transition-opacity hover:opacity-85 disabled:opacity-50 cursor-pointer"
         type="submit"
       >
         {formState.isSubmitting ? "Saving..." : "Add Transaction"}

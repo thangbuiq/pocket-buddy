@@ -28,6 +28,12 @@ class ParseResponse(BaseModel):
 ParseTextResponse = ParseResponse
 
 
+class ParseBatchResponse(BaseModel):
+    """Structured transactions returned by the batch file parser."""
+
+    transactions: list[ParseResponse] = Field(default_factory=list, max_length=100)
+
+
 class HistoricalTransaction(BaseModel):
     """A lightweight transaction record used for recurring suggestion context."""
 

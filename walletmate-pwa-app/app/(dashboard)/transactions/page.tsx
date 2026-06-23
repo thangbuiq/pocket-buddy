@@ -1,6 +1,7 @@
 "use client";
 
 import { AddTransactionSheet } from "@/components/forms/AddTransactionSheet";
+import { BatchTransactionImport } from "@/components/forms/BatchTransactionImport";
 import { TransactionCard } from "@/components/shared/TransactionCard";
 import {
   useCreateTransaction,
@@ -46,26 +47,31 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="space-y-8 animate-in">
+    <div className="space-y-7 animate-in sm:space-y-10">
       {/* Page Heading */}
       <div>
         <span className="eyebrow mb-3 block">Transactions</span>
-        <h1 className="font-serif text-[2.5rem] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+        <h1 className="font-serif text-[2.7rem] font-normal leading-[1.05] text-foreground sm:text-[3.25rem]">
           {t("transactions")}
         </h1>
       </div>
 
-      <AddTransactionSheet
-        onSubmit={async (data) => {
-          await createTransaction.mutateAsync(data);
-        }}
-      />
+      <div className="space-y-4 sm:space-y-6">
+        <BatchTransactionImport />
+        <AddTransactionSheet
+          onSubmit={async (data) => {
+            await createTransaction.mutateAsync(data);
+          }}
+        />
+      </div>
+
       {isLoading ? (
-        <p className="text-sm text-muted">{t("loading")}</p>
+        <p className="text-base text-muted">{t("loading")}</p>
       ) : data.length === 0 ? (
-        <p className="text-sm text-muted">{t("noTransactions")}</p>
+        <p className="text-base text-muted">{t("noTransactions")}</p>
       ) : (
-        <div className="space-y-3">
+        <section className="space-y-3">
+          <span className="eyebrow block">History</span>
           {data.map((transaction) => (
             <div key={transaction.id} className="relative group">
               <TransactionCard
@@ -83,14 +89,14 @@ export default function TransactionsPage() {
                     deleteTransaction.mutate(transaction.id);
                   }
                 }}
-                className="absolute right-2 bottom-2 rounded p-2 text-muted transition hover:bg-destructive/20 hover:text-destructive cursor-pointer opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                className="absolute right-2 bottom-2 flex h-11 w-11 items-center justify-center rounded-[3px] text-muted transition hover:bg-destructive/20 hover:text-destructive cursor-pointer opacity-100 md:h-auto md:w-auto md:p-2 md:opacity-0 md:group-hover:opacity-100"
                 aria-label="Delete transaction"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-5 w-5 md:h-4 md:w-4" />
               </button>
             </div>
           ))}
-        </div>
+        </section>
       )}
     </div>
   );

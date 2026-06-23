@@ -56,8 +56,9 @@ function LandingContent() {
               walletmate
             </span>
             <h1 className="blur-reveal stagger-2 mt-8 font-serif text-[clamp(2.5rem,5vw,4rem)] font-normal leading-[1.08] tracking-[-0.02em] text-foreground">
-              Smarter budgeting with AI insights and effortless expense
-              tracking.
+              Smarter budgeting with{" "}
+              <span className="serif-accent">AI insights</span> and{" "}
+              <span className="serif-accent">effortless</span> expense tracking.
             </h1>
             <p className="blur-reveal stagger-3 mt-8 font-sans text-lg leading-relaxed text-text-dim max-w-[580px]">
               Track transactions, stay on budget, and get practical
@@ -88,7 +89,7 @@ function LandingContent() {
               02 - Features
             </span>
             <h2 className="mt-4 font-serif text-[clamp(1.75rem,3vw,2.5rem)] font-normal leading-[1.2] tracking-[-0.01em] text-foreground">
-              Built for clarity.
+              Built for <span className="serif-accent">clarity</span>.
             </h2>
 
             <div className="mt-16 space-y-12">
@@ -178,7 +179,8 @@ function LandingContent() {
               03 - Start
             </span>
             <h2 className="mt-8 font-serif text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
-              Take control of your spending.
+              Take <span className="serif-accent">control</span> of your
+              spending.
             </h2>
             <p className="mt-6 font-sans text-lg leading-relaxed text-text-dim">
               No credit card. No signup wall. Jump straight into the demo.

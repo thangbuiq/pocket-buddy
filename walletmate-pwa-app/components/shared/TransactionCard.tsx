@@ -19,11 +19,11 @@ export function TransactionCard({
   const hasEndDate = Boolean(transaction.recurringEndDate);
 
   return (
-    <article className="rounded-[4px] border border-border bg-card p-4 transition-colors hover:border-muted">
-      <div className="flex items-start justify-between gap-4">
+    <article className="rounded-[4px] border border-border bg-card p-4 pr-14 transition-colors hover:border-muted sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h4 className="font-sans text-[0.9rem] font-medium text-foreground">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="font-sans text-base font-medium text-foreground">
               {transaction.category}
             </h4>
             {isRecurring && (
@@ -38,7 +38,7 @@ export function TransactionCard({
               </span>
             )}
           </div>
-          <p className="font-sans text-sm text-muted">
+          <p className="mt-1 font-sans text-[0.95rem] leading-6 text-muted">
             {transaction.description || "No description"}
           </p>
           {isRecurring && hasEndDate && (
@@ -47,9 +47,9 @@ export function TransactionCard({
             </p>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3 sm:justify-end">
           <div
-            className={`font-mono text-[0.9rem] font-medium ${
+            className={`font-mono text-base font-medium ${
               transaction.type === "expense"
                 ? "text-destructive"
                 : "text-success"
@@ -62,11 +62,11 @@ export function TransactionCard({
             <button
               type="button"
               onClick={() => onCancelRecurring(transaction)}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[3px] border border-border text-muted transition-colors hover:border-destructive hover:text-destructive cursor-pointer"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border border-border text-muted transition-colors hover:border-destructive hover:text-destructive cursor-pointer"
               aria-label={t("recurringCancel")}
               title={t("recurringCancel")}
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>

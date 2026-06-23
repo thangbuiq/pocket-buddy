@@ -203,6 +203,19 @@ h3 {
   font-weight: 500;
 }
 
+.serif-accent {
+  color: var(--primary);
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-shadow: 0 0 18px var(--glow-subtle);
+}
+
+.light .serif-accent {
+  color: var(--accent);
+  text-shadow: none;
+}
+
 /* Mono labels / eyebrows / metadata */
 .eyebrow,
 .mono-label {

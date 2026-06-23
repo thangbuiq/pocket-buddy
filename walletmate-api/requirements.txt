@@ -20,6 +20,8 @@ click==8.4.1
     # via uvicorn
 distro==1.9.0
     # via openai
+et-xmlfile==2.0.0
+    # via openpyxl
 fastapi==0.136.3
     # via walletmate-api (pyproject.toml)
 h11==0.16.0
@@ -51,8 +53,12 @@ langchain-protocol==0.0.17
     # via langchain-core
 langsmith==0.8.15
     # via langchain-core
+loguru==0.7.3
+    # via walletmate-api (pyproject.toml)
 openai==2.41.1
     # via langchain-openai
+openpyxl==3.1.5
+    # via walletmate-api (pyproject.toml)
 orjson==3.11.9
     # via langsmith
 packaging==26.2

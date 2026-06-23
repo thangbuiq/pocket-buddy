@@ -83,6 +83,38 @@ export async function parseImage(file: File): Promise<ParsedExpense> {
 }
 
 /**
+ * Parse transactions from a CSV/XLSX file using the Python FastAPI backend.
+ */
+export async function parseBatchFile(
+  file: File,
+  language: "vi" | "en",
+): Promise<ParsedExpense[]> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(
+    `${API_URL}/api/parse-batch?language=${encodeURIComponent(language)}`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+
+  if (!res.ok) {
+    const error = await res.json();
+    if (error.redirect) {
+      throw new Error(
+        JSON.stringify({ message: error.error, redirect: error.redirect }),
+      );
+    }
+    throw new Error(error.error || "Failed to parse batch file");
+  }
+
+  const data = (await res.json()) as { transactions: ParsedExpense[] };
+  return data.transactions;
+}
+
+/**
  * Ask the Python backend whether a candidate transaction should be recurring.
  * Sends the candidate plus a limited history (previous + current month).
  */

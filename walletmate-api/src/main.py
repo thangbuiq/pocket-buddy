@@ -12,6 +12,7 @@ from .config import APP_TITLE
 from .routes import (
     analyze_router,
     health_router,
+    parse_batch_router,
     parse_image_router,
     parse_text_router,
     suggest_recurring_router,
@@ -40,6 +41,7 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(parse_text_router)
 app.include_router(parse_image_router)
+app.include_router(parse_batch_router)
 app.include_router(suggest_recurring_router)
 app.include_router(analyze_router)
 
