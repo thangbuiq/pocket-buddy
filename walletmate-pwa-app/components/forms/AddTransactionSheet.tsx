@@ -8,6 +8,7 @@ import {
   transactionSchema,
   type TransactionInput,
 } from "@/lib/validations/transactions";
+import { Toggle } from "@/components/ui/toggle";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -229,16 +230,24 @@ export function AddTransactionSheet({
       )}
 
       {/* Recurring toggle */}
-      <label className="flex min-h-14 cursor-pointer items-center gap-3 rounded-[3px] border border-border bg-background p-4 transition-colors hover:border-muted">
-        <input
-          type="checkbox"
-          {...register("recurring")}
-          className="h-5 w-5 accent-primary"
-        />
-        <span className="font-sans text-base text-foreground">
-          {t("recurring")}
+      <Toggle
+        type="button"
+        pressed={Boolean(watchedRecurring)}
+        onPressedChange={(pressed) =>
+          setValue("recurring", pressed, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          })
+        }
+        size="lg"
+        className="w-full justify-between bg-background text-base normal-case tracking-[0] data-[state=off]:text-foreground"
+      >
+        <span className="font-sans">{t("recurring")}</span>
+        <span className="font-mono text-[0.7rem] uppercase tracking-[0.08em] opacity-70">
+          {watchedRecurring ? "On" : "Off"}
         </span>
-      </label>
+      </Toggle>
 
       {watchedRecurring && (
         <>

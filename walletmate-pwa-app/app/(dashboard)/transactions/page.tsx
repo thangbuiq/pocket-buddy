@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { AddTransactionSheet } from "@/components/forms/AddTransactionSheet";
 import { BatchTransactionImport } from "@/components/forms/BatchTransactionImport";
 import { TransactionCard } from "@/components/shared/TransactionCard";
+import { TransactionsTable } from "@/components/shared/TransactionsTable";
 import {
   useCreateTransaction,
   useTransactions,
@@ -10,8 +12,9 @@ import {
   useUpdateTransaction,
 } from "@/hooks/use-transactions";
 import { useI18n } from "@/lib/i18n";
-import { Trash2 } from "lucide-react";
+import { LayoutGrid, Table2, Trash2 } from "lucide-react";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { Toggle } from "@/components/ui/toggle";
 import type { Transaction } from "@/types";
 
 export default function TransactionsPage() {
@@ -21,6 +24,7 @@ export default function TransactionsPage() {
   const deleteTransaction = useDeleteTransaction();
   const updateTransaction = useUpdateTransaction();
   const { confirm } = useConfirm();
+  const [viewMode, setViewMode] = useState<"card" | "table">("card");
 
   const handleCancelRecurring = async (transaction: Transaction) => {
     if (
@@ -71,31 +75,62 @@ export default function TransactionsPage() {
         <p className="text-base text-muted">{t("noTransactions")}</p>
       ) : (
         <section className="space-y-3">
-          <span className="eyebrow block">History</span>
-          {data.map((transaction) => (
-            <div key={transaction.id} className="relative group">
-              <TransactionCard
-                transaction={transaction}
-                onCancelRecurring={handleCancelRecurring}
-              />
-              <button
-                onClick={async () => {
-                  if (
-                    await confirm({
-                      title: "Delete Transaction",
-                      description: t("deleteConfirm") as string,
-                    })
-                  ) {
-                    deleteTransaction.mutate(transaction.id);
-                  }
-                }}
-                className="absolute right-2 bottom-2 flex h-11 w-11 items-center justify-center rounded-[3px] text-muted transition hover:bg-destructive/20 hover:text-destructive cursor-pointer opacity-100 md:h-auto md:w-auto md:p-2 md:opacity-0 md:group-hover:opacity-100"
-                aria-label="Delete transaction"
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <span className="eyebrow block">History</span>
+            <div className="grid grid-cols-2 gap-2 rounded-[3px] border border-border bg-card p-1">
+              <Toggle
+                type="button"
+                pressed={viewMode === "card"}
+                onPressedChange={() => setViewMode("card")}
+                size="sm"
+                className="min-h-11"
+                aria-label="Card mode"
               >
-                <Trash2 className="h-5 w-5 md:h-4 md:w-4" />
-              </button>
+                <LayoutGrid className="h-4 w-4" />
+                Cards
+              </Toggle>
+              <Toggle
+                type="button"
+                pressed={viewMode === "table"}
+                onPressedChange={() => setViewMode("table")}
+                size="sm"
+                className="min-h-11"
+                aria-label="Table mode"
+              >
+                <Table2 className="h-4 w-4" />
+                Table
+              </Toggle>
             </div>
-          ))}
+          </div>
+
+          {viewMode === "table" ? (
+            <TransactionsTable transactions={data} />
+          ) : (
+            data.map((transaction) => (
+              <div key={transaction.id} className="relative group">
+                <TransactionCard
+                  transaction={transaction}
+                  onCancelRecurring={handleCancelRecurring}
+                />
+                <button
+                  onClick={async () => {
+                    if (
+                      await confirm({
+                        title: "Delete Transaction",
+                        description: t("deleteConfirm") as string,
+                      })
+                    ) {
+                      deleteTransaction.mutate(transaction.id);
+                    }
+                  }}
+                  className="absolute right-2 bottom-2 flex h-11 w-11 items-center justify-center rounded-[3px] text-muted transition hover:bg-destructive/20 hover:text-destructive cursor-pointer opacity-100 md:h-auto md:w-auto md:p-2 md:opacity-0 md:group-hover:opacity-100"
+                  aria-label="Delete transaction"
+                >
+                  <Trash2 className="h-5 w-5 md:h-4 md:w-4" />
+                </button>
+              </div>
+            ))
+          )}
         </section>
       )}
     </div>

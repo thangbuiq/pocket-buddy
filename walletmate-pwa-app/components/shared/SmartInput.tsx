@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, X, Loader2, Camera, ImageIcon, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
+import { Toggle } from "@/components/ui/toggle";
 import { formatNumberInput, parseNumberInput } from "@/lib/utils";
 import { parseText, parseImage } from "@/lib/api";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -575,16 +576,18 @@ export function SmartInput() {
                 <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
                   {t("recurring")}
                 </span>
-                <label className="relative inline-flex cursor-pointer items-center">
-                  <input
-                    type="checkbox"
-                    checked={editedData.recurring}
-                    onChange={(e) => updateField("recurring", e.target.checked)}
-                    className="peer sr-only"
-                  />
-                  <div className="h-5 w-9 rounded-full bg-border peer-checked:bg-primary peer-focus:ring-2 peer-focus:ring-primary/30 transition-colors" />
-                  <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-background transition-transform peer-checked:translate-x-4" />
-                </label>
+                <Toggle
+                  type="button"
+                  pressed={Boolean(editedData.recurring)}
+                  onPressedChange={(pressed) =>
+                    updateField("recurring", pressed)
+                  }
+                  size="sm"
+                  className="w-20"
+                  aria-label={t("recurring") as string}
+                >
+                  {editedData.recurring ? "On" : "Off"}
+                </Toggle>
               </div>
 
               {/* Row 7: Recurring frequency */}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Check,
@@ -10,27 +11,17 @@ import {
   X,
   XCircle,
 } from "lucide-react";
+import { DataTable } from "@/components/ui/data-table";
+import { Toggle } from "@/components/ui/toggle";
 import { parseBatchFile } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
-import { formatCurrency, parseNumberInput } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import type { ParsedExpense } from "@/lib/validations/parse";
 
 const MAX_BATCH_FILE_SIZE = 5 * 1024 * 1024;
 const MAX_BATCH_TRANSACTIONS = 100;
 const ACCEPTED_FILE_TYPES =
   ".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-
-const CATEGORIES = [
-  "Ăn uống",
-  "Di chuyển",
-  "Mua sắm",
-  "Giải trí",
-  "Hóa đơn",
-  "Sức khỏe",
-  "Học tập",
-  "Lương",
-  "Khác",
-];
 
 type BatchRow = ParsedExpense & {
   id: string;
@@ -49,23 +40,13 @@ export function BatchTransactionImport() {
 
   const approvedCount = rows.filter((row) => row.approved).length;
 
-  const updateRow = <K extends keyof ParsedExpense>(
-    id: string,
-    field: K,
-    value: ParsedExpense[K],
-  ) => {
-    setRows((current) =>
-      current.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
-    );
-  };
-
-  const toggleRow = (id: string) => {
+  const toggleRow = useCallback((id: string) => {
     setRows((current) =>
       current.map((row) =>
         row.id === id ? { ...row, approved: !row.approved } : row,
       ),
     );
-  };
+  }, []);
 
   const validateFile = (file: File) => {
     const extension = file.name.split(".").pop()?.toLowerCase();
@@ -120,6 +101,83 @@ export function BatchTransactionImport() {
       setIsParsing(false);
     }
   };
+
+  const columns = useMemo<ColumnDef<BatchRow>[]>(
+    () => [
+      {
+        id: "approved",
+        header: "Approve",
+        cell: ({ row }) => {
+          const transaction = row.original;
+          return (
+            <Toggle
+              type="button"
+              pressed={transaction.approved}
+              onPressedChange={() => toggleRow(transaction.id)}
+              size="sm"
+              className="w-24 data-[state=off]:border-destructive/40 data-[state=off]:bg-destructive/10 data-[state=off]:text-destructive"
+              aria-label={`Approve ${transaction.description}`}
+            >
+              {transaction.approved ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <X className="h-4 w-4" />
+              )}
+              {transaction.approved ? "Yes" : "No"}
+            </Toggle>
+          );
+        },
+      },
+      {
+        accessorKey: "type",
+        header: "Type",
+        cell: ({ row }) => (
+          <span
+            className={`font-mono text-[0.75rem] uppercase tracking-[0.08em] ${
+              row.original.type === "income"
+                ? "text-success"
+                : "text-destructive"
+            }`}
+          >
+            {row.original.type}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "amount",
+        header: "Amount",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-mono">
+            {formatCurrency(row.original.amount)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "category",
+        header: "Category",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap">{row.original.category}</span>
+        ),
+      },
+      {
+        accessorKey: "description",
+        header: "Description",
+        cell: ({ row }) => (
+          <span className="block min-w-48">{row.original.description}</span>
+        ),
+      },
+      {
+        accessorKey: "transactionDate",
+        header: "Date",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-mono">
+            {row.original.transactionDate}
+          </span>
+        ),
+      },
+    ],
+    [toggleRow],
+  );
 
   const handleSaveApproved = async () => {
     const approvedRows = rows.filter((row) => row.approved);
@@ -219,118 +277,12 @@ export function BatchTransactionImport() {
 
       {rows.length > 0 && (
         <>
-          <div className="mt-5 overflow-x-auto rounded-[3px] border border-border">
-            <table className="min-w-[820px] w-full border-collapse bg-background text-left">
-              <thead>
-                <tr className="border-b border-border text-[0.7rem] uppercase tracking-[0.1em] text-muted">
-                  <th className="w-24 px-3 py-3 font-mono">Approve</th>
-                  <th className="w-28 px-3 py-3 font-mono">Type</th>
-                  <th className="w-36 px-3 py-3 font-mono">Amount</th>
-                  <th className="w-36 px-3 py-3 font-mono">Category</th>
-                  <th className="px-3 py-3 font-mono">Description</th>
-                  <th className="w-40 px-3 py-3 font-mono">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="border-b border-border last:border-b-0"
-                  >
-                    <td className="px-3 py-3">
-                      <button
-                        type="button"
-                        onClick={() => toggleRow(row.id)}
-                        className={`flex min-h-11 w-20 items-center justify-center gap-1 rounded-[3px] border font-mono text-[0.7rem] uppercase tracking-[0.08em] ${
-                          row.approved
-                            ? "border-success/40 bg-success/10 text-success"
-                            : "border-destructive/40 bg-destructive/10 text-destructive"
-                        }`}
-                      >
-                        {row.approved ? (
-                          <Check className="h-4 w-4" />
-                        ) : (
-                          <X className="h-4 w-4" />
-                        )}
-                        {row.approved ? "Yes" : "No"}
-                      </button>
-                    </td>
-                    <td className="px-3 py-3">
-                      <select
-                        value={row.type}
-                        onChange={(event) =>
-                          updateRow(
-                            row.id,
-                            "type",
-                            event.target.value as ParsedExpense["type"],
-                          )
-                        }
-                        className="min-h-11 w-full rounded-[3px] border border-border bg-card px-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                      >
-                        <option value="expense">Expense</option>
-                        <option value="income">Income</option>
-                      </select>
-                    </td>
-                    <td className="px-3 py-3">
-                      <input
-                        value={row.amount ? String(row.amount) : ""}
-                        inputMode="decimal"
-                        onChange={(event) =>
-                          updateRow(
-                            row.id,
-                            "amount",
-                            parseNumberInput(event.target.value),
-                          )
-                        }
-                        className="min-h-11 w-full rounded-[3px] border border-border bg-card px-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                        aria-label="Amount"
-                      />
-                    </td>
-                    <td className="px-3 py-3">
-                      <select
-                        value={row.category}
-                        onChange={(event) =>
-                          updateRow(row.id, "category", event.target.value)
-                        }
-                        className="min-h-11 w-full rounded-[3px] border border-border bg-card px-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                      >
-                        {CATEGORIES.map((category) => (
-                          <option key={category} value={category}>
-                            {category}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="px-3 py-3">
-                      <input
-                        value={row.description}
-                        onChange={(event) =>
-                          updateRow(row.id, "description", event.target.value)
-                        }
-                        className="min-h-11 w-full min-w-48 rounded-[3px] border border-border bg-card px-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                        aria-label="Description"
-                      />
-                    </td>
-                    <td className="px-3 py-3">
-                      <input
-                        type="date"
-                        value={row.transactionDate}
-                        onChange={(event) =>
-                          updateRow(
-                            row.id,
-                            "transactionDate",
-                            event.target.value,
-                          )
-                        }
-                        className="min-h-11 w-full rounded-[3px] border border-border bg-card px-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                        aria-label="Transaction date"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={columns}
+            data={rows}
+            className="mt-5 min-w-full [&_table]:min-w-[760px]"
+            emptyLabel="No transactions found."
+          />
 
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <button
