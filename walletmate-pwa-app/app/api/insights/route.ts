@@ -4,11 +4,21 @@ import { analyzeTransactions } from "@/lib/api";
 import { db } from "@/db";
 import { insights } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import type { AnalyzeRequest } from "@/types";
+import type { AnalyzeRequest, AnalyzeResponse } from "@/types";
 
 type InsightsRequest = AnalyzeRequest & {
   regenerate?: boolean;
 };
+
+function hasFourInsights(content: unknown): content is AnalyzeResponse {
+  return (
+    typeof content === "object" &&
+    content !== null &&
+    "insights" in content &&
+    Array.isArray((content as AnalyzeResponse).insights) &&
+    (content as AnalyzeResponse).insights.length === 4
+  );
+}
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -40,7 +50,11 @@ export async function POST(request: Request) {
       )
       .limit(1);
 
-    if (existingRows.length > 0 && !regenerate) {
+    if (
+      existingRows.length > 0 &&
+      !regenerate &&
+      hasFourInsights(existingRows[0].content)
+    ) {
       return NextResponse.json(existingRows[0].content);
     }
 

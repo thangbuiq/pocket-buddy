@@ -2,6 +2,9 @@
 
 # walletmate
 
+[![CI](https://github.com/thangbuiq/walletmate/actions/workflows/ci.yml/badge.svg)](https://github.com/thangbuiq/walletmate/actions/workflows/ci.yml)
+[![Prek](https://github.com/thangbuiq/walletmate/actions/workflows/prek.yml/badge.svg)](https://github.com/thangbuiq/walletmate/actions/workflows/prek.yml)
+
 > Tired of typing out every coffee or meal you buy? `walletmate` makes tracking your spending easy. Just take a picture of your receipt or type something like "bought coffee 50k today" and our AI will do the rest.
 
 ![walletmate App UI](./assets/app-ui.png)
@@ -94,6 +97,82 @@ Python FastAPI service providing:
 
 - Node.js 20+ and Bun
 - Python 3.12+ and uv
+
+## One-command Docker deployment
+
+Use this when you want to run the whole stack locally or on your own server:
+
+- `postgres`: local PostgreSQL database
+- `api`: FastAPI AI parsing backend on port `8000`
+- `pwa`: Next.js PWA on port `3000`
+
+### 1. Create the Docker env file
+
+```bash
+cp docker.env.example .env
+openssl rand -base64 32
+```
+
+Paste the generated secret into `AUTH_SECRET` in `.env`, then set `OPENAI_API_KEY`.
+
+For local Docker, the default URLs work:
+
+```env
+AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:8000
+CORS_ORIGINS=http://localhost:3000
+API_URL=http://api:8000
+```
+
+For a server, change the public URLs to your domain:
+
+```env
+AUTH_URL=https://walletmate.example.com
+NEXT_PUBLIC_API_URL=https://walletmate-api.example.com
+CORS_ORIGINS=https://walletmate.example.com
+API_URL=http://api:8000
+```
+
+`NEXT_PUBLIC_API_URL` must be reachable from users' browsers. `API_URL` is internal to Docker and should normally stay `http://api:8000`.
+
+### 2. Start everything
+
+```bash
+docker compose up --build
+```
+
+Open:
+
+- App: http://localhost:3000
+- API health: http://localhost:8000/api/health
+- API docs: http://localhost:8000/swagger
+
+The PWA container runs `bun run db:push` on startup, so the local Postgres tables are created automatically.
+
+### Common Docker commands
+
+```bash
+docker compose up -d --build     # start in background
+docker compose logs -f           # follow logs
+docker compose down              # stop containers
+docker compose down -v           # stop and delete local database volume
+```
+
+### GitHub login on Docker
+
+The demo login works without GitHub OAuth. To enable GitHub login, create an OAuth app at GitHub Developer Settings and set:
+
+```env
+GITHUB_ID=...
+GITHUB_SECRET=...
+AUTH_URL=http://localhost:3000
+```
+
+For a server, set the GitHub OAuth callback URL to:
+
+```text
+https://walletmate.example.com/api/auth/callback/github
+```
 
 ### Setup
 

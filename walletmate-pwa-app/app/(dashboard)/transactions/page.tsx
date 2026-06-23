@@ -13,7 +13,14 @@ import {
   useUpdateTransaction,
 } from "@/hooks/use-transactions";
 import { useCurrency, useI18n } from "@/lib/i18n";
-import { ChevronDown, LayoutGrid, Search, Table2, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  FileSpreadsheet,
+  LayoutGrid,
+  Search,
+  Table2,
+  Trash2,
+} from "lucide-react";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Toggle } from "@/components/ui/toggle";
 import type { Transaction } from "@/types";
@@ -149,6 +156,20 @@ export default function TransactionsPage() {
       </div>
 
       <div className="space-y-4 sm:space-y-6">
+        <div className="flex items-start gap-3 rounded-[4px] border border-primary/25 bg-primary/5 p-4 text-sm text-foreground">
+          <FileSpreadsheet className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <p className="font-sans leading-6">
+            Adding more than 2 transactions? Use{" "}
+            <a
+              href="#batch-import"
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Batch Import
+            </a>{" "}
+            below to upload CSV, Excel, PDF, or image files and review
+            everything at once.
+          </p>
+        </div>
         <SmartInput />
         <details className="group">
           <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-[4px] border border-border bg-card px-4 font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted transition-colors hover:text-foreground sm:px-6">

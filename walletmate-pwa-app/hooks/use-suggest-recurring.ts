@@ -21,5 +21,8 @@ export function useSuggestRecurring() {
         payload.language,
       );
     },
+    onError: (error) => {
+      console.error("[useSuggestRecurring] Suggestion failed:", error);
+    },
   });
 }

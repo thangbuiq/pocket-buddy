@@ -22,6 +22,14 @@ ALLOWED_CATEGORIES = [
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:3000,https://walletmate.vercel.app",
+    ).split(",")
+    if origin.strip()
+]
 
 
 def require_env(name: str) -> str:

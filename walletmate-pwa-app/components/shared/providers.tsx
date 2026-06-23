@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 import { I18nProvider } from "@/lib/i18n";
 import { ConfirmDialogProvider } from "@/components/ui/confirm-dialog";
+import { Toaster } from "@/components/ui/sonner";
 
 function createQueryClient() {
   return new QueryClient({
@@ -29,7 +30,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <SessionProvider>
         <I18nProvider>
           <QueryClientProvider client={queryClient}>
-            <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
+            <ConfirmDialogProvider>
+              {children}
+              <Toaster />
+            </ConfirmDialogProvider>
           </QueryClientProvider>
         </I18nProvider>
       </SessionProvider>

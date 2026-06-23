@@ -74,6 +74,8 @@ pydantic==2.13.4
     #   openai
 pydantic-core==2.46.4
     # via pydantic
+pypdf==6.14.2
+    # via walletmate-api (pyproject.toml)
 python-dotenv==1.2.2
     # via walletmate-api (pyproject.toml)
 python-multipart==0.0.32
@@ -101,14 +103,12 @@ tqdm==4.68.2
     # via openai
 typing-extensions==4.15.0
     # via
-    #   anyio
     #   fastapi
     #   langchain-core
     #   langchain-protocol
     #   openai
     #   pydantic
     #   pydantic-core
-    #   starlette
     #   typing-inspection
 typing-inspection==0.4.2
     # via

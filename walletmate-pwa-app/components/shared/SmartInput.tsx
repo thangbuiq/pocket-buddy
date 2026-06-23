@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, X, Loader2, Camera, ImageIcon, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { Toggle } from "@/components/ui/toggle";
@@ -90,6 +91,9 @@ export function SmartInput() {
         setEditedData({ ...data, recurring: false, recurringFreq: undefined });
         setSuggestion(null);
         setShowSuggestion(false);
+        toast.success("AI parsed your transaction", {
+          description: "Review the details before adding it to your ledger.",
+        });
       }
     },
     onError: (err) => {
@@ -97,6 +101,9 @@ export function SmartInput() {
       const message = err instanceof Error ? err.message : t("parseError");
       console.error("[SmartInput] Parse error:", message, err);
       setError(message);
+      toast.error("Could not parse transaction", {
+        description: message,
+      });
     },
   });
 
@@ -172,6 +179,17 @@ export function SmartInput() {
         imageUrlRef.current = null;
       }
       setSelectedImage(null);
+      toast.success("Transaction added", {
+        description: "Your parsed transaction was saved.",
+      });
+    },
+    onError: (err) => {
+      const message = err instanceof Error ? err.message : "Save failed";
+      console.error("[SmartInput] Save error:", err);
+      setError(message);
+      toast.error("Could not save transaction", {
+        description: message,
+      });
     },
   });
 

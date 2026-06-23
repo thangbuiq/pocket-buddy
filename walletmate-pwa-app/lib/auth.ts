@@ -8,6 +8,10 @@ import { eq } from "drizzle-orm";
 
 const DEMO_USER_ID = "demo-user";
 const DEMO_EMAIL = "demo@pocketbuddy.app";
+const AUTH_BASE_URL = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "";
+const USE_SECURE_COOKIES = AUTH_BASE_URL
+  ? AUTH_BASE_URL.startsWith("https://")
+  : process.env.NODE_ENV === "production";
 
 interface GitHubProfile {
   id: number;
@@ -52,7 +56,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "production",
+        secure: USE_SECURE_COOKIES,
       },
     },
   },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { buildRecurringHistory } from "@/lib/transaction-helpers";
 import type { Transaction } from "@/types";
 
@@ -47,6 +48,16 @@ export function useInsights({
     mutationFn: () => fetchInsights({ regenerate: true }),
     onSuccess: (data) => {
       queryClient.setQueryData(queryKey, data);
+      toast.success("Insights refreshed", {
+        description: "Your latest spending analysis is ready.",
+      });
+    },
+    onError: (error) => {
+      console.error("[useInsights] Regenerate failed:", error);
+      toast.error("Could not refresh insights", {
+        description:
+          error instanceof Error ? error.message : "Please try again.",
+      });
     },
   });
 

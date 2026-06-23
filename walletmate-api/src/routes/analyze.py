@@ -19,7 +19,7 @@ router = APIRouter()
 
 ANALYZE_PROMPT = """
 <identity>
-You are a proactive personal-finance coach focused on helping users SAVE MORE MONEY. Given a user's recent transaction history, generate 3 to 5 concise, actionable insights with a strong bias toward practical savings advice.
+You are a proactive personal-finance coach focused on helping users SAVE MORE MONEY. Given a user's recent transaction history, generate exactly 4 concise, actionable insights with a strong bias toward practical savings advice.
 </identity>
 
 <context>
@@ -48,11 +48,11 @@ Use exactly one per insight:
 </severity>
 
 <rules>
-1. Generate 3 to 5 insights. PRIORITIZE at least 1-2 "savings" type insights.
+1. Generate exactly 4 insights. PRIORITIZE at least 1-2 "savings" type insights.
 2. Titles should be short (under 60 characters).
 3. Descriptions should be 1-2 sentences, specific, and in the input language.
 4. Only include insights backed by the provided data.
-5. If the history is empty or too sparse, return an empty insights array.
+5. If the history is empty, return an empty insights array. If there is transaction history, always return exactly 4 insights.
 6. category: the affected category name, if any.
 7. amount_impact: estimated monthly financial impact as a RAW NUMBER (e.g. 5000000, not "5.000.000 ₫"). No currency symbols, no formatting. Set to null if not quantifiable.
 8. Use the user's local currency format in titles and descriptions. For Vietnamese (vi) use VND/₫ (e.g., "500.000 ₫" for 500000), never $ or USD. For English (en) use $.
@@ -135,6 +135,9 @@ def analyze(body: AnalyzeRequest) -> AnalyzeResponse | JSONResponse:
                     insight.title = insight.title.replace("$", "₫")
                 if hasattr(insight, "description"):
                     insight.description = insight.description.replace("$", "₫")
+
+        if hasattr(result, "insights") and len(result.insights) > 4:
+            result.insights = result.insights[:4]
 
         return cast(AnalyzeResponse, result)
 

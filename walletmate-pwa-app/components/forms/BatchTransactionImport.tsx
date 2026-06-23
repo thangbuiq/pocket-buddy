@@ -11,6 +11,7 @@ import {
   X,
   XCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 import { DataTable } from "@/components/ui/data-table";
 import { Toggle } from "@/components/ui/toggle";
 import { parseBatchFile } from "@/lib/api";
@@ -21,7 +22,7 @@ import type { ParsedExpense } from "@/lib/validations/parse";
 const MAX_BATCH_FILE_SIZE = 5 * 1024 * 1024;
 const MAX_BATCH_TRANSACTIONS = 100;
 const ACCEPTED_FILE_TYPES =
-  ".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  ".csv,.xlsx,.pdf,.jpg,.jpeg,.png,.webp,.gif,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/pdf,image/jpeg,image/png,image/webp,image/gif";
 
 type BatchRow = ParsedExpense & {
   id: string;
@@ -50,8 +51,12 @@ export function BatchTransactionImport() {
 
   const validateFile = (file: File) => {
     const extension = file.name.split(".").pop()?.toLowerCase();
-    if (!["csv", "xlsx"].includes(extension ?? "")) {
-      return "Only CSV and XLSX files are supported.";
+    if (
+      !["csv", "xlsx", "pdf", "jpg", "jpeg", "png", "webp", "gif"].includes(
+        extension ?? "",
+      )
+    ) {
+      return "Only CSV, XLSX, PDF, and image files are supported.";
     }
     if (file.size > MAX_BATCH_FILE_SIZE) {
       return "File too large. Maximum size is 5 MB.";
@@ -83,6 +88,16 @@ export function BatchTransactionImport() {
       );
       if (parsedRows.length === 0) {
         setError("No transactions were found in this file.");
+        toast.error("No transactions found", {
+          description: "Try another CSV, XLSX, PDF, or image file.",
+        });
+      } else {
+        toast.success("File parsed", {
+          description: `${Math.min(
+            parsedRows.length,
+            MAX_BATCH_TRANSACTIONS,
+          )} transactions are ready for review.`,
+        });
       }
     } catch (err) {
       const message =
@@ -96,7 +111,11 @@ export function BatchTransactionImport() {
       } catch {
         // Keep the original message.
       }
+      console.error("[BatchTransactionImport] Parse error:", err);
       setError(message);
+      toast.error("Could not parse file", {
+        description: message,
+      });
     } finally {
       setIsParsing(false);
     }
@@ -207,26 +226,41 @@ export function BatchTransactionImport() {
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
       setRows([]);
       setFileName(null);
+      toast.success("Transactions imported", {
+        description: `${approvedRows.length} approved ${
+          approvedRows.length === 1 ? "transaction was" : "transactions were"
+        } saved.`,
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save rows");
+      const message =
+        err instanceof Error ? err.message : "Failed to save rows";
+      console.error("[BatchTransactionImport] Save error:", err);
+      setError(message);
+      toast.error("Could not import transactions", {
+        description: message,
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <section className="rounded-[4px] border border-border bg-card p-4 sm:p-6">
+    <section
+      id="batch-import"
+      className="rounded-[4px] border border-border bg-card p-4 sm:p-6"
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <span className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-primary">
             Batch Import
           </span>
           <h2 className="mt-1 font-serif text-[1.7rem] leading-tight text-foreground sm:text-[2rem]">
-            CSV / Excel <span className="serif-accent">review</span>
+            CSV / Excel / PDF / Image{" "}
+            <span className="serif-accent">review</span>
           </h2>
           <p className="mt-2 max-w-xl font-sans text-sm leading-6 text-muted sm:text-base">
-            CSV or XLSX only. Up to {MAX_BATCH_TRANSACTIONS} transactions and 5
-            MB per file.
+            CSV, XLSX, PDF, JPG, PNG, WebP, or GIF. Up to{" "}
+            {MAX_BATCH_TRANSACTIONS} transactions and 5 MB per file.
           </p>
         </div>
 
