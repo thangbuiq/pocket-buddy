@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import {
-  Bar,
   CartesianGrid,
-  ComposedChart,
   Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -13,13 +12,13 @@ import {
 } from "recharts";
 import { useI18n } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
-import type { CashFlowPoint } from "@/lib/analytics";
+import type { SpendingPacePoint } from "@/lib/analytics";
 
-export function MonthlyTrendChart({
+export function SpendingPaceChart({
   data,
   currency = "VND",
 }: {
-  data: CashFlowPoint[];
+  data: SpendingPacePoint[];
   currency?: string;
 }) {
   const { t } = useI18n();
@@ -34,10 +33,10 @@ export function MonthlyTrendChart({
     <div className="card-shadow flex h-80 flex-col rounded-[4px] border border-border bg-card p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3">
         <h3 className="font-serif text-lg text-foreground">
-          {t("cashFlowTrend")}
+          {t("spendingPace")}
         </h3>
         <span className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted">
-          {t("lastSixMonths")}
+          {t("monthToDate")}
         </span>
       </div>
       <div className="min-h-0 flex-1">
@@ -48,14 +47,15 @@ export function MonthlyTrendChart({
             minWidth={0}
             minHeight={0}
           >
-            <ComposedChart
+            <LineChart
               data={data}
               margin={{ top: 4, right: 0, bottom: 8, left: -18 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
-                dataKey="month"
+                dataKey="day"
                 stroke="var(--muted)"
+                interval="preserveStartEnd"
                 tick={{
                   fontFamily: "'IBM Plex Mono', monospace",
                   fontSize: "0.7rem",
@@ -73,12 +73,9 @@ export function MonthlyTrendChart({
               <Tooltip
                 formatter={(value, name) => [
                   formatCurrency(Number(value), currency),
-                  name === "income"
-                    ? t("income")
-                    : name === "expenses"
-                      ? t("expense")
-                      : t("netCashFlow"),
+                  name === "current" ? t("currentMonth") : t("previousMonth"),
                 ]}
+                labelFormatter={(day) => `${t("day")} ${day}`}
                 contentStyle={{
                   backgroundColor: "var(--card)",
                   border: "1px solid var(--border)",
@@ -88,24 +85,24 @@ export function MonthlyTrendChart({
                   fontSize: "0.75rem",
                 }}
               />
-              <Bar
-                dataKey="income"
-                fill="var(--success)"
-                radius={[2, 2, 0, 0]}
-              />
-              <Bar
-                dataKey="expenses"
-                fill="var(--destructive)"
-                radius={[2, 2, 0, 0]}
+              <Line
+                type="monotone"
+                dataKey="previous"
+                stroke="var(--muted)"
+                strokeDasharray="4 4"
+                strokeWidth={2}
+                dot={false}
+                connectNulls
               />
               <Line
                 type="monotone"
-                dataKey="net"
+                dataKey="current"
                 stroke="var(--primary)"
                 strokeWidth={2}
-                dot={{ r: 2 }}
+                dot={false}
+                connectNulls
               />
-            </ComposedChart>
+            </LineChart>
           </ResponsiveContainer>
         ) : (
           <div className="flex h-full items-center justify-center font-mono text-sm text-muted">

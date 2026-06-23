@@ -44,7 +44,7 @@ export function InsightsList({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 md:grid-cols-2 lg:gap-4">
       {insights.map((insight, index) => {
         const Icon = ICONS[insight.type];
         const severityStyle = SEVERITY_STYLES[insight.severity];
@@ -52,7 +52,7 @@ export function InsightsList({
         return (
           <article
             key={`${insight.type}-${index}`}
-            className={`rounded-[4px] border p-5 transition-colors hover:opacity-90 ${severityStyle}`}
+            className={`flex h-full min-h-40 flex-col rounded-[4px] border p-4 transition-colors hover:opacity-90 sm:p-5 ${severityStyle}`}
           >
             <div className="mb-3 flex items-center gap-2">
               <Icon className="h-4 w-4" />
@@ -62,10 +62,10 @@ export function InsightsList({
                 )}
               </span>
             </div>
-            <h3 className="font-serif text-[1.1rem] leading-tight text-foreground">
+            <h3 className="font-serif text-base leading-tight text-foreground sm:text-[1.1rem]">
               {insight.title}
             </h3>
-            <p className="mt-2 font-sans text-sm text-muted">
+            <p className="mt-2 flex-1 font-sans text-sm leading-6 text-foreground/80">
               {insight.description}
             </p>
             {insight.amount_impact !== undefined &&

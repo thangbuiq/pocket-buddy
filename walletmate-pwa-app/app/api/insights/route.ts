@@ -6,6 +6,10 @@ import { insights } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { AnalyzeRequest } from "@/types";
 
+type InsightsRequest = AnalyzeRequest & {
+  regenerate?: boolean;
+};
+
 export async function POST(request: Request) {
   const session = await auth();
   const userId = session?.user?.id;
@@ -15,7 +19,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as AnalyzeRequest;
+    const body = (await request.json()) as InsightsRequest;
+    const { regenerate = false, ...analyzeRequest } = body;
 
     // Check if an insight already exists for today
     const today = new Date();
@@ -35,20 +40,26 @@ export async function POST(request: Request) {
       )
       .limit(1);
 
-    if (existingRows.length > 0) {
+    if (existingRows.length > 0 && !regenerate) {
       return NextResponse.json(existingRows[0].content);
     }
 
-    // No existing insight for today, so generate it
-    const newAdvice = await analyzeTransactions(body);
+    // No existing insight for today, or the user explicitly requested a refresh.
+    const newAdvice = await analyzeTransactions(analyzeRequest);
 
-    // Save to database
-    await db.insert(insights).values({
-      userId,
-      date: dateStr,
-      language: body.language,
-      content: newAdvice,
-    });
+    if (existingRows.length > 0) {
+      await db
+        .update(insights)
+        .set({ content: newAdvice })
+        .where(eq(insights.id, existingRows[0].id));
+    } else {
+      await db.insert(insights).values({
+        userId,
+        date: dateStr,
+        language: body.language,
+        content: newAdvice,
+      });
+    }
 
     return NextResponse.json(newAdvice);
   } catch (error) {

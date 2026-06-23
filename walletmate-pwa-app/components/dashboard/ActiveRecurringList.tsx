@@ -93,10 +93,10 @@ export function ActiveRecurringList({
             key={txn.id}
             className="rounded-[4px] border border-border bg-card p-4 transition-colors hover:border-muted"
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               {/* Left: info */}
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Repeat className="h-3.5 w-3.5 shrink-0 text-primary" />
                   <h4 className="truncate font-sans text-[0.9rem] font-medium text-foreground">
                     {txn.description || txn.category}
@@ -130,8 +130,8 @@ export function ActiveRecurringList({
               </div>
 
               {/* Right: amount + actions */}
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="font-mono text-[0.9rem] font-medium text-destructive">
+              <div className="flex shrink-0 items-center justify-between gap-2 sm:justify-end">
+                <span className="min-w-0 font-mono text-[0.9rem] font-medium text-destructive [overflow-wrap:anywhere]">
                   -{formatCurrency(txn.amount, currency)}
                 </span>
 
@@ -146,36 +146,36 @@ export function ActiveRecurringList({
                       setDateValue(txn.recurringEndDate ?? "");
                     }
                   }}
-                  className="flex h-7 w-7 items-center justify-center rounded-[3px] border border-border text-muted transition-colors hover:border-primary hover:text-primary cursor-pointer"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border border-border text-muted transition-colors hover:border-primary hover:text-primary cursor-pointer"
                   aria-label="Set end date"
                   title={t("recurringEndDate")}
                 >
-                  <Calendar className="h-3.5 w-3.5" />
+                  <Calendar className="h-4 w-4" />
                 </button>
 
                 {/* Cancel recurring */}
                 <button
                   type="button"
                   onClick={() => onCancelRecurring(txn)}
-                  className="flex h-7 w-7 items-center justify-center rounded-[3px] border border-border text-muted transition-colors hover:border-destructive hover:text-destructive cursor-pointer"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border border-border text-muted transition-colors hover:border-destructive hover:text-destructive cursor-pointer"
                   aria-label={t("recurringCancel")}
                   title={t("recurringCancel")}
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
             {/* Inline end-date picker */}
             {isEditing && (
-              <div className="mt-3 flex items-center gap-2 rounded-[3px] border border-primary/20 bg-primary/5 p-3">
+              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-[3px] border border-primary/20 bg-primary/5 p-3">
                 <Calendar className="h-3.5 w-3.5 shrink-0 text-primary" />
                 <input
                   type="date"
                   value={dateValue}
                   onChange={(e) => setDateValue(e.target.value)}
                   min={new Date().toISOString().slice(0, 10)}
-                  className="flex-1 bg-transparent font-mono text-sm text-foreground focus:outline-none"
+                  className="min-h-10 min-w-40 flex-1 bg-transparent font-mono text-sm text-foreground focus:outline-none"
                 />
                 <button
                   type="button"
@@ -184,21 +184,21 @@ export function ActiveRecurringList({
                     onSetEndDate(txn.id, dateValue);
                     setEditingId(null);
                   }}
-                  className="rounded-[3px] bg-primary px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.08em] text-primary-foreground transition-opacity hover:opacity-85 disabled:opacity-50 cursor-pointer"
+                  className="min-h-10 rounded-[3px] bg-primary px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.08em] text-primary-foreground transition-opacity hover:opacity-85 disabled:opacity-50 cursor-pointer"
                 >
                   {t("apply")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingId(null)}
-                  className="rounded-[3px] border border-border px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.08em] text-muted transition-colors hover:text-foreground cursor-pointer"
+                  className="min-h-10 rounded-[3px] border border-border px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.08em] text-muted transition-colors hover:text-foreground cursor-pointer"
                 >
                   {t("cancel")}
                 </button>
 
                 {/* Preview recurrences left */}
                 {dateValue && txn.recurringFreq && (
-                  <span className="ml-auto font-sans text-xs text-muted italic">
+                  <span className="font-sans text-xs text-muted italic sm:ml-auto">
                     {countRecurrencesLeft(txn.recurringFreq, dateValue)}{" "}
                     {t("recurringLeftPlural")}
                   </span>

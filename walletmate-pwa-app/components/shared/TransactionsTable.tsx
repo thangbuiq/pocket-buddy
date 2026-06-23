@@ -31,8 +31,10 @@ function SortHeader({
 
 export function TransactionsTable({
   transactions,
+  currency = "VND",
 }: {
   transactions: Transaction[];
+  currency?: string;
 }) {
   const columns = useMemo<ColumnDef<Transaction>[]>(
     () => [
@@ -65,7 +67,7 @@ export function TransactionsTable({
         header: ({ column }) => <SortHeader label="Amount" column={column} />,
         cell: ({ row }) => (
           <span className="whitespace-nowrap font-mono">
-            {formatCurrency(row.original.amount)}
+            {formatCurrency(row.original.amount, currency)}
           </span>
         ),
       },
@@ -97,7 +99,7 @@ export function TransactionsTable({
         ),
       },
     ],
-    [],
+    [currency],
   );
 
   return (

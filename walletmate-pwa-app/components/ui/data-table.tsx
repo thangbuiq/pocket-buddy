@@ -49,7 +49,7 @@ export function DataTable<TData, TValue>({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[3px] border border-border bg-background",
+        "overflow-x-auto rounded-[3px] border border-border bg-background",
         className,
       )}
     >

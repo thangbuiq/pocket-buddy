@@ -1,6 +1,8 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
+import type { CategorySpendPoint } from "@/lib/analytics";
 
 const CATEGORY_COLORS = [
   "var(--chart-1)",
@@ -17,55 +19,57 @@ export function CategoryBreakdown({
   data,
   currency = "VND",
 }: {
-  data: Array<{ name: string; value: number }>;
+  data: CategorySpendPoint[];
   currency?: string;
 }) {
-  const total = data.reduce((sum, d) => sum + d.value, 0);
+  const { t } = useI18n();
+  const total = data.reduce((sum, d) => sum + d.amount, 0);
 
   if (data.length === 0 || total === 0) {
     return (
       <div className="flex h-72 items-center justify-center rounded-[4px] border border-border bg-card">
-        <p className="font-mono text-sm text-muted">No expense data</p>
+        <p className="font-mono text-sm text-muted">{t("noExpenseData")}</p>
       </div>
     );
   }
 
-  const sorted = [...data].sort((a, b) => b.value - a.value);
+  const sorted = [...data].sort((a, b) => b.amount - a.amount);
 
   return (
-    <div className="flex h-72 flex-col rounded-[4px] border border-border bg-card p-5">
+    <div className="flex h-80 flex-col rounded-[4px] border border-border bg-card p-4 sm:p-5">
       <div className="mb-4 flex shrink-0 items-baseline justify-between">
-        <h3 className="font-serif text-lg text-foreground">By Category</h3>
+        <h3 className="font-serif text-lg text-foreground">
+          {t("topCategories")}
+        </h3>
         <span className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted">
-          {sorted.length} {sorted.length === 1 ? "category" : "categories"}
+          {sorted.length} {t("categoriesCount")}
         </span>
       </div>
       <div className="flex-1 space-y-3 overflow-y-auto pr-2">
         {sorted.map((item, i) => {
-          const pct = total > 0 ? (item.value / total) * 100 : 0;
           const color = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
           return (
-            <div key={item.name} className="group">
+            <div key={item.category} className="group">
               <div className="mb-1.5 flex items-center gap-2">
                 <span
                   className="h-2 w-2 flex-shrink-0 rounded-full"
                   style={{ backgroundColor: color }}
                 />
                 <span className="flex-1 truncate font-sans text-sm text-foreground">
-                  {item.name}
+                  {item.category}
                 </span>
-                <span className="font-mono text-[0.7rem] tabular-nums text-text-dim">
-                  {formatCurrency(item.value, currency)}
+                <span className="font-mono text-[0.7rem] tabular-nums text-text-dim [overflow-wrap:anywhere]">
+                  {formatCurrency(item.amount, currency)}
                 </span>
                 <span className="w-10 text-right font-mono text-[0.7rem] tabular-nums text-muted">
-                  {pct.toFixed(0)}%
+                  {item.percent.toFixed(0)}%
                 </span>
               </div>
               <div className="h-[3px] overflow-hidden rounded-full bg-border">
                 <div
                   className="h-full rounded-full transition-all duration-500 ease-out"
                   style={{
-                    width: `${pct}%`,
+                    width: `${item.percent}%`,
                     backgroundColor: color,
                   }}
                 />

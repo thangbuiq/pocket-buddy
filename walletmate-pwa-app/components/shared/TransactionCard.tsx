@@ -19,7 +19,7 @@ export function TransactionCard({
   const hasEndDate = Boolean(transaction.recurringEndDate);
 
   return (
-    <article className="rounded-[4px] border border-border bg-card p-4 pr-14 transition-colors hover:border-muted sm:p-5">
+    <article className="rounded-[4px] border border-border bg-card p-4 transition-colors hover:border-muted sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -49,7 +49,7 @@ export function TransactionCard({
         </div>
         <div className="flex items-center justify-between gap-3 sm:justify-end">
           <div
-            className={`font-mono text-base font-medium ${
+            className={`font-mono text-base font-medium [overflow-wrap:anywhere] ${
               transaction.type === "expense"
                 ? "text-destructive"
                 : "text-success"

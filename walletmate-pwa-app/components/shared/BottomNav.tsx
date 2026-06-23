@@ -37,7 +37,7 @@ export function BottomNav() {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isSettingsOpen]);
 

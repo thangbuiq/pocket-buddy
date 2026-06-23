@@ -9,10 +9,13 @@ import {
   PiggyBank,
   ChevronLeft,
   ChevronRight,
+  RefreshCw,
 } from "lucide-react";
 import { TransactionCard } from "@/components/shared/TransactionCard";
 import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";
 import { CategoryBreakdown } from "@/components/charts/CategoryBreakdown";
+import { SpendingPaceChart } from "@/components/charts/SpendingPaceChart";
+import { RecurringIncomeRatioCard } from "@/components/charts/RecurringIncomeRatioCard";
 import { SmartInput } from "@/components/shared/SmartInput";
 import { ActiveRecurringList } from "@/components/dashboard/ActiveRecurringList";
 import {
@@ -24,6 +27,12 @@ import { useInsights } from "@/hooks/use-insights";
 import { useI18n, useCurrency } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import {
+  buildCashFlowTrend,
+  buildSpendingPace,
+  buildTopCategorySpend,
+  getMonthlyRecurringExpense,
+} from "@/lib/analytics";
 
 type OverviewMode = "month" | "year";
 
@@ -34,15 +43,24 @@ export default function DashboardPage() {
   const { data: transactions = [] } = useTransactions();
   const updateTransaction = useUpdateTransaction();
   const { confirm } = useConfirm();
-  const { data: insightsData, isLoading: isInsightsLoading } = useInsights({
+  const {
+    data: insightsData,
+    isLoading: isInsightsLoading,
+    isError: isInsightsError,
+    regenerate,
+    isRegenerating,
+    regenerateError,
+  } = useInsights({
     transactions,
     language,
   });
 
-  const now = new Date();
+  const now = useMemo(() => new Date(), []);
+  const currentMonthIndex = now.getMonth();
+  const currentYear = now.getFullYear();
   const [overviewMode, setOverviewMode] = useState<OverviewMode>("month");
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
-  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(currentMonthIndex);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
 
   const walletLabel = session?.user?.githubUsername
     ? `Ví của "${session.user.githubUsername}"`
@@ -66,62 +84,120 @@ export default function DashboardPage() {
 
   const isCurrentPeriod =
     overviewMode === "month"
-      ? selectedMonth === now.getMonth() && selectedYear === now.getFullYear()
-      : selectedYear === now.getFullYear();
+      ? selectedMonth === currentMonthIndex && selectedYear === currentYear
+      : selectedYear === currentYear;
+
+  const getPeriodTransactions = useCallback(
+    (month: number, year: number, mode: OverviewMode) => {
+      return transactions.filter((item) => {
+        const d = new Date(item.transactionDate);
+        if (mode === "month") {
+          return d.getMonth() === month && d.getFullYear() === year;
+        }
+        return d.getFullYear() === year;
+      });
+    },
+    [transactions],
+  );
 
   // Filtered transactions based on selected period
   const filteredTransactions = useMemo(() => {
-    return transactions.filter((item) => {
-      const d = new Date(item.transactionDate);
-      if (overviewMode === "month") {
-        return (
-          d.getMonth() === selectedMonth && d.getFullYear() === selectedYear
-        );
-      }
-      return d.getFullYear() === selectedYear;
-    });
-  }, [transactions, overviewMode, selectedMonth, selectedYear]);
+    return getPeriodTransactions(selectedMonth, selectedYear, overviewMode);
+  }, [getPeriodTransactions, overviewMode, selectedMonth, selectedYear]);
 
-  const expenses = filteredTransactions.filter(
-    (item) => item.type === "expense",
-  );
-  const income = filteredTransactions.filter((item) => item.type === "income");
-  const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
-  const totalIncome = income.reduce((sum, item) => sum + item.amount, 0);
-  const net = totalIncome - totalExpenses;
-
-  // All-time data for charts (unchanged)
-  const allExpenses = transactions.filter((item) => item.type === "expense");
-  const categoryTotals = allExpenses.reduce(
-    (acc, t) => {
-      acc[t.category] = (acc[t.category] || 0) + t.amount;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
-  const categoryData = Object.entries(categoryTotals).map(([name, value]) => ({
-    name,
-    value,
-  }));
-
-  const monthlyData: Array<{ month: string; amount: number }> = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthLabel =
-      language === "vi"
-        ? `T${d.getMonth() + 1}`
-        : d.toLocaleString("en-US", { month: "short" });
-    const monthExpenses = allExpenses.filter((t) => {
-      const td = new Date(t.transactionDate);
-      return (
-        td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear()
+  const previousTransactions = useMemo(() => {
+    if (overviewMode === "month") {
+      const previousDate = new Date(selectedYear, selectedMonth - 1, 1);
+      return getPeriodTransactions(
+        previousDate.getMonth(),
+        previousDate.getFullYear(),
+        "month",
       );
-    });
-    monthlyData.push({
-      month: monthLabel,
-      amount: monthExpenses.reduce((s, t) => s + t.amount, 0),
-    });
-  }
+    }
+    return getPeriodTransactions(selectedMonth, selectedYear - 1, "year");
+  }, [getPeriodTransactions, overviewMode, selectedMonth, selectedYear]);
+
+  const {
+    totalExpenses,
+    totalIncome,
+    net,
+    previousTotalExpenses,
+    previousTotalIncome,
+    previousNet,
+  } = useMemo(() => {
+    const expenses = filteredTransactions.filter(
+      (item) => item.type === "expense",
+    );
+    const income = filteredTransactions.filter(
+      (item) => item.type === "income",
+    );
+    const previousExpenses = previousTransactions.filter(
+      (item) => item.type === "expense",
+    );
+    const previousIncome = previousTransactions.filter(
+      (item) => item.type === "income",
+    );
+    const nextTotalExpenses = expenses.reduce(
+      (sum, item) => sum + item.amount,
+      0,
+    );
+    const nextTotalIncome = income.reduce((sum, item) => sum + item.amount, 0);
+    const nextPreviousTotalExpenses = previousExpenses.reduce(
+      (sum, item) => sum + item.amount,
+      0,
+    );
+    const nextPreviousTotalIncome = previousIncome.reduce(
+      (sum, item) => sum + item.amount,
+      0,
+    );
+
+    return {
+      totalExpenses: nextTotalExpenses,
+      totalIncome: nextTotalIncome,
+      net: nextTotalIncome - nextTotalExpenses,
+      previousTotalExpenses: nextPreviousTotalExpenses,
+      previousTotalIncome: nextPreviousTotalIncome,
+      previousNet: nextPreviousTotalIncome - nextPreviousTotalExpenses,
+    };
+  }, [filteredTransactions, previousTransactions]);
+
+  const savingsRate =
+    totalIncome > 0 ? Math.max(Math.round((net / totalIncome) * 100), 0) : 0;
+  const previousSavingsRate =
+    previousTotalIncome > 0
+      ? Math.max(Math.round((previousNet / previousTotalIncome) * 100), 0)
+      : 0;
+
+  const cashFlowData = useMemo(
+    () => buildCashFlowTrend(transactions, language),
+    [language, transactions],
+  );
+  const categoryData = useMemo(
+    () => buildTopCategorySpend(transactions),
+    [transactions],
+  );
+  const spendingPaceData = useMemo(
+    () => buildSpendingPace(transactions),
+    [transactions],
+  );
+  const monthlyRecurringExpense = useMemo(
+    () => getMonthlyRecurringExpense(transactions),
+    [transactions],
+  );
+  const currentMonthIncome = useMemo(
+    () =>
+      transactions
+        .filter((item) => {
+          const d = new Date(item.transactionDate);
+          return (
+            item.type === "income" &&
+            d.getMonth() === currentMonthIndex &&
+            d.getFullYear() === currentYear
+          );
+        })
+        .reduce((sum, item) => sum + item.amount, 0),
+    [currentMonthIndex, currentYear, transactions],
+  );
 
   const overviewPeriodLabel =
     overviewMode === "month"
@@ -131,39 +207,58 @@ export default function DashboardPage() {
         )
       : selectedYear.toString();
 
+  const formatDelta = (
+    current: number,
+    previous: number,
+    isPercent = false,
+  ) => {
+    if (previous === 0 && current === 0) return t("noChange");
+    if (isPercent) {
+      const delta = current - previous;
+      return `${delta >= 0 ? "+" : ""}${delta}${t("percentagePointShort")}`;
+    }
+    const delta = current - previous;
+    const sign = delta >= 0 ? "+" : "";
+    return `${sign}${formatCurrency(delta, currency)}`;
+  };
+
   const overviewItems = [
     {
       label: t("totalIncome"),
       value: formatCurrency(totalIncome, currency),
+      delta: formatDelta(totalIncome, previousTotalIncome),
       icon: TrendingUp,
       iconColor: "text-success",
     },
     {
       label: t("totalExpenses"),
       value: formatCurrency(totalExpenses, currency),
+      delta: formatDelta(totalExpenses, previousTotalExpenses),
       icon: TrendingDown,
       iconColor: "text-destructive",
     },
     {
       label: t("netCashFlow"),
       value: formatCurrency(net, currency),
+      delta: formatDelta(net, previousNet),
       icon: ArrowUpDown,
       iconColor: net >= 0 ? "text-success" : "text-destructive",
     },
     {
       label: t("savingsRate"),
-      value: `${totalIncome > 0 ? Math.max(Math.round((net / totalIncome) * 100), 0) : 0}%`,
+      value: `${savingsRate}%`,
+      delta: formatDelta(savingsRate, previousSavingsRate, true),
       icon: PiggyBank,
       iconColor: "text-primary",
     },
   ];
 
   return (
-    <div className="space-y-16 animate-in">
+    <div className="space-y-8 animate-in sm:space-y-12 lg:space-y-16">
       {/* Page Heading */}
       <div>
         <span className="eyebrow mb-3 block">Dashboard</span>
-        <h1 className="font-serif text-[2.5rem] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
+        <h1 className="font-serif text-[2rem] font-normal leading-[1.08] text-foreground sm:text-[2.5rem]">
           {walletLabel}
         </h1>
       </div>
@@ -176,7 +271,7 @@ export default function DashboardPage() {
 
       {/* Summary Stats */}
       <section>
-        <div className="mb-6 flex items-end justify-between gap-4">
+        <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <div>
             <span className="eyebrow block">02 - Overview</span>
             <div className="mt-1 flex items-center gap-1">
@@ -184,11 +279,11 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => navigatePeriod(-1)}
                 className="flex h-10 w-10 items-center justify-center rounded-[3px] text-muted hover:bg-muted/10 hover:text-foreground transition-colors"
-                aria-label="Previous period"
+                aria-label={t("previousPeriod")}
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <span className="font-sans text-sm text-muted capitalize min-w-[120px] text-center">
+              <span className="min-w-[8.5rem] flex-1 text-center font-sans text-sm capitalize text-muted sm:flex-none">
                 {overviewPeriodLabel}
               </span>
               <button
@@ -196,13 +291,13 @@ export default function DashboardPage() {
                 onClick={() => navigatePeriod(1)}
                 disabled={isCurrentPeriod}
                 className="flex h-10 w-10 items-center justify-center rounded-[3px] text-muted hover:bg-muted/10 hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label="Next period"
+                aria-label={t("nextPeriod")}
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
             </div>
           </div>
-          <div className="flex rounded-[4px] border border-border overflow-hidden">
+          <div className="grid grid-cols-2 overflow-hidden rounded-[4px] border border-border sm:flex">
             <button
               type="button"
               onClick={() => setOverviewMode("month")}
@@ -228,22 +323,25 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {overviewItems.map((item) => {
             const Icon = item.icon;
             return (
               <article
                 key={item.label}
-                className="card-shadow rounded-[4px] border border-border bg-card p-5 transition-colors hover:border-muted"
+                className="card-shadow rounded-[4px] border border-border bg-card p-3 transition-colors hover:border-muted sm:p-5"
               >
                 <div className="mb-3 flex items-center gap-2">
                   <Icon className={`h-4 w-4 ${item.iconColor}`} />
-                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted">
+                  <p className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted sm:text-[0.65rem]">
                     {item.label}
                   </p>
                 </div>
-                <p className="mt-2 font-mono text-xl font-medium text-foreground">
+                <p className="mt-2 font-mono text-base font-medium text-foreground tabular-nums [overflow-wrap:anywhere] sm:text-xl">
                   {item.value}
+                </p>
+                <p className="mt-2 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted [overflow-wrap:anywhere]">
+                  {item.delta} {t("vsPrevious")}
                 </p>
               </article>
             );
@@ -305,15 +403,43 @@ export default function DashboardPage() {
       {/* Charts */}
       <section>
         <span className="eyebrow mb-6 block">04 - Analytics</span>
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
+          <MonthlyTrendChart data={cashFlowData} currency={currency} />
           <CategoryBreakdown data={categoryData} currency={currency} />
-          <MonthlyTrendChart data={monthlyData} />
+          <SpendingPaceChart data={spendingPaceData} currency={currency} />
+          <RecurringIncomeRatioCard
+            monthlyIncome={currentMonthIncome}
+            monthlyRecurringExpense={monthlyRecurringExpense}
+            currency={currency}
+          />
         </div>
       </section>
 
       {/* Advice */}
       <section>
-        <span className="eyebrow mb-6 block">05 - Advice</span>
+        <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
+          <span className="eyebrow block">05 - Advice</span>
+          <button
+            type="button"
+            onClick={() => regenerate()}
+            disabled={
+              transactions.length < 3 || isInsightsLoading || isRegenerating
+            }
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[3px] border border-border bg-card px-3 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted transition-colors hover:border-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${isRegenerating ? "animate-spin" : ""}`}
+            />
+            {isRegenerating
+              ? t("regeneratingInsights")
+              : t("regenerateInsights")}
+          </button>
+        </div>
+        {(isInsightsError || regenerateError) && (
+          <p className="mb-4 font-sans text-sm text-destructive">
+            {t("insightsError")}
+          </p>
+        )}
         {isInsightsLoading ? (
           <p className="font-sans text-sm text-muted">{t("loading")}</p>
         ) : (
@@ -327,8 +453,8 @@ export default function DashboardPage() {
       {/* Recent Transactions */}
       <section>
         <span className="eyebrow mb-6 block">06 - Recent</span>
-        <div className="card-shadow space-y-4 rounded-[4px] border border-border bg-card p-6">
-          <h2 className="font-serif text-[1.5rem] text-foreground">
+        <div className="card-shadow space-y-4 rounded-[4px] border border-border bg-card p-4 sm:p-6">
+          <h2 className="font-serif text-[1.25rem] text-foreground sm:text-[1.5rem]">
             {t("recentTransactions")}
           </h2>
           {recentTransactions.length === 0 ? (

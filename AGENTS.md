@@ -49,7 +49,7 @@ bun run lint      # eslint
 pre-commit run --all-files
 ```
 
-Runs: trailing-whitespace, end-of-file-fixer, ruff check+format (api), mypy (api src), eslint+prettier (pwa).
+Runs: trailing-whitespace, end-of-file-fixer, check-yaml, check-merge-conflict, debug-statements, ruff check+format (api), mypy (api src), eslint+prettier (pwa).
 
 ## Backend conventions
 
@@ -72,6 +72,8 @@ Runs: trailing-whitespace, end-of-file-fixer, ruff check+format (api), mypy (api
 - Offline-first: `lib/offline/queue.ts` for pending mutations
 - Tailwind CSS v4 with `@tailwindcss/postcss`
 - Strict TypeScript, `noEmit`
+- Dashboard analytics helpers live in `lib/analytics.ts`; chart components should stay presentational and use Recharts.
+- Transactions page defaults to table view. Delete actions are intentionally available from card view, with a table-view tip directing users to switch views.
 
 ## Deployment
 
@@ -84,7 +86,7 @@ Both apps deploy to Vercel on merge to `main`:
 
 `.env` files are gitignored. Copy from `.env.example`:
 
-- `walletmate-api/.env` - `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`
+- `walletmate-api/.env` - `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`, `API_URL`
 - `walletmate-pwa-app/.env` - `DATABASE_URL`, `AUTH_SECRET`, `GITHUB_ID`, `GITHUB_SECRET`, `NEXT_PUBLIC_API_URL`
 
 ## Testing
