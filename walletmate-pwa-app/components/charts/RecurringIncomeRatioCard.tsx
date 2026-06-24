@@ -24,7 +24,7 @@ export function RecurringIncomeRatioCard({
   const barRatio = Math.min(ratio, 100);
 
   return (
-    <article className="card-shadow flex h-80 flex-col justify-between rounded-[4px] border border-border bg-card p-4 sm:p-5">
+    <article className="card-shadow flex h-80 flex-col justify-between rounded-[4px] border border-border bg-card p-4 sm:h-96 sm:p-5">
       <div>
         <div className="mb-4 flex items-center gap-2">
           <Repeat className="h-4 w-4 text-primary" />

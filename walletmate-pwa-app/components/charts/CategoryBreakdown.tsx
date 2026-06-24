@@ -17,7 +17,7 @@ const CATEGORY_COLORS = [
   "var(--chart-8)",
 ];
 
-const MAX_VISIBLE_SLICES = 4;
+const MAX_CATEGORY_ROWS = 6;
 
 type DonutPoint = CategorySpendPoint & {
   color: string;
@@ -27,9 +27,11 @@ type DonutPoint = CategorySpendPoint & {
 export function CategoryBreakdown({
   data,
   currency = "VND",
+  periodLabel,
 }: {
   data: CategorySpendPoint[];
   currency?: string;
+  periodLabel?: string;
 }) {
   const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
@@ -44,8 +46,12 @@ export function CategoryBreakdown({
     if (total === 0) return [];
 
     const sorted = [...data].sort((a, b) => b.amount - a.amount);
-    const visible = sorted.slice(0, MAX_VISIBLE_SLICES);
-    const remainder = sorted.slice(MAX_VISIBLE_SLICES);
+    const visibleCount =
+      sorted.length > MAX_CATEGORY_ROWS
+        ? MAX_CATEGORY_ROWS - 1
+        : MAX_CATEGORY_ROWS;
+    const visible = sorted.slice(0, visibleCount);
+    const remainder = sorted.slice(visibleCount);
     const points = visible.map((item, index) => ({
       ...item,
       id: `category-${index}-${item.category}`,
@@ -76,17 +82,22 @@ export function CategoryBreakdown({
   }
 
   return (
-    <div className="card-shadow flex min-h-80 flex-col rounded-[4px] border border-border bg-card p-4 sm:h-80 sm:p-5">
-      <div className="mb-3 flex shrink-0 items-baseline justify-between gap-3">
-        <h3 className="font-serif text-lg text-foreground">
-          {t("topCategories")}
+    <div className="card-shadow flex min-h-80 flex-col rounded-[4px] border border-border bg-card p-4 sm:h-96 sm:p-5">
+      <div className="mb-3 flex shrink-0 items-start justify-between gap-3">
+        <h3 className="min-w-0 font-serif text-lg leading-tight text-foreground">
+          {t("expenseCategories")}
+          {periodLabel ? (
+            <span className="mt-1 block font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted">
+              {periodLabel}
+            </span>
+          ) : null}
         </h3>
-        <span className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted">
+        <span className="shrink-0 font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted">
           {data.length} {t("categoriesCount")}
         </span>
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-3 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:items-center">
+      <div className="grid min-h-0 flex-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:items-center">
         <div className="relative mx-auto h-40 w-full max-w-56 sm:h-full sm:max-w-none">
           {mounted ? (
             <>
@@ -148,11 +159,11 @@ export function CategoryBreakdown({
           )}
         </div>
 
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-1.5">
           {chartData.map((item) => (
             <div
               key={item.id}
-              className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 gap-y-0.5 rounded-[3px] border border-border/70 bg-background/40 px-2.5 py-1.5"
+              className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 rounded-[3px] border border-border/70 bg-background/40 px-2.5 py-1"
             >
               <span
                 className="h-2.5 w-2.5 rounded-full"
@@ -161,11 +172,13 @@ export function CategoryBreakdown({
               <span className="min-w-0 truncate font-sans text-sm text-foreground">
                 {item.category}
               </span>
-              <span className="font-mono text-[0.72rem] tabular-nums text-primary">
-                {item.percent.toFixed(0)}%
-              </span>
-              <span className="col-start-2 col-end-4 min-w-0 font-mono text-[0.62rem] uppercase tracking-[0.06em] text-muted [overflow-wrap:anywhere]">
-                {formatCurrency(item.amount, currency)}
+              <span className="min-w-0 text-right">
+                <span className="block font-mono text-[0.72rem] leading-tight tabular-nums text-primary">
+                  {item.percent.toFixed(0)}%
+                </span>
+                <span className="block max-w-20 truncate font-mono text-[0.55rem] uppercase tracking-[0.04em] text-muted">
+                  {formatCurrency(item.amount, currency)}
+                </span>
               </span>
             </div>
           ))}

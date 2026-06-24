@@ -434,22 +434,32 @@ export default function DashboardPage() {
       {/* Charts */}
       <section>
         <span className="eyebrow mb-4 block sm:mb-6">Analytics</span>
-        <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-          <MonthlyTrendChart
-            data={cashFlowData}
-            currency={currency}
-            subtitle={
-              overviewMode === "month" ? t("latestSixMonths") : undefined
-            }
-          />
-          <CategoryBreakdown data={categoryData} currency={currency} />
-          <SpendingPaceChart data={spendingPaceData} currency={currency} />
-          <RecurringIncomeRatioCard
-            monthlyIncome={selectedPeriodIncome}
-            monthlyRecurringExpense={monthlyRecurringExpense}
-            currency={currency}
-            hideIncomeAmounts={!showIncomeAmounts}
-          />
+        <div className="grid gap-4 lg:grid-cols-5 lg:gap-6">
+          <div className="order-1 lg:col-span-3">
+            <CategoryBreakdown
+              data={categoryData}
+              currency={currency}
+              periodLabel={overviewPeriodLabel}
+            />
+          </div>
+          <div className="order-2 lg:col-span-2">
+            <RecurringIncomeRatioCard
+              monthlyIncome={selectedPeriodIncome}
+              monthlyRecurringExpense={monthlyRecurringExpense}
+              currency={currency}
+              hideIncomeAmounts={!showIncomeAmounts}
+            />
+          </div>
+          <div className="order-3 space-y-4 lg:col-span-5 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
+            <MonthlyTrendChart
+              data={cashFlowData}
+              currency={currency}
+              subtitle={
+                overviewMode === "month" ? t("latestSixMonths") : undefined
+              }
+            />
+            <SpendingPaceChart data={spendingPaceData} currency={currency} />
+          </div>
         </div>
       </section>
 
