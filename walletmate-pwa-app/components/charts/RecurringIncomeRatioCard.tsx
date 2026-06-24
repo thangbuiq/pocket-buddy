@@ -3,15 +3,18 @@
 import { Repeat } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
+import { formatMaskedCurrency } from "@/lib/privacy";
 
 export function RecurringIncomeRatioCard({
   monthlyIncome,
   monthlyRecurringExpense,
   currency = "VND",
+  hideIncomeAmounts = false,
 }: {
   monthlyIncome: number;
   monthlyRecurringExpense: number;
   currency?: string;
+  hideIncomeAmounts?: boolean;
 }) {
   const { t } = useI18n();
   const ratio =
@@ -30,7 +33,7 @@ export function RecurringIncomeRatioCard({
           </h3>
         </div>
         <p className="font-mono text-[2rem] leading-tight text-foreground tabular-nums">
-          {ratio.toFixed(0)}%
+          {hideIncomeAmounts ? "***%" : `${ratio.toFixed(0)}%`}
         </p>
         <p className="mt-2 font-sans text-sm leading-6 text-muted">
           {t("fixedExpenseRatioDescription")}
@@ -50,7 +53,9 @@ export function RecurringIncomeRatioCard({
               {t("monthlyIncome")}
             </p>
             <p className="mt-1 font-mono text-sm text-success [overflow-wrap:anywhere]">
-              {formatCurrency(monthlyIncome, currency)}
+              {hideIncomeAmounts
+                ? formatMaskedCurrency(currency)
+                : formatCurrency(monthlyIncome, currency)}
             </p>
           </div>
           <div className="rounded-[3px] border border-border bg-background p-3">

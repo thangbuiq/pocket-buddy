@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { AddTransactionSheet } from "@/components/forms/AddTransactionSheet";
 import { BatchTransactionImport } from "@/components/forms/BatchTransactionImport";
 import { SmartInput } from "@/components/shared/SmartInput";
+import { IncomePrivacyToggle } from "@/components/shared/IncomePrivacyToggle";
 import { TransactionCard } from "@/components/shared/TransactionCard";
 import { TransactionsTable } from "@/components/shared/TransactionsTable";
 import {
@@ -42,6 +43,7 @@ export default function TransactionsPage() {
   const [periodFilter, setPeriodFilter] = useState<"all" | "month" | "year">(
     "all",
   );
+  const [showIncomeAmounts, setShowIncomeAmounts] = useState(false);
 
   const categories = useMemo(
     () =>
@@ -195,29 +197,35 @@ export default function TransactionsPage() {
         <section className="space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span className="eyebrow block">History</span>
-            <div className="hidden grid-cols-2 gap-2 rounded-[3px] border border-border bg-card p-1 sm:grid">
-              <Toggle
-                type="button"
-                pressed={viewMode === "card"}
-                onPressedChange={() => setViewMode("card")}
-                size="sm"
-                className="min-h-11"
-                aria-label="Card mode"
-              >
-                <LayoutGrid className="h-4 w-4" />
-                {t("cardsView")}
-              </Toggle>
-              <Toggle
-                type="button"
-                pressed={viewMode === "table"}
-                onPressedChange={() => setViewMode("table")}
-                size="sm"
-                className="min-h-11"
-                aria-label="Table mode"
-              >
-                <Table2 className="h-4 w-4" />
-                {t("tableView")}
-              </Toggle>
+            <div className="flex items-center gap-2">
+              <IncomePrivacyToggle
+                isVisible={showIncomeAmounts}
+                onToggle={() => setShowIncomeAmounts((value) => !value)}
+              />
+              <div className="hidden grid-cols-2 gap-2 rounded-[3px] border border-border bg-card p-1 sm:grid">
+                <Toggle
+                  type="button"
+                  pressed={viewMode === "card"}
+                  onPressedChange={() => setViewMode("card")}
+                  size="sm"
+                  className="min-h-11"
+                  aria-label="Card mode"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  {t("cardsView")}
+                </Toggle>
+                <Toggle
+                  type="button"
+                  pressed={viewMode === "table"}
+                  onPressedChange={() => setViewMode("table")}
+                  size="sm"
+                  className="min-h-11"
+                  aria-label="Table mode"
+                >
+                  <Table2 className="h-4 w-4" />
+                  {t("tableView")}
+                </Toggle>
+              </div>
             </div>
           </div>
 
@@ -306,6 +314,7 @@ export default function TransactionsPage() {
               <TransactionsTable
                 transactions={filteredTransactions}
                 currency={currency}
+                hideIncomeAmounts={!showIncomeAmounts}
               />
             </div>
           ) : (
@@ -322,6 +331,7 @@ export default function TransactionsPage() {
                           transaction={transaction}
                           currency={currency}
                           onCancelRecurring={handleCancelRecurring}
+                          hideIncomeAmount={!showIncomeAmounts}
                         />
                         <div className="flex justify-end">
                           <button

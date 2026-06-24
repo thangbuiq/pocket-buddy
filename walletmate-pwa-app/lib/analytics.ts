@@ -19,6 +19,17 @@ export type SpendingPacePoint = {
   previous: number | null;
 };
 
+type CashFlowTrendOptions = {
+  mode?: "month" | "year";
+  month?: number;
+  year?: number;
+};
+
+type SpendingPaceOptions = {
+  month?: number;
+  year?: number;
+};
+
 const MONTHLY_MULTIPLIER: Record<RecurringFrequency, number> = {
   daily: 30,
   weekly: 52 / 12,
@@ -38,13 +49,22 @@ function monthLabel(date: Date, language: "vi" | "en") {
 export function buildCashFlowTrend(
   transactions: Transaction[],
   language: "vi" | "en",
-  months = 6,
+  options: CashFlowTrendOptions = {},
 ): CashFlowPoint[] {
   const now = new Date();
+  const mode = options.mode ?? "month";
+  const anchorMonth = options.month ?? now.getMonth();
+  const anchorYear = options.year ?? now.getFullYear();
 
-  return Array.from({ length: months }, (_, index) => {
-    const offset = months - index - 1;
-    const date = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+  const dates =
+    mode === "year"
+      ? Array.from({ length: 12 }, (_, index) => new Date(anchorYear, index, 1))
+      : Array.from({ length: 6 }, (_, index) => {
+          const offset = 6 - index - 1;
+          return new Date(anchorYear, anchorMonth - offset, 1);
+        });
+
+  return dates.map((date) => {
     const monthTransactions = transactions.filter((transaction) =>
       sameMonth(
         new Date(transaction.transactionDate),
@@ -95,11 +115,14 @@ export function buildTopCategorySpend(
 
 export function buildSpendingPace(
   transactions: Transaction[],
+  options: SpendingPaceOptions = {},
 ): SpendingPacePoint[] {
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
+  const currentYear = options.year ?? now.getFullYear();
+  const currentMonth = options.month ?? now.getMonth();
   const previousDate = new Date(currentYear, currentMonth - 1, 1);
+  const isCurrentCalendarMonth =
+    currentYear === now.getFullYear() && currentMonth === now.getMonth();
   const daysInCurrentMonth = new Date(
     currentYear,
     currentMonth + 1,
@@ -145,7 +168,8 @@ export function buildSpendingPace(
 
     return {
       day,
-      current: day <= now.getDate() ? currentTotal : null,
+      current:
+        !isCurrentCalendarMonth || day <= now.getDate() ? currentTotal : null,
       previous: day <= daysInPreviousMonth ? previousTotal : null,
     };
   });

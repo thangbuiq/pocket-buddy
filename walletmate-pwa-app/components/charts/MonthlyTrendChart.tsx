@@ -18,9 +18,11 @@ import type { CashFlowPoint } from "@/lib/analytics";
 export function MonthlyTrendChart({
   data,
   currency = "VND",
+  subtitle,
 }: {
   data: CashFlowPoint[];
   currency?: string;
+  subtitle?: string;
 }) {
   const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
@@ -37,7 +39,7 @@ export function MonthlyTrendChart({
           {t("cashFlowTrend")}
         </h3>
         <span className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted">
-          {t("lastSixMonths")}
+          {subtitle ?? t("lastSixMonths")}
         </span>
       </div>
       <div className="min-h-0 flex-1">
@@ -63,12 +65,10 @@ export function MonthlyTrendChart({
               />
               <YAxis
                 stroke="var(--muted)"
-                width={46}
-                tick={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: "0.7rem",
-                }}
-                tickFormatter={(value) => `${Number(value) / 1000}k`}
+                width={8}
+                axisLine={false}
+                tick={false}
+                tickLine={false}
               />
               <Tooltip
                 formatter={(value, name) => [

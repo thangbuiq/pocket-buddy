@@ -1,6 +1,7 @@
 import { Repeat, X } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
+import { formatMaskedCurrency } from "@/lib/privacy";
 import type { TranslationKey } from "@/lib/i18n";
 import type { Transaction } from "@/types";
 
@@ -8,10 +9,12 @@ export function TransactionCard({
   transaction,
   currency = "VND",
   onCancelRecurring,
+  hideIncomeAmount = false,
 }: {
   transaction: Transaction;
   currency?: string;
   onCancelRecurring?: (transaction: Transaction) => void;
+  hideIncomeAmount?: boolean;
 }) {
   const { t } = useI18n();
 
@@ -56,7 +59,9 @@ export function TransactionCard({
             }`}
           >
             {transaction.type === "expense" ? "-" : "+"}
-            {formatCurrency(transaction.amount, currency)}
+            {transaction.type === "income" && hideIncomeAmount
+              ? formatMaskedCurrency(currency)
+              : formatCurrency(transaction.amount, currency)}
           </div>
           {isRecurring && onCancelRecurring && (
             <button

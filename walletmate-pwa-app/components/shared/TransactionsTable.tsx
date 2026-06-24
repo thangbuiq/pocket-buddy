@@ -5,6 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { formatCurrency } from "@/lib/utils";
+import { formatMaskedCurrency } from "@/lib/privacy";
 import type { Transaction } from "@/types";
 
 function SortHeader({
@@ -32,9 +33,11 @@ function SortHeader({
 export function TransactionsTable({
   transactions,
   currency = "VND",
+  hideIncomeAmounts = false,
 }: {
   transactions: Transaction[];
   currency?: string;
+  hideIncomeAmounts?: boolean;
 }) {
   const columns = useMemo<ColumnDef<Transaction>[]>(
     () => [
@@ -67,7 +70,9 @@ export function TransactionsTable({
         header: ({ column }) => <SortHeader label="Amount" column={column} />,
         cell: ({ row }) => (
           <span className="whitespace-nowrap font-mono">
-            {formatCurrency(row.original.amount, currency)}
+            {row.original.type === "income" && hideIncomeAmounts
+              ? formatMaskedCurrency(currency)
+              : formatCurrency(row.original.amount, currency)}
           </span>
         ),
       },
@@ -99,7 +104,7 @@ export function TransactionsTable({
         ),
       },
     ],
-    [currency],
+    [currency, hideIncomeAmounts],
   );
 
   return (

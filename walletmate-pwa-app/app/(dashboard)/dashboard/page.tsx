@@ -12,6 +12,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { TransactionCard } from "@/components/shared/TransactionCard";
+import { IncomePrivacyToggle } from "@/components/shared/IncomePrivacyToggle";
 import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";
 import { CategoryBreakdown } from "@/components/charts/CategoryBreakdown";
 import { SpendingPaceChart } from "@/components/charts/SpendingPaceChart";
@@ -26,6 +27,7 @@ import { InsightsList } from "@/components/dashboard/InsightsList";
 import { useInsights } from "@/hooks/use-insights";
 import { useI18n, useCurrency } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
+import { formatMaskedCurrency } from "@/lib/privacy";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   buildCashFlowTrend,
@@ -61,6 +63,7 @@ export default function DashboardPage() {
   const [overviewMode, setOverviewMode] = useState<OverviewMode>("month");
   const [selectedMonth, setSelectedMonth] = useState(currentMonthIndex);
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [showIncomeAmounts, setShowIncomeAmounts] = useState(false);
 
   const walletLabel = session?.user?.githubUsername
     ? `Ví của "${session.user.githubUsername}"`
@@ -168,35 +171,43 @@ export default function DashboardPage() {
       ? Math.max(Math.round((previousNet / previousTotalIncome) * 100), 0)
       : 0;
 
+  const analyticsMonth =
+    overviewMode === "month"
+      ? selectedMonth
+      : selectedYear === currentYear
+        ? currentMonthIndex
+        : 11;
   const cashFlowData = useMemo(
-    () => buildCashFlowTrend(transactions, language),
-    [language, transactions],
+    () =>
+      buildCashFlowTrend(transactions, language, {
+        mode: overviewMode,
+        month: analyticsMonth,
+        year: selectedYear,
+      }),
+    [analyticsMonth, language, overviewMode, selectedYear, transactions],
   );
   const categoryData = useMemo(
-    () => buildTopCategorySpend(transactions),
-    [transactions],
+    () => buildTopCategorySpend(filteredTransactions),
+    [filteredTransactions],
   );
   const spendingPaceData = useMemo(
-    () => buildSpendingPace(transactions),
-    [transactions],
+    () =>
+      buildSpendingPace(transactions, {
+        month: analyticsMonth,
+        year: selectedYear,
+      }),
+    [analyticsMonth, selectedYear, transactions],
   );
   const monthlyRecurringExpense = useMemo(
-    () => getMonthlyRecurringExpense(transactions),
-    [transactions],
+    () => getMonthlyRecurringExpense(filteredTransactions),
+    [filteredTransactions],
   );
-  const currentMonthIncome = useMemo(
+  const selectedPeriodIncome = useMemo(
     () =>
-      transactions
-        .filter((item) => {
-          const d = new Date(item.transactionDate);
-          return (
-            item.type === "income" &&
-            d.getMonth() === currentMonthIndex &&
-            d.getFullYear() === currentYear
-          );
-        })
+      filteredTransactions
+        .filter((item) => item.type === "income")
         .reduce((sum, item) => sum + item.amount, 0),
-    [currentMonthIndex, currentYear, transactions],
+    [filteredTransactions],
   );
 
   const overviewPeriodLabel =
@@ -227,6 +238,7 @@ export default function DashboardPage() {
       label: t("totalIncome"),
       value: formatCurrency(totalIncome, currency),
       delta: formatDelta(totalIncome, previousTotalIncome),
+      isIncomeRelated: true,
       icon: TrendingUp,
       iconColor: "text-success",
     },
@@ -234,6 +246,7 @@ export default function DashboardPage() {
       label: t("totalExpenses"),
       value: formatCurrency(totalExpenses, currency),
       delta: formatDelta(totalExpenses, previousTotalExpenses),
+      isIncomeRelated: false,
       icon: TrendingDown,
       iconColor: "text-destructive",
     },
@@ -241,6 +254,7 @@ export default function DashboardPage() {
       label: t("netCashFlow"),
       value: formatCurrency(net, currency),
       delta: formatDelta(net, previousNet),
+      isIncomeRelated: true,
       icon: ArrowUpDown,
       iconColor: net >= 0 ? "text-success" : "text-destructive",
     },
@@ -248,6 +262,7 @@ export default function DashboardPage() {
       label: t("savingsRate"),
       value: `${savingsRate}%`,
       delta: formatDelta(savingsRate, previousSavingsRate, true),
+      isIncomeRelated: true,
       icon: PiggyBank,
       iconColor: "text-primary",
     },
@@ -297,29 +312,35 @@ export default function DashboardPage() {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-2 overflow-hidden rounded-[4px] border border-border sm:flex">
-            <button
-              type="button"
-              onClick={() => setOverviewMode("month")}
-              className={`px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] transition-colors ${
-                overviewMode === "month"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-muted hover:text-foreground"
-              }`}
-            >
-              {t("overviewMonth")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setOverviewMode("year")}
-              className={`px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] transition-colors border-l border-border ${
-                overviewMode === "year"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-muted hover:text-foreground"
-              }`}
-            >
-              {t("overviewYear")}
-            </button>
+          <div className="flex items-center gap-2">
+            <IncomePrivacyToggle
+              isVisible={showIncomeAmounts}
+              onToggle={() => setShowIncomeAmounts((value) => !value)}
+            />
+            <div className="grid grid-cols-2 overflow-hidden rounded-[4px] border border-border sm:flex">
+              <button
+                type="button"
+                onClick={() => setOverviewMode("month")}
+                className={`px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] transition-colors ${
+                  overviewMode === "month"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-muted hover:text-foreground"
+                }`}
+              >
+                {t("overviewMonth")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setOverviewMode("year")}
+                className={`px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] transition-colors border-l border-border ${
+                  overviewMode === "year"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-muted hover:text-foreground"
+                }`}
+              >
+                {t("overviewYear")}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -338,10 +359,19 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <p className="mt-2 font-mono text-base font-medium text-foreground tabular-nums [overflow-wrap:anywhere] sm:text-xl">
-                  {item.value}
+                  {item.isIncomeRelated && !showIncomeAmounts
+                    ? item.label === t("savingsRate")
+                      ? "***%"
+                      : formatMaskedCurrency(currency)
+                    : item.value}
                 </p>
                 <p className="mt-2 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted [overflow-wrap:anywhere]">
-                  {item.delta} {t("vsPrevious")}
+                  {item.isIncomeRelated && !showIncomeAmounts
+                    ? item.label === t("savingsRate")
+                      ? `***${t("percentagePointShort")}`
+                      : formatMaskedCurrency(currency)
+                    : item.delta}{" "}
+                  {t("vsPrevious")}
                 </p>
               </article>
             );
@@ -404,13 +434,20 @@ export default function DashboardPage() {
       <section>
         <span className="eyebrow mb-6 block">04 - Analytics</span>
         <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-          <MonthlyTrendChart data={cashFlowData} currency={currency} />
+          <MonthlyTrendChart
+            data={cashFlowData}
+            currency={currency}
+            subtitle={
+              overviewMode === "month" ? t("latestSixMonths") : undefined
+            }
+          />
           <CategoryBreakdown data={categoryData} currency={currency} />
           <SpendingPaceChart data={spendingPaceData} currency={currency} />
           <RecurringIncomeRatioCard
-            monthlyIncome={currentMonthIncome}
+            monthlyIncome={selectedPeriodIncome}
             monthlyRecurringExpense={monthlyRecurringExpense}
             currency={currency}
+            hideIncomeAmounts={!showIncomeAmounts}
           />
         </div>
       </section>
@@ -467,6 +504,7 @@ export default function DashboardPage() {
                 key={transaction.id}
                 transaction={transaction}
                 currency={currency}
+                hideIncomeAmount={!showIncomeAmounts}
               />
             ))
           )}

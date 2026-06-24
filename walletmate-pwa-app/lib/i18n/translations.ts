@@ -56,6 +56,7 @@ export const translations = {
     noTransactions: "Chưa có giao dịch nào",
     cashFlowTrend: "Dòng tiền",
     lastSixMonths: "6 tháng",
+    latestSixMonths: "6 tháng gần nhất",
     topCategories: "Danh mục chi nhiều",
     categoriesCount: "danh mục",
     noExpenseData: "Chưa có dữ liệu chi tiêu",
@@ -63,12 +64,15 @@ export const translations = {
     monthToDate: "từ đầu tháng",
     currentMonth: "Tháng này",
     previousMonth: "Tháng trước",
+    average: "Trung bình",
     day: "Ngày",
     fixedExpenseRatio: "Chi cố định / thu nhập",
     fixedExpenseRatioDescription:
       "Ước tính chi phí định kỳ hàng tháng so với thu nhập tháng này.",
     monthlyIncome: "Thu tháng",
     fixedExpenses: "Chi cố định",
+    showIncomeAmounts: "Hiện số thu nhập",
+    hideIncomeAmounts: "Ẩn số thu nhập",
 
     // Recurring
     recurring: "Định kỳ",
@@ -216,6 +220,7 @@ export const translations = {
     noTransactions: "No transactions yet",
     cashFlowTrend: "Cash Flow Trend",
     lastSixMonths: "6 months",
+    latestSixMonths: "Latest 6 months",
     topCategories: "Top Categories",
     categoriesCount: "categories",
     noExpenseData: "No expense data",
@@ -223,12 +228,15 @@ export const translations = {
     monthToDate: "Month to date",
     currentMonth: "Current month",
     previousMonth: "Previous month",
+    average: "Average",
     day: "Day",
     fixedExpenseRatio: "Fixed Costs / Income",
     fixedExpenseRatioDescription:
       "Estimated recurring monthly expenses compared with this month's income.",
     monthlyIncome: "Monthly income",
     fixedExpenses: "Fixed costs",
+    showIncomeAmounts: "Show income amounts",
+    hideIncomeAmounts: "Hide income amounts",
 
     // Recurring
     recurring: "Recurring",
