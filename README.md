@@ -7,7 +7,24 @@
 
 > Tired of typing out every coffee or meal you buy? `walletmate` makes tracking your spending easy. Just take a picture of your receipt or type something like "bought coffee 50k today" and our AI will do the rest.
 
-![walletmate App UI](./assets/app-ui.png)
+<table>
+<tr>
+<td>
+Load your transactions
+</td>
+<td>
+Get personalized insights
+</td>
+</tr>
+<tr>
+<td width="44%" valign="top">
+<img src="assets/app-ui.png" width="100%" />
+</td>
+<td width="56%" valign="top">
+<img src="assets/analytics.png" width="100%" />
+</td>
+</tr>
+</table>
 
 </div>
 
@@ -21,7 +38,7 @@
 
 ## See Smart Input in Action
 
-- Image Parsing:
+- Image Parsing: (receipt scan)
 
     <table>
     <tr>
@@ -42,7 +59,7 @@
     </tr>
     </table>
 
-- Text Parsing
+- Text Parsing (from natural language):
 
     **Input:**
 
