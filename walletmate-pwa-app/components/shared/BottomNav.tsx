@@ -16,7 +16,7 @@ const navItems = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { t } = useI18n();
+  const { t, language, setLanguage } = useI18n();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -43,8 +43,8 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-[12px] md:hidden">
-        <ul className="grid grid-cols-3 gap-1 relative">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-2 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-2 backdrop-blur-[12px] md:hidden">
+        <ul className="relative grid grid-cols-3 gap-1">
           {navItems.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;
@@ -53,9 +53,9 @@ export function BottomNav() {
                 <Link
                   href={item.href}
                   className={cn(
-                    "flex min-h-[3.5rem] flex-col items-center justify-center rounded-[3px] transition-colors cursor-pointer",
+                    "flex min-h-16 flex-col items-center justify-center rounded-[3px] border border-transparent transition-colors cursor-pointer",
                     active
-                      ? "text-primary"
+                      ? "border-primary/25 bg-primary/10 text-primary"
                       : "text-muted hover:text-foreground",
                   )}
                   onClick={() => setIsSettingsOpen(false)}
@@ -74,9 +74,9 @@ export function BottomNav() {
             <button
               onClick={() => setIsSettingsOpen(!isSettingsOpen)}
               className={cn(
-                "flex min-h-[3.5rem] w-full flex-col items-center justify-center rounded-[3px] transition-colors cursor-pointer",
+                "flex min-h-16 w-full cursor-pointer flex-col items-center justify-center rounded-[3px] border border-transparent transition-colors",
                 isSettingsOpen
-                  ? "text-primary"
+                  ? "border-primary/25 bg-primary/10 text-primary"
                   : "text-muted hover:text-foreground",
               )}
             >
@@ -88,13 +88,50 @@ export function BottomNav() {
 
             {/* Settings Menu Popup */}
             {isSettingsOpen && (
-              <div className="absolute bottom-[calc(100%+0.5rem)] right-0 w-48 flex flex-col rounded-[4px] border border-border bg-card p-2 shadow-lg animate-in slide-in-from-bottom-2 fade-in">
+              <div className="absolute bottom-[calc(100%+0.75rem)] right-0 flex w-64 flex-col rounded-[4px] border border-border bg-card p-2 shadow-lg animate-in slide-in-from-bottom-2 fade-in">
+                <div className="border-b border-border p-2">
+                  <span className="mb-2 block font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted">
+                    Language
+                  </span>
+                  <div className="grid grid-cols-2 gap-1 rounded-[3px] border border-border bg-background p-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLanguage("vi");
+                        setIsSettingsOpen(false);
+                      }}
+                      className={cn(
+                        "min-h-11 cursor-pointer rounded-[2px] px-3 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors",
+                        language === "vi"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted hover:text-foreground",
+                      )}
+                    >
+                      VI
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLanguage("en");
+                        setIsSettingsOpen(false);
+                      }}
+                      className={cn(
+                        "min-h-11 cursor-pointer rounded-[2px] px-3 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors",
+                        language === "en"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted hover:text-foreground",
+                      )}
+                    >
+                      EN
+                    </button>
+                  </div>
+                </div>
                 <button
                   onClick={() => {
                     setTheme(resolvedTheme === "dark" ? "light" : "dark");
                     setIsSettingsOpen(false);
                   }}
-                  className="flex w-full items-center gap-3 rounded-[3px] p-3 text-left text-muted transition-colors hover:bg-muted/10 hover:text-foreground cursor-pointer"
+                  className="flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-[3px] p-3 text-left text-muted transition-colors hover:bg-muted/10 hover:text-foreground"
                 >
                   {mounted && resolvedTheme === "dark" ? (
                     <Sun className="h-4 w-4" />
@@ -112,7 +149,7 @@ export function BottomNav() {
                     signOut({ callbackUrl: "/login" });
                     setIsSettingsOpen(false);
                   }}
-                  className="flex w-full items-center gap-3 rounded-[3px] p-3 text-left text-muted transition-colors hover:bg-muted/10 hover:text-foreground cursor-pointer"
+                  className="flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-[3px] p-3 text-left text-muted transition-colors hover:bg-muted/10 hover:text-foreground"
                 >
                   <LogOut className="h-4 w-4" />
                   <span className="font-sans text-sm font-medium">

@@ -20,7 +20,7 @@ export function IncomePrivacyToggle({
     <button
       type="button"
       onClick={onToggle}
-      className={`inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-[3px] border border-dashed border-muted bg-card px-3 font-mono text-[0.65rem] uppercase tracking-[0.08em] text-foreground shadow-sm transition-colors hover:border-primary hover:text-primary ${className}`}
+      className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-[3px] border border-dashed border-muted bg-card px-3 font-mono text-[0.65rem] uppercase tracking-[0.08em] text-foreground shadow-sm transition-colors hover:border-primary hover:text-primary ${className}`}
       aria-label={label}
       title={label}
     >

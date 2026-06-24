@@ -269,7 +269,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-8 animate-in sm:space-y-12 lg:space-y-16">
+    <div className="space-y-7 animate-in sm:space-y-12 lg:space-y-16">
       {/* Page Heading */}
       <div>
         <span className="eyebrow mb-3 block">Dashboard</span>
@@ -280,20 +280,20 @@ export default function DashboardPage() {
 
       {/* Smart Input - Primary feature */}
       <section>
-        <span className="eyebrow mb-4 block">01 - Smart Input</span>
+        <span className="eyebrow mb-3 block sm:mb-4">Smart Input</span>
         <SmartInput />
       </section>
 
       {/* Summary Stats */}
       <section>
-        <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+        <div className="mb-4 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <div>
-            <span className="eyebrow block">02 - Overview</span>
+            <span className="eyebrow block">Overview</span>
             <div className="mt-1 flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => navigatePeriod(-1)}
-                className="flex h-10 w-10 items-center justify-center rounded-[3px] text-muted hover:bg-muted/10 hover:text-foreground transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-[3px] text-muted transition-colors hover:bg-muted/10 hover:text-foreground"
                 aria-label={t("previousPeriod")}
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -305,23 +305,24 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => navigatePeriod(1)}
                 disabled={isCurrentPeriod}
-                className="flex h-10 w-10 items-center justify-center rounded-[3px] text-muted hover:bg-muted/10 hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex h-11 w-11 items-center justify-center rounded-[3px] text-muted transition-colors hover:bg-muted/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label={t("nextPeriod")}
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
             </div>
           </div>
-          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-start">
             <IncomePrivacyToggle
               isVisible={showIncomeAmounts}
               onToggle={() => setShowIncomeAmounts((value) => !value)}
+              className="min-h-11 w-full sm:w-auto"
             />
             <div className="grid grid-cols-2 overflow-hidden rounded-[4px] border border-border sm:flex">
               <button
                 type="button"
                 onClick={() => setOverviewMode("month")}
-                className={`px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] transition-colors ${
+                className={`min-h-11 px-3 font-mono text-[0.6rem] uppercase tracking-[0.12em] transition-colors ${
                   overviewMode === "month"
                     ? "bg-primary text-primary-foreground"
                     : "bg-card text-muted hover:text-foreground"
@@ -332,7 +333,7 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setOverviewMode("year")}
-                className={`px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] transition-colors border-l border-border ${
+                className={`min-h-11 border-l border-border px-3 font-mono text-[0.6rem] uppercase tracking-[0.12em] transition-colors ${
                   overviewMode === "year"
                     ? "bg-primary text-primary-foreground"
                     : "bg-card text-muted hover:text-foreground"
@@ -344,28 +345,28 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-5 lg:grid-cols-4">
           {overviewItems.map((item) => {
             const Icon = item.icon;
             return (
               <article
                 key={item.label}
-                className="card-shadow rounded-[4px] border border-border bg-card p-3 transition-colors hover:border-muted sm:p-5"
+                className="card-shadow min-w-0 overflow-hidden rounded-[4px] border border-border bg-card p-3 transition-colors hover:border-muted sm:p-5"
               >
-                <div className="mb-3 flex items-center gap-2">
-                  <Icon className={`h-4 w-4 ${item.iconColor}`} />
-                  <p className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted sm:text-[0.65rem]">
+                <div className="mb-3 flex min-w-0 items-center gap-2">
+                  <Icon className={`h-4 w-4 shrink-0 ${item.iconColor}`} />
+                  <p className="min-w-0 font-mono text-[0.56rem] uppercase tracking-[0.08em] text-muted [overflow-wrap:anywhere] sm:text-[0.65rem] sm:tracking-[0.1em]">
                     {item.label}
                   </p>
                 </div>
-                <p className="mt-2 font-mono text-base font-medium text-foreground tabular-nums [overflow-wrap:anywhere] sm:text-xl">
+                <p className="mt-2 min-w-0 font-mono text-[0.82rem] font-medium leading-snug text-foreground tabular-nums [overflow-wrap:anywhere] min-[430px]:text-sm sm:text-xl">
                   {item.isIncomeRelated && !showIncomeAmounts
                     ? item.label === t("savingsRate")
                       ? "***%"
                       : formatMaskedCurrency(currency)
                     : item.value}
                 </p>
-                <p className="mt-2 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted [overflow-wrap:anywhere]">
+                <p className="mt-2 min-w-0 font-mono text-[0.56rem] uppercase leading-snug tracking-[0.06em] text-muted [overflow-wrap:anywhere] sm:text-[0.62rem] sm:tracking-[0.08em]">
                   {item.isIncomeRelated && !showIncomeAmounts
                     ? item.label === t("savingsRate")
                       ? `***${t("percentagePointShort")}`
@@ -381,8 +382,8 @@ export default function DashboardPage() {
 
       {/* Active Recurring */}
       <section>
-        <span className="eyebrow mb-6 block">
-          03 - {t("activeRecurringTitle")}
+        <span className="eyebrow mb-4 block sm:mb-6">
+          {t("activeRecurringTitle")}
         </span>
         <ActiveRecurringList
           transactions={transactions}
@@ -432,7 +433,7 @@ export default function DashboardPage() {
 
       {/* Charts */}
       <section>
-        <span className="eyebrow mb-6 block">04 - Analytics</span>
+        <span className="eyebrow mb-4 block sm:mb-6">Analytics</span>
         <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
           <MonthlyTrendChart
             data={cashFlowData}
@@ -455,7 +456,7 @@ export default function DashboardPage() {
       {/* Advice */}
       <section>
         <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
-          <span className="eyebrow block">05 - Advice</span>
+          <span className="eyebrow block">Advice</span>
           <button
             type="button"
             onClick={() => regenerate()}
@@ -489,7 +490,7 @@ export default function DashboardPage() {
 
       {/* Recent Transactions */}
       <section>
-        <span className="eyebrow mb-6 block">06 - Recent</span>
+        <span className="eyebrow mb-4 block sm:mb-6">Recent</span>
         <div className="card-shadow space-y-4 rounded-[4px] border border-border bg-card p-4 sm:p-6">
           <h2 className="font-serif text-[1.25rem] text-foreground sm:text-[1.5rem]">
             {t("recentTransactions")}

@@ -8,8 +8,13 @@ import type { TransactionInput } from "@/lib/validations/transactions";
 export function useTransactions() {
   return useQuery({
     queryKey: ["transactions"],
-    queryFn: async () =>
-      (await fetch("/api/transactions")).json() as Promise<Transaction[]>,
+    queryFn: async () => {
+      const res = await fetch("/api/transactions");
+      if (!res.ok) {
+        throw new Error("Failed to load transactions");
+      }
+      return (await res.json()) as Transaction[];
+    },
   });
 }
 

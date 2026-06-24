@@ -34,7 +34,12 @@ export default function TransactionsPage() {
   const deleteTransaction = useDeleteTransaction();
   const updateTransaction = useUpdateTransaction();
   const { confirm } = useConfirm();
-  const [viewMode, setViewMode] = useState<"card" | "table">("table");
+  const [viewMode, setViewMode] = useState<"card" | "table">(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(min-width: 640px)").matches
+      ? "table"
+      : "card",
+  );
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">(
     "all",
@@ -201,6 +206,7 @@ export default function TransactionsPage() {
               <IncomePrivacyToggle
                 isVisible={showIncomeAmounts}
                 onToggle={() => setShowIncomeAmounts((value) => !value)}
+                className="min-h-11"
               />
               <div className="hidden grid-cols-2 gap-2 rounded-[3px] border border-border bg-card p-1 sm:grid">
                 <Toggle
@@ -229,14 +235,14 @@ export default function TransactionsPage() {
             </div>
           </div>
 
-          <div className="grid gap-2 rounded-[4px] border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4">
-            <label className="relative block">
+          <div className="grid gap-3 rounded-[4px] border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="relative block sm:col-span-2 lg:col-span-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={t("searchTransactions")}
-                className="min-h-11 w-full rounded-[3px] border border-border bg-background px-9 font-sans text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
+                className="min-h-12 w-full rounded-[3px] border border-border bg-background px-9 font-sans text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none sm:min-h-11"
               />
             </label>
             <select
@@ -246,7 +252,7 @@ export default function TransactionsPage() {
                   event.target.value as "all" | "income" | "expense",
                 )
               }
-              className="min-h-11 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none"
+              className="min-h-12 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none sm:min-h-11"
             >
               <option value="all">{t("allTypes")}</option>
               <option value="expense">{t("expense")}</option>
@@ -255,7 +261,7 @@ export default function TransactionsPage() {
             <select
               value={categoryFilter}
               onChange={(event) => setCategoryFilter(event.target.value)}
-              className="min-h-11 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none"
+              className="min-h-12 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none sm:min-h-11"
             >
               <option value="all">{t("allCategories")}</option>
               {categories.map((category) => (
@@ -269,7 +275,7 @@ export default function TransactionsPage() {
               onChange={(event) =>
                 setPeriodFilter(event.target.value as "all" | "month" | "year")
               }
-              className="min-h-11 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none"
+              className="min-h-12 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none sm:min-h-11"
             >
               <option value="all">{t("allTime")}</option>
               <option value="month">{t("thisMonth")}</option>
@@ -283,7 +289,7 @@ export default function TransactionsPage() {
               pressed={viewMode === "card"}
               onPressedChange={() => setViewMode("card")}
               size="sm"
-              className="min-h-11"
+              className="min-h-12"
               aria-label="Card mode"
             >
               <LayoutGrid className="h-4 w-4" />
@@ -294,7 +300,7 @@ export default function TransactionsPage() {
               pressed={viewMode === "table"}
               onPressedChange={() => setViewMode("table")}
               size="sm"
-              className="min-h-11"
+              className="min-h-12"
               aria-label="Table mode"
             >
               <Table2 className="h-4 w-4" />

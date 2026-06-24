@@ -25,7 +25,7 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 // Default values for SSR
-const DEFAULT_LANGUAGE: Language = "en";
+const DEFAULT_LANGUAGE: Language = "vi";
 const DEFAULT_CURRENCY: Currency = "VND";
 
 // External store for localStorage

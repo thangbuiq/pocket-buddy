@@ -360,7 +360,7 @@ export function SmartInput() {
               type="button"
               onClick={handleUploadClick}
               disabled={isLoading}
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer disabled:opacity-50 ${
+              className={`flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-[3px] border transition-colors disabled:opacity-50 ${
                 isFocused
                   ? "border-primary text-primary"
                   : "border-border text-muted hover:border-primary hover:text-primary"
@@ -373,7 +373,7 @@ export function SmartInput() {
 
           {/* Inline image attached indicator - fills input width, replaces camera + upload */}
           {hasImage && (
-            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[3px] border border-primary/30 bg-primary/5 px-3 py-2.5">
+            <div className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-[3px] border border-primary/30 bg-primary/5 px-3 py-2.5">
               <ImageIcon className="h-4 w-4 shrink-0 text-primary" />
               <span className="truncate font-mono text-[0.7rem] uppercase tracking-[0.1em] text-primary">
                 Image attached
@@ -381,10 +381,10 @@ export function SmartInput() {
               <button
                 type="button"
                 onClick={handleRemoveImage}
-                className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-destructive/10 text-muted hover:text-destructive cursor-pointer"
+                className="ml-auto flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-[3px] text-muted transition-colors hover:bg-destructive/10 hover:text-destructive"
                 aria-label={t("removeImage")}
               >
-                <X className="h-3 w-3" />
+                <X className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -413,7 +413,7 @@ export function SmartInput() {
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               placeholder={t("smartInputPlaceholder")}
-              className="min-w-0 flex-1 bg-transparent px-1 py-3 font-sans text-foreground placeholder:text-muted focus:outline-none"
+              className="min-h-11 min-w-0 flex-1 bg-transparent px-1 py-3 font-sans text-foreground placeholder:text-muted focus:outline-none"
               disabled={isLoading}
             />
           )}
@@ -422,7 +422,7 @@ export function SmartInput() {
           <button
             type="submit"
             disabled={!canSubmit || isLoading}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] bg-primary text-primary-foreground transition-opacity hover:opacity-85 disabled:opacity-50 cursor-pointer"
+            className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-[3px] bg-primary text-primary-foreground transition-opacity hover:opacity-85 disabled:opacity-50"
             aria-label={t("send")}
           >
             {parseMutation.isPending ? (
@@ -441,252 +441,251 @@ export function SmartInput() {
         </p>
       )}
 
-      {/* Preview popup - identical for both text and image parsing results */}
+      {/* Preview review panel */}
       {preview && editedData && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 animate-in">
-          <div className="rounded-[4px] border border-border bg-card p-6">
-            <p className="mb-3 font-mono text-[0.7rem] uppercase tracking-[0.15em] text-foreground">
+        <div className="fixed inset-x-0 bottom-0 z-50 max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-border bg-card p-4 pb-[max(env(safe-area-inset-bottom),1rem)] shadow-lg animate-in sm:absolute sm:bottom-auto sm:left-0 sm:right-0 sm:top-full sm:mt-2 sm:max-h-none sm:overflow-visible sm:rounded-[4px] sm:border sm:p-6">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <p className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-foreground">
               {t("previewTitle")}
             </p>
+            <button
+              type="button"
+              onClick={handleReject}
+              className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-[3px] border border-border text-muted transition-colors hover:border-primary hover:text-primary sm:hidden"
+              aria-label={t("reject")}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
-            {/* Recurring suggestion banner */}
-            {showSuggestion && suggestion && (
-              <div className="mb-3 rounded-[3px] border border-primary/30 bg-primary/5 p-3">
-                <div className="flex items-start gap-2">
-                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <div>
-                    <p className="font-sans text-sm text-foreground">
-                      {t("recurringSuggestion")}
-                    </p>
-                    <p className="mt-1 font-sans text-xs text-muted">
-                      {suggestion.reason}
-                    </p>
-                  </div>
+          {/* Recurring suggestion banner */}
+          {showSuggestion && suggestion && (
+            <div className="mb-3 rounded-[3px] border border-primary/30 bg-primary/5 p-3">
+              <div className="flex items-start gap-2">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <p className="font-sans text-sm text-foreground">
+                    {t("recurringSuggestion")}
+                  </p>
+                  <p className="mt-1 font-sans text-xs text-muted">
+                    {suggestion.reason}
+                  </p>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {suggestRecurringMutation.isPending && (
-              <div className="mb-3 flex items-center gap-2 text-muted">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                <span className="font-sans text-xs">
-                  {t("analyzingPattern")}
-                </span>
-              </div>
-            )}
+          {suggestRecurringMutation.isPending && (
+            <div className="mb-3 flex items-center gap-2 text-muted">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span className="font-sans text-xs">{t("analyzingPattern")}</span>
+            </div>
+          )}
 
-            <div className="space-y-3 rounded-[3px] border border-border bg-background p-4">
-              {/* Row 1: Type toggle */}
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
-                  {t("type")}
-                </span>
-                <div className="flex gap-1 rounded-[3px] border border-border p-0.5">
-                  <button
-                    type="button"
-                    onClick={() => updateField("type", "expense")}
-                    className={`rounded-[2px] px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer ${
-                      editedData.type === "expense"
-                        ? "bg-destructive/15 text-destructive"
-                        : "text-muted hover:text-foreground"
-                    }`}
-                  >
-                    {t("expense")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => updateField("type", "income")}
-                    className={`rounded-[2px] px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors cursor-pointer ${
-                      editedData.type === "income"
-                        ? "bg-success/15 text-success"
-                        : "text-muted hover:text-foreground"
-                    }`}
-                  >
-                    {t("income")}
-                  </button>
-                </div>
-              </div>
-
-              {/* Row 2: Amount */}
-              <div className="flex items-center justify-between text-sm">
-                <label
-                  htmlFor="edit-amount"
-                  className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
-                >
-                  {t("amount")}
-                </label>
-                <input
-                  id="edit-amount"
-                  type="text"
-                  inputMode="decimal"
-                  value={formatNumberInput(editedData.amount, language)}
-                  onChange={(e) =>
-                    updateField("amount", parseNumberInput(e.target.value))
-                  }
-                  className={`w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm focus:border-primary focus:outline-none ${
+          <div className="space-y-4 rounded-[3px] border border-border bg-background p-3 sm:space-y-3 sm:p-4">
+            {/* Row 1: Type toggle */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
+                {t("type")}
+              </span>
+              <div className="grid grid-cols-2 gap-1 rounded-[3px] border border-border p-0.5 sm:flex">
+                <button
+                  type="button"
+                  onClick={() => updateField("type", "expense")}
+                  className={`min-h-11 cursor-pointer rounded-[2px] px-3 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors sm:min-h-0 sm:py-1 ${
                     editedData.type === "expense"
-                      ? "text-destructive"
-                      : "text-success"
+                      ? "bg-destructive/15 text-destructive"
+                      : "text-muted hover:text-foreground"
                   }`}
-                />
+                >
+                  {t("expense")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateField("type", "income")}
+                  className={`min-h-11 cursor-pointer rounded-[2px] px-3 font-mono text-[0.7rem] uppercase tracking-[0.08em] transition-colors sm:min-h-0 sm:py-1 ${
+                    editedData.type === "income"
+                      ? "bg-success/15 text-success"
+                      : "text-muted hover:text-foreground"
+                  }`}
+                >
+                  {t("income")}
+                </button>
               </div>
+            </div>
 
-              {/* Row 3: Category */}
-              <div className="flex items-center justify-between text-sm">
+            {/* Row 2: Amount */}
+            <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <label
+                htmlFor="edit-amount"
+                className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
+              >
+                {t("amount")}
+              </label>
+              <input
+                id="edit-amount"
+                type="text"
+                inputMode="decimal"
+                value={formatNumberInput(editedData.amount, language)}
+                onChange={(e) =>
+                  updateField("amount", parseNumberInput(e.target.value))
+                }
+                className={`min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right ${
+                  editedData.type === "expense"
+                    ? "text-destructive"
+                    : "text-success"
+                }`}
+              />
+            </div>
+
+            {/* Row 3: Category */}
+            <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <label
+                htmlFor="edit-category"
+                className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
+              >
+                {t("category")}
+              </label>
+              <select
+                id="edit-category"
+                value={editedData.category}
+                onChange={(e) => updateField("category", e.target.value)}
+                className="min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm text-foreground focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Row 4: Description */}
+            <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <label
+                htmlFor="edit-description"
+                className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
+              >
+                {t("description")}
+              </label>
+              <input
+                id="edit-description"
+                type="text"
+                value={editedData.description}
+                onChange={(e) => updateField("description", e.target.value)}
+                className="min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm text-foreground focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right"
+              />
+            </div>
+
+            {/* Row 5: Date */}
+            <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <label
+                htmlFor="edit-date"
+                className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
+              >
+                {t("date")}
+              </label>
+              <input
+                id="edit-date"
+                type="date"
+                value={editedData.transactionDate}
+                onChange={(e) => updateField("transactionDate", e.target.value)}
+                className="min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm text-foreground focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right"
+              />
+            </div>
+
+            {/* Row 6: Recurring toggle */}
+            <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
+                {t("recurring")}
+              </span>
+              <Toggle
+                type="button"
+                pressed={Boolean(editedData.recurring)}
+                onPressedChange={(pressed) => updateField("recurring", pressed)}
+                size="sm"
+                className="min-h-11 w-full sm:w-20"
+                aria-label={t("recurring") as string}
+              >
+                {editedData.recurring ? "On" : "Off"}
+              </Toggle>
+            </div>
+
+            {/* Row 7: Recurring frequency */}
+            {editedData.recurring && (
+              <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <label
-                  htmlFor="edit-category"
+                  htmlFor="edit-recurring-freq"
                   className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
                 >
-                  {t("category")}
+                  {t("recurringFrequency")}
                 </label>
                 <select
-                  id="edit-category"
-                  value={editedData.category}
-                  onChange={(e) => updateField("category", e.target.value)}
-                  className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
+                  id="edit-recurring-freq"
+                  value={editedData.recurringFreq ?? "monthly"}
+                  onChange={(e) =>
+                    updateField(
+                      "recurringFreq",
+                      e.target.value as RecurringFrequency,
+                    )
+                  }
+                  className="min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm text-foreground focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right"
                 >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
+                  {RECURRING_FREQUENCIES.map((freq) => (
+                    <option key={freq} value={freq}>
+                      {t(
+                        `recurring${
+                          freq.charAt(0).toUpperCase() + freq.slice(1)
+                        }` as TranslationKey,
+                      )}
                     </option>
                   ))}
                 </select>
               </div>
+            )}
 
-              {/* Row 4: Description */}
-              <div className="flex items-center justify-between text-sm">
+            {/* Row 8: Recurring end date */}
+            {editedData.recurring && (
+              <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <label
-                  htmlFor="edit-description"
+                  htmlFor="edit-recurring-end"
                   className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
                 >
-                  {t("description")}
+                  {t("recurringEndDate")}
                 </label>
                 <input
-                  id="edit-description"
-                  type="text"
-                  value={editedData.description}
-                  onChange={(e) => updateField("description", e.target.value)}
-                  className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
-                />
-              </div>
-
-              {/* Row 5: Date */}
-              <div className="flex items-center justify-between text-sm">
-                <label
-                  htmlFor="edit-date"
-                  className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
-                >
-                  {t("date")}
-                </label>
-                <input
-                  id="edit-date"
+                  id="edit-recurring-end"
                   type="date"
-                  value={editedData.transactionDate}
+                  value={editedData.recurringEndDate ?? ""}
                   onChange={(e) =>
-                    updateField("transactionDate", e.target.value)
+                    updateField("recurringEndDate", e.target.value || undefined)
                   }
-                  className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
+                  className="min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm text-foreground focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right"
                 />
               </div>
+            )}
+          </div>
 
-              {/* Row 6: Recurring toggle */}
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground">
-                  {t("recurring")}
-                </span>
-                <Toggle
-                  type="button"
-                  pressed={Boolean(editedData.recurring)}
-                  onPressedChange={(pressed) =>
-                    updateField("recurring", pressed)
-                  }
-                  size="sm"
-                  className="w-20"
-                  aria-label={t("recurring") as string}
-                >
-                  {editedData.recurring ? "On" : "Off"}
-                </Toggle>
-              </div>
-
-              {/* Row 7: Recurring frequency */}
-              {editedData.recurring && (
-                <div className="flex items-center justify-between text-sm">
-                  <label
-                    htmlFor="edit-recurring-freq"
-                    className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
-                  >
-                    {t("recurringFrequency")}
-                  </label>
-                  <select
-                    id="edit-recurring-freq"
-                    value={editedData.recurringFreq ?? "monthly"}
-                    onChange={(e) =>
-                      updateField(
-                        "recurringFreq",
-                        e.target.value as RecurringFrequency,
-                      )
-                    }
-                    className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
-                  >
-                    {RECURRING_FREQUENCIES.map((freq) => (
-                      <option key={freq} value={freq}>
-                        {t(
-                          `recurring${
-                            freq.charAt(0).toUpperCase() + freq.slice(1)
-                          }` as TranslationKey,
-                        )}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+          <div className="mt-4 flex flex-col gap-2 min-[430px]:flex-row">
+            <button
+              onClick={handleApprove}
+              disabled={saveMutation.isPending}
+              className="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-[3px] bg-primary px-4 font-mono text-[0.8rem] uppercase tracking-[0.08em] text-primary-foreground transition-opacity hover:opacity-85 disabled:opacity-50"
+            >
+              {saveMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
               )}
-
-              {/* Row 8: Recurring end date */}
-              {editedData.recurring && (
-                <div className="flex items-center justify-between text-sm">
-                  <label
-                    htmlFor="edit-recurring-end"
-                    className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-foreground"
-                  >
-                    {t("recurringEndDate")}
-                  </label>
-                  <input
-                    id="edit-recurring-end"
-                    type="date"
-                    value={editedData.recurringEndDate ?? ""}
-                    onChange={(e) =>
-                      updateField(
-                        "recurringEndDate",
-                        e.target.value || undefined,
-                      )
-                    }
-                    className="w-40 rounded-[3px] border border-border bg-transparent px-2 py-1 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={handleApprove}
-                disabled={saveMutation.isPending}
-                className="flex flex-1 items-center justify-center gap-2 rounded-[3px] bg-primary py-3 font-mono text-[0.8rem] uppercase tracking-[0.08em] text-primary-foreground transition-opacity hover:opacity-85 disabled:opacity-50 cursor-pointer"
-              >
-                {saveMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Check className="h-4 w-4" />
-                )}
-                {t("approve")}
-              </button>
-              <button
-                onClick={handleReject}
-                className="flex items-center justify-center gap-2 rounded-[3px] border border-border px-5 py-3 font-mono text-[0.8rem] uppercase tracking-[0.08em] text-muted transition-colors hover:border-primary hover:text-primary cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-                {t("reject")}
-              </button>
-            </div>
+              {t("approve")}
+            </button>
+            <button
+              onClick={handleReject}
+              className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[3px] border border-border px-5 font-mono text-[0.8rem] uppercase tracking-[0.08em] text-muted transition-colors hover:border-primary hover:text-primary"
+            >
+              <X className="h-4 w-4" />
+              {t("reject")}
+            </button>
           </div>
         </div>
       )}

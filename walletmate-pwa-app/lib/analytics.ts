@@ -90,7 +90,7 @@ export function buildCashFlowTrend(
 
 export function buildTopCategorySpend(
   transactions: Transaction[],
-  limit = 6,
+  limit?: number,
 ): CategorySpendPoint[] {
   const totals = transactions
     .filter((transaction) => transaction.type === "expense")
@@ -103,14 +103,15 @@ export function buildTopCategorySpend(
 
   if (total === 0) return [];
 
-  return Object.entries(totals)
+  const sorted = Object.entries(totals)
     .map(([category, amount]) => ({
       category,
       amount,
       percent: (amount / total) * 100,
     }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, limit);
+    .sort((a, b) => b.amount - a.amount);
+
+  return typeof limit === "number" ? sorted.slice(0, limit) : sorted;
 }
 
 export function buildSpendingPace(

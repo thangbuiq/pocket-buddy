@@ -75,18 +75,10 @@ function LandingContent() {
           </div>
         </section>
 
-        {/* ── Section 2: Features ── */}
         <section className="features-section relative flex min-h-[80vh] w-full items-center px-6 py-24 md:px-12">
-          <span
-            className="pointer-events-none absolute right-6 top-12 font-mono text-[clamp(6rem,15vw,12rem)] font-medium leading-none text-foreground/[0.02] select-none"
-            aria-hidden="true"
-          >
-            02
-          </span>
-
           <div className="mx-auto w-full max-w-[680px]">
             <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
-              02 - Features
+              Features
             </span>
             <h2 className="mt-4 font-serif text-[clamp(1.75rem,3vw,2.5rem)] font-normal leading-[1.2] tracking-[-0.01em] text-foreground">
               Built for <span className="serif-accent">clarity</span>.
@@ -167,7 +159,6 @@ function LandingContent() {
           </div>
         </section>
 
-        {/* ── Section 3: CTA ── */}
         <section className="cta-section flex min-h-[60vh] w-full items-center justify-center px-6 py-24 md:px-12">
           <AnimatedContainer
             animation="slide-up"
@@ -176,7 +167,7 @@ function LandingContent() {
             className="mx-auto w-full max-w-[560px] text-center"
           >
             <span className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-primary">
-              03 - Start
+              Start
             </span>
             <h2 className="mt-8 font-serif text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em] text-foreground">
               Take <span className="serif-accent">control</span> of your
