@@ -39,7 +39,7 @@ export function LoginForm({
       <button
         onClick={handleGitHubLogin}
         disabled={loading !== null || !githubOAuthEnabled}
-        className="flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-4 py-3 font-medium text-background transition-colors hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+        className="flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-4 py-3 text-background transition-colors hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
         title={
           githubOAuthEnabled
             ? undefined
@@ -47,7 +47,7 @@ export function LoginForm({
         }
       >
         <GitHubIcon className="h-5 w-5" />
-        <span className="font-mono uppercase tracking-[0.08em]">
+        <span className="font-mono text-xs font-normal uppercase tracking-[0.08em]">
           {loading === "github" ? "Connecting..." : "Continue with GitHub"}
         </span>
       </button>
@@ -55,9 +55,9 @@ export function LoginForm({
       <button
         onClick={handleDemoLogin}
         disabled={loading !== null}
-        className="w-full rounded-md border border-border bg-background px-4 py-3 font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50 cursor-pointer"
+        className="w-full rounded-md border border-border bg-background px-4 py-3 text-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50 cursor-pointer"
       >
-        <span className="font-mono uppercase tracking-[0.08em]">
+        <span className="font-mono text-xs font-normal uppercase tracking-[0.08em]">
           {loading === "demo" ? "Loading..." : "Try Demo"}
         </span>
       </button>
