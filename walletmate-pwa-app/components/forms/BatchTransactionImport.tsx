@@ -20,7 +20,7 @@ import { formatCurrency } from "@/lib/utils";
 import type { ParsedExpense } from "@/lib/validations/parse";
 
 const MAX_BATCH_FILE_SIZE = 5 * 1024 * 1024;
-const MAX_BATCH_TRANSACTIONS = 100;
+const MAX_BATCH_TRANSACTIONS = 50;
 const ACCEPTED_FILE_TYPES =
   ".csv,.xlsx,.pdf,.jpg,.jpeg,.png,.webp,.gif,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/pdf,image/jpeg,image/png,image/webp,image/gif";
 
@@ -56,10 +56,16 @@ export function BatchTransactionImport() {
         extension ?? "",
       )
     ) {
-      return "Only CSV, XLSX, PDF, and image files are supported.";
+      return {
+        title: "Unsupported file type",
+        description: "Upload a CSV, XLSX, PDF, JPG, PNG, WebP, or GIF file.",
+      };
     }
     if (file.size > MAX_BATCH_FILE_SIZE) {
-      return "File too large. Maximum size is 5 MB.";
+      return {
+        title: "File too large",
+        description: "Upload a smaller file. Maximum file size is 5 MB.",
+      };
     }
     return null;
   };
@@ -67,7 +73,12 @@ export function BatchTransactionImport() {
   const handleFile = async (file: File) => {
     const validationError = validateFile(file);
     if (validationError) {
-      setError(validationError);
+      setRows([]);
+      setFileName(null);
+      setError(validationError.description);
+      toast.error(validationError.title, {
+        description: validationError.description,
+      });
       return;
     }
 
@@ -77,26 +88,32 @@ export function BatchTransactionImport() {
 
     try {
       const parsedRows = await parseBatchFile(file, language);
-      setRows(
-        parsedRows.slice(0, MAX_BATCH_TRANSACTIONS).map((row, index) => ({
-          ...row,
-          recurring: false,
-          recurringFreq: undefined,
-          id: `${file.name}-${index}-${row.transactionDate}-${row.amount}`,
-          approved: true,
-        })),
-      );
       if (parsedRows.length === 0) {
+        setRows([]);
         setError("No transactions were found in this file.");
         toast.error("No transactions found", {
           description: "Try another CSV, XLSX, PDF, or image file.",
         });
+      } else if (parsedRows.length > MAX_BATCH_TRANSACTIONS) {
+        setRows([]);
+        setError(
+          `This file has ${parsedRows.length} transactions. Maximum ${MAX_BATCH_TRANSACTIONS} transactions per file.`,
+        );
+        toast.error("Too many transactions", {
+          description: `Split transactions into multiple files. Maximum ${MAX_BATCH_TRANSACTIONS} transactions per file.`,
+        });
       } else {
+        setRows(
+          parsedRows.map((row, index) => ({
+            ...row,
+            recurring: false,
+            recurringFreq: undefined,
+            id: `${file.name}-${index}-${row.transactionDate}-${row.amount}`,
+            approved: true,
+          })),
+        );
         toast.success("File parsed", {
-          description: `${Math.min(
-            parsedRows.length,
-            MAX_BATCH_TRANSACTIONS,
-          )} transactions are ready for review.`,
+          description: `${parsedRows.length} transactions are ready for review.`,
         });
       }
     } catch (err) {
@@ -260,7 +277,8 @@ export function BatchTransactionImport() {
           </h2>
           <p className="mt-2 max-w-xl font-sans text-sm leading-6 text-muted sm:text-base">
             CSV, XLSX, PDF, JPG, PNG, WebP, or GIF. Up to{" "}
-            {MAX_BATCH_TRANSACTIONS} transactions and 5 MB per file.
+            {MAX_BATCH_TRANSACTIONS} transactions and 5 MB per file. Upload a
+            smaller file or split transactions into multiple files if needed.
           </p>
         </div>
 

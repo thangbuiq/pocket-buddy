@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useEffect,
   useContext,
   useSyncExternalStore,
   ReactNode,
@@ -35,6 +36,8 @@ function createLocalStorageStore<T>(
   validator: (v: string | null) => T | null,
 ) {
   const listeners = new Set<() => void>();
+  let hydrated = false;
+  let currentValue = defaultValue;
 
   return {
     subscribe(callback: () => void) {
@@ -42,11 +45,18 @@ function createLocalStorageStore<T>(
       return () => listeners.delete(callback);
     },
     getSnapshot(): T {
-      if (typeof window === "undefined") return defaultValue;
-      const stored = localStorage.getItem(key);
-      return validator(stored) ?? defaultValue;
+      return currentValue;
+    },
+    hydrate() {
+      if (hydrated || typeof window === "undefined") return;
+      hydrated = true;
+      const stored = validator(localStorage.getItem(key)) ?? defaultValue;
+      if (stored === currentValue) return;
+      currentValue = stored;
+      listeners.forEach((cb) => cb());
     },
     set(value: T) {
+      currentValue = value;
       localStorage.setItem(key, String(value));
       listeners.forEach((cb) => cb());
     },
@@ -76,6 +86,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     currencyStore.getSnapshot,
     currencyStore.getSnapshot,
   );
+
+  useEffect(() => {
+    languageStore.hydrate();
+    currencyStore.hydrate();
+  }, []);
 
   const setLanguage = (lang: Language) => languageStore.set(lang);
   const setCurrency = (curr: Currency) => currencyStore.set(curr);

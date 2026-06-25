@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { AddTransactionSheet } from "@/components/forms/AddTransactionSheet";
 import { BatchTransactionImport } from "@/components/forms/BatchTransactionImport";
+import { DateRangePicker } from "@/components/shared/DateRangePicker";
 import { SmartInput } from "@/components/shared/SmartInput";
 import { IncomePrivacyToggle } from "@/components/shared/IncomePrivacyToggle";
 import { TransactionCard } from "@/components/shared/TransactionCard";
@@ -23,8 +24,20 @@ import {
   Trash2,
 } from "lucide-react";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
+import { type DateRange } from "react-day-picker";
 import type { Transaction } from "@/types";
+
+function parseTransactionDate(dateValue: string) {
+  return new Date(`${dateValue}T00:00:00`);
+}
 
 export default function TransactionsPage() {
   const { t, language } = useI18n();
@@ -45,9 +58,7 @@ export default function TransactionsPage() {
     "all",
   );
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [periodFilter, setPeriodFilter] = useState<"all" | "month" | "year">(
-    "all",
-  );
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showIncomeAmounts, setShowIncomeAmounts] = useState(false);
 
   const categories = useMemo(
@@ -60,11 +71,20 @@ export default function TransactionsPage() {
 
   const filteredTransactions = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    const now = new Date();
+    const rangeFrom = dateRange?.from;
+    const rangeTo = dateRange?.to ?? rangeFrom;
+    const rangeStart = rangeFrom
+      ? new Date(rangeFrom).setHours(0, 0, 0, 0)
+      : undefined;
+    const rangeEnd = rangeTo
+      ? new Date(rangeTo).setHours(23, 59, 59, 999)
+      : undefined;
 
     return data
       .filter((transaction) => {
-        const transactionDate = new Date(transaction.transactionDate);
+        const transactionTime = parseTransactionDate(
+          transaction.transactionDate,
+        ).getTime();
         const matchesQuery =
           normalizedQuery.length === 0 ||
           transaction.category.toLowerCase().includes(normalizedQuery) ||
@@ -75,22 +95,21 @@ export default function TransactionsPage() {
           typeFilter === "all" || transaction.type === typeFilter;
         const matchesCategory =
           categoryFilter === "all" || transaction.category === categoryFilter;
-        const matchesPeriod =
-          periodFilter === "all" ||
-          (periodFilter === "month" &&
-            transactionDate.getMonth() === now.getMonth() &&
-            transactionDate.getFullYear() === now.getFullYear()) ||
-          (periodFilter === "year" &&
-            transactionDate.getFullYear() === now.getFullYear());
+        const matchesDateRange =
+          rangeStart === undefined ||
+          rangeEnd === undefined ||
+          (transactionTime >= rangeStart && transactionTime <= rangeEnd);
 
-        return matchesQuery && matchesType && matchesCategory && matchesPeriod;
+        return (
+          matchesQuery && matchesType && matchesCategory && matchesDateRange
+        );
       })
       .sort(
         (a, b) =>
-          new Date(b.transactionDate).getTime() -
-          new Date(a.transactionDate).getTime(),
+          parseTransactionDate(b.transactionDate).getTime() -
+          parseTransactionDate(a.transactionDate).getTime(),
       );
-  }, [categoryFilter, data, periodFilter, query, typeFilter]);
+  }, [categoryFilter, data, dateRange, query, typeFilter]);
 
   const groupedTransactions = useMemo(() => {
     return filteredTransactions.reduce<
@@ -112,7 +131,7 @@ export default function TransactionsPage() {
   }, [filteredTransactions]);
 
   const formatDateGroup = (dateValue: string) => {
-    const date = new Date(dateValue + "T00:00:00");
+    const date = parseTransactionDate(dateValue);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const yesterday = new Date(today);
@@ -235,7 +254,7 @@ export default function TransactionsPage() {
             </div>
           </div>
 
-          <div className="grid gap-3 rounded-[4px] border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 rounded-[4px] border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-5">
             <label className="relative block sm:col-span-2 lg:col-span-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
               <input
@@ -245,42 +264,39 @@ export default function TransactionsPage() {
                 className="min-h-12 w-full rounded-[3px] border border-border bg-background px-9 font-sans text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none sm:min-h-11"
               />
             </label>
-            <select
+            <Select
               value={typeFilter}
-              onChange={(event) =>
-                setTypeFilter(
-                  event.target.value as "all" | "income" | "expense",
-                )
+              onValueChange={(value) =>
+                setTypeFilter(value as "all" | "income" | "expense")
               }
-              className="min-h-12 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none sm:min-h-11"
             >
-              <option value="all">{t("allTypes")}</option>
-              <option value="expense">{t("expense")}</option>
-              <option value="income">{t("income")}</option>
-            </select>
-            <select
-              value={categoryFilter}
-              onChange={(event) => setCategoryFilter(event.target.value)}
-              className="min-h-12 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none sm:min-h-11"
-            >
-              <option value="all">{t("allCategories")}</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-            <select
-              value={periodFilter}
-              onChange={(event) =>
-                setPeriodFilter(event.target.value as "all" | "month" | "year")
-              }
-              className="min-h-12 rounded-[3px] border border-border bg-background px-3 font-sans text-sm text-foreground focus:border-primary focus:outline-none sm:min-h-11"
-            >
-              <option value="all">{t("allTime")}</option>
-              <option value="month">{t("thisMonth")}</option>
-              <option value="year">{t("thisYear")}</option>
-            </select>
+              <SelectTrigger className="min-h-12 sm:min-h-11">
+                <SelectValue placeholder={t("allTypes") as string} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("allTypes")}</SelectItem>
+                <SelectItem value="expense">{t("expense")}</SelectItem>
+                <SelectItem value="income">{t("income")}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="min-h-12 sm:min-h-11">
+                <SelectValue placeholder={t("allCategories") as string} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("allCategories")}</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <DateRangePicker
+              value={dateRange}
+              onChange={setDateRange}
+              className="sm:col-span-2"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-2 rounded-[3px] border border-border bg-card p-1 sm:hidden">

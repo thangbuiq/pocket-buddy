@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Repeat, Calendar, X } from "lucide-react";
+import { format } from "date-fns";
+import { Repeat, Calendar as CalendarIcon, X } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
@@ -27,6 +34,14 @@ function countRecurrencesLeft(
     Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
   );
   return Math.max(0, Math.floor(daysLeft / FREQUENCY_DAYS[freq]));
+}
+
+function parseDateValue(value: string) {
+  return value ? new Date(`${value}T00:00:00`) : undefined;
+}
+
+function toDateValue(date: Date) {
+  return date.toISOString().slice(0, 10);
 }
 
 export function ActiveRecurringList({
@@ -117,15 +132,20 @@ export function ActiveRecurringList({
 
                 {/* End date note */}
                 {hasEnd && recurrencesLeft !== null && (
-                  <p className="mt-1.5 font-sans text-xs text-muted italic">
-                    {t("recurringUntil")} {txn.recurringEndDate}
-                    <span className="ml-1 text-foreground font-medium not-italic">
-                      · {recurrencesLeft}{" "}
-                      {recurrencesLeft === 1
-                        ? (t("recurringLeft") as string)
-                        : (t("recurringLeftPlural") as string)}
-                    </span>
-                  </p>
+                  <div className="mt-1.5 space-y-1">
+                    <p className="font-sans text-xs text-muted italic">
+                      {t("recurringUntil")} {txn.recurringEndDate}
+                      <span className="ml-1 text-foreground font-medium not-italic">
+                        · {recurrencesLeft}{" "}
+                        {recurrencesLeft === 1
+                          ? (t("recurringLeft") as string)
+                          : (t("recurringLeftPlural") as string)}
+                      </span>
+                    </p>
+                    <p className="font-sans text-xs leading-5 text-muted">
+                      This is the end date set for the recurring transaction.
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -150,7 +170,7 @@ export function ActiveRecurringList({
                   aria-label="Set end date"
                   title={t("recurringEndDate")}
                 >
-                  <Calendar className="h-4 w-4" />
+                  <CalendarIcon className="h-4 w-4" />
                 </button>
 
                 {/* Cancel recurring */}
@@ -169,14 +189,38 @@ export function ActiveRecurringList({
             {/* Inline end-date picker */}
             {isEditing && (
               <div className="mt-3 flex flex-wrap items-center gap-2 rounded-[3px] border border-primary/20 bg-primary/5 p-3">
-                <Calendar className="h-3.5 w-3.5 shrink-0 text-primary" />
-                <input
-                  type="date"
-                  value={dateValue}
-                  onChange={(e) => setDateValue(e.target.value)}
-                  min={new Date().toISOString().slice(0, 10)}
-                  className="min-h-10 min-w-40 flex-1 bg-transparent font-mono text-sm text-foreground focus:outline-none"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex min-h-10 min-w-56 flex-1 items-center gap-2 rounded-[3px] border border-border bg-background px-3 text-left font-sans text-sm text-foreground transition-colors hover:border-primary"
+                    >
+                      <CalendarIcon className="h-3.5 w-3.5 shrink-0 text-primary" />
+                      <span className="truncate">
+                        {dateValue
+                          ? format(parseDateValue(dateValue)!, "LLL dd, y")
+                          : t("recurringEndDate")}
+                      </span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="start"
+                    className="w-[min(calc(100vw-2rem),22rem)] p-3"
+                  >
+                    <Calendar
+                      mode="single"
+                      selected={parseDateValue(dateValue)}
+                      defaultMonth={parseDateValue(dateValue)}
+                      disabled={{ before: new Date() }}
+                      onSelect={(date) => {
+                        if (date) setDateValue(toDateValue(date));
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <p className="basis-full font-sans text-xs leading-5 text-muted">
+                  This is the end date set for the recurring transaction.
+                </p>
                 <button
                   type="button"
                   disabled={!dateValue}

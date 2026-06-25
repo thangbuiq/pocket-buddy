@@ -9,6 +9,13 @@ import {
   type TransactionInput,
 } from "@/lib/validations/transactions";
 import { Toggle } from "@/components/ui/toggle";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -24,6 +31,18 @@ const RECURRING_FREQUENCIES: RecurringFrequency[] = [
   "weekly",
   "monthly",
   "yearly",
+];
+
+const CATEGORIES = [
+  "Ăn uống",
+  "Di chuyển",
+  "Mua sắm",
+  "Giải trí",
+  "Hóa đơn",
+  "Sức khỏe",
+  "Học tập",
+  "Lương",
+  "Khác",
 ];
 
 export function AddTransactionSheet({
@@ -60,6 +79,7 @@ export function AddTransactionSheet({
   const watchedCategory = useWatch({ control, name: "category" });
   const watchedType = useWatch({ control, name: "type" });
   const watchedRecurring = useWatch({ control, name: "recurring" });
+  const watchedRecurringFreq = useWatch({ control, name: "recurringFreq" });
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -146,13 +166,24 @@ export function AddTransactionSheet({
         <span className="serif-accent">Manual</span> Input
       </h3>
 
-      <select
-        {...register("type")}
-        className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
+      <Select
+        value={watchedType}
+        onValueChange={(value) =>
+          setValue("type", value as TransactionInput["type"], {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          })
+        }
       >
-        <option value="expense">Expense</option>
-        <option value="income">Income</option>
-      </select>
+        <SelectTrigger className="min-h-14 px-4 text-base">
+          <SelectValue placeholder="Type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="expense">Expense</SelectItem>
+          <SelectItem value="income">Income</SelectItem>
+        </SelectContent>
+      </Select>
 
       <input
         {...register("amount", { valueAsNumber: true })}
@@ -162,20 +193,27 @@ export function AddTransactionSheet({
         className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
       />
 
-      <select
-        {...register("category")}
-        className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
+      <Select
+        value={watchedCategory}
+        onValueChange={(value) =>
+          setValue("category", value, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          })
+        }
       >
-        <option value="Ăn uống">Ăn uống</option>
-        <option value="Di chuyển">Di chuyển</option>
-        <option value="Mua sắm">Mua sắm</option>
-        <option value="Giải trí">Giải trí</option>
-        <option value="Hóa đơn">Hóa đơn</option>
-        <option value="Sức khỏe">Sức khỏe</option>
-        <option value="Học tập">Học tập</option>
-        <option value="Lương">Lương</option>
-        <option value="Khác">Khác</option>
-      </select>
+        <SelectTrigger className="min-h-14 px-4 text-base">
+          <SelectValue placeholder="Category" />
+        </SelectTrigger>
+        <SelectContent>
+          {CATEGORIES.map((category) => (
+            <SelectItem key={category} value={category}>
+              {category}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       <input
         {...register("description")}
@@ -251,18 +289,29 @@ export function AddTransactionSheet({
 
       {watchedRecurring && (
         <>
-          <select
-            {...register("recurringFreq")}
-            className="min-h-14 rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
+          <Select
+            value={watchedRecurringFreq ?? "monthly"}
+            onValueChange={(value) =>
+              setValue("recurringFreq", value as RecurringFrequency, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
           >
-            {RECURRING_FREQUENCIES.map((freq) => (
-              <option key={freq} value={freq}>
-                {t(
-                  `recurring${freq.charAt(0).toUpperCase() + freq.slice(1)}` as TranslationKey,
-                )}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="min-h-14 px-4 text-base">
+              <SelectValue placeholder={t("recurringFrequency") as string} />
+            </SelectTrigger>
+            <SelectContent>
+              {RECURRING_FREQUENCIES.map((freq) => (
+                <SelectItem key={freq} value={freq}>
+                  {t(
+                    `recurring${freq.charAt(0).toUpperCase() + freq.slice(1)}` as TranslationKey,
+                  )}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           <label className="block font-sans text-xs text-muted">
             {t("recurringEndDate")}
@@ -271,6 +320,9 @@ export function AddTransactionSheet({
               type="date"
               className="mt-1.5 min-h-14 w-full rounded-[3px] border border-border bg-background px-4 font-sans text-base text-foreground focus:border-primary focus:outline-none"
             />
+            <span className="mt-1.5 block leading-5">
+              This is the end date for the recurring transaction.
+            </span>
           </label>
         </>
       )}

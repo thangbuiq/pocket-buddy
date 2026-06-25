@@ -7,6 +7,13 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { Toggle } from "@/components/ui/toggle";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatNumberInput, parseNumberInput } from "@/lib/utils";
 import { parseText, parseImage } from "@/lib/api";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -136,15 +143,6 @@ export function SmartInput() {
             data.recurringFreq &&
             data.confidence !== "low"
           ) {
-            setEditedData((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    recurring: true,
-                    recurringFreq: data.recurringFreq,
-                  }
-                : prev,
-            );
             setShowSuggestion(true);
           } else {
             setShowSuggestion(false);
@@ -443,7 +441,7 @@ export function SmartInput() {
 
       {/* Preview review panel */}
       {preview && editedData && (
-        <div className="fixed inset-x-0 bottom-0 z-50 max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-border bg-card p-4 pb-[max(env(safe-area-inset-bottom),1rem)] shadow-lg animate-in sm:absolute sm:bottom-auto sm:left-0 sm:right-0 sm:top-full sm:mt-2 sm:max-h-none sm:overflow-visible sm:rounded-[4px] sm:border sm:p-6">
+        <div className="z-30 mt-2 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-[4px] border border-border bg-card p-4 shadow-lg animate-in sm:absolute sm:left-0 sm:right-0 sm:top-full sm:max-h-none sm:overflow-visible sm:p-6">
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-foreground">
               {t("previewTitle")}
@@ -469,6 +467,10 @@ export function SmartInput() {
                   </p>
                   <p className="mt-1 font-sans text-xs text-muted">
                     {suggestion.reason}
+                  </p>
+                  <p className="mt-1 font-sans text-xs text-muted">
+                    AI detected a possible recurring transaction. Review it and
+                    turn recurring on if you want to save it that way.
                   </p>
                 </div>
               </div>
@@ -546,18 +548,21 @@ export function SmartInput() {
               >
                 {t("category")}
               </label>
-              <select
-                id="edit-category"
+              <Select
                 value={editedData.category}
-                onChange={(e) => updateField("category", e.target.value)}
-                className="min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm text-foreground focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right"
+                onValueChange={(value) => updateField("category", value)}
               >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="min-h-11 w-full bg-transparent font-mono sm:w-40">
+                  <SelectValue placeholder={t("category") as string} />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Row 4: Description */}
@@ -620,27 +625,29 @@ export function SmartInput() {
                 >
                   {t("recurringFrequency")}
                 </label>
-                <select
-                  id="edit-recurring-freq"
+                <Select
                   value={editedData.recurringFreq ?? "monthly"}
-                  onChange={(e) =>
-                    updateField(
-                      "recurringFreq",
-                      e.target.value as RecurringFrequency,
-                    )
+                  onValueChange={(value) =>
+                    updateField("recurringFreq", value as RecurringFrequency)
                   }
-                  className="min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm text-foreground focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right"
                 >
-                  {RECURRING_FREQUENCIES.map((freq) => (
-                    <option key={freq} value={freq}>
-                      {t(
-                        `recurring${
-                          freq.charAt(0).toUpperCase() + freq.slice(1)
-                        }` as TranslationKey,
-                      )}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="min-h-11 w-full bg-transparent font-mono sm:w-40">
+                    <SelectValue
+                      placeholder={t("recurringFrequency") as string}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RECURRING_FREQUENCIES.map((freq) => (
+                      <SelectItem key={freq} value={freq}>
+                        {t(
+                          `recurring${
+                            freq.charAt(0).toUpperCase() + freq.slice(1)
+                          }` as TranslationKey,
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
@@ -662,6 +669,9 @@ export function SmartInput() {
                   }
                   className="min-h-11 w-full rounded-[3px] border border-border bg-transparent px-3 font-mono text-sm text-foreground focus:border-primary focus:outline-none sm:w-40 sm:px-2 sm:py-1 sm:text-right"
                 />
+                <p className="font-sans text-xs leading-5 text-muted sm:w-40 sm:text-right">
+                  This is the end date for the recurring transaction.
+                </p>
               </div>
             )}
           </div>
