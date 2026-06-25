@@ -441,7 +441,7 @@ export function SmartInput() {
 
       {/* Preview review panel */}
       {preview && editedData && (
-        <div className="z-30 mt-2 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-[4px] border border-border bg-card p-4 shadow-lg animate-in sm:absolute sm:left-0 sm:right-0 sm:top-full sm:max-h-none sm:overflow-visible sm:p-6">
+        <div className="relative z-30 mt-3 w-full overflow-visible rounded-[4px] border border-border bg-card p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-lg animate-in sm:absolute sm:left-0 sm:right-0 sm:top-full sm:mt-2 sm:p-6">
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-foreground">
               {t("previewTitle")}
