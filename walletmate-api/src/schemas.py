@@ -44,33 +44,6 @@ class HistoricalTransaction(BaseModel):
     transactionDate: str  # noqa: N815
 
 
-class CandidateTransaction(BaseModel):
-    """The transaction the user is about to save."""
-
-    type: Literal["expense", "income"]
-    amount: float = Field(..., gt=0)
-    category: str
-    description: str
-    transactionDate: str  # noqa: N815
-
-
-class SuggestRecurringRequest(BaseModel):
-    """Incoming payload for the recurring-suggestion endpoint."""
-
-    candidate: CandidateTransaction
-    history: list[HistoricalTransaction] = Field(default_factory=list)
-    language: Literal["vi", "en"] = "vi"
-
-
-class SuggestRecurringResponse(BaseModel):
-    """Structured recurring suggestion returned by the AI."""
-
-    recurring: bool
-    recurringFreq: Literal["daily", "weekly", "monthly", "yearly"] | None = None  # noqa: N815
-    confidence: Literal["high", "medium", "low"] = "low"
-    reason: str
-
-
 class AnalyzeRequest(BaseModel):
     """Incoming payload for the AI insights endpoint."""
 

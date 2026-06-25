@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, X, Loader2, Camera, ImageIcon, Sparkles } from "lucide-react";
+import { Check, X, Loader2, Camera, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
@@ -16,14 +16,8 @@ import {
 } from "@/components/ui/select";
 import { formatNumberInput, parseNumberInput } from "@/lib/utils";
 import { parseText, parseImage } from "@/lib/api";
-import { useTransactions } from "@/hooks/use-transactions";
-import { useSuggestRecurring } from "@/hooks/use-suggest-recurring";
-import {
-  buildCandidateTransaction,
-  getRecentHistoryForSuggestion,
-} from "@/lib/transaction-helpers";
 import type { ParsedExpense } from "@/lib/validations/parse";
-import type { RecurringFrequency, RecurringSuggestion } from "@/types";
+import type { RecurringFrequency } from "@/types";
 
 const CATEGORIES = [
   "Ăn uống",
@@ -49,7 +43,6 @@ const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB (matches Groq backend limit)
 export function SmartInput() {
   const { t, language } = useI18n();
   const queryClient = useQueryClient();
-  const { data: transactions = [] } = useTransactions();
 
   // State
   const [text, setText] = useState("");
@@ -58,10 +51,6 @@ export function SmartInput() {
   const [isFocused, setIsFocused] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [suggestion, setSuggestion] = useState<RecurringSuggestion | null>(
-    null,
-  );
-  const [showSuggestion, setShowSuggestion] = useState(false);
 
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
@@ -96,8 +85,6 @@ export function SmartInput() {
       if (data) {
         setPreview(data);
         setEditedData({ ...data, recurring: false, recurringFreq: undefined });
-        setSuggestion(null);
-        setShowSuggestion(false);
         toast.success("AI parsed your transaction", {
           description: "Review the details before adding it to your ledger.",
         });
@@ -113,45 +100,6 @@ export function SmartInput() {
       });
     },
   });
-
-  const suggestRecurringMutation = useSuggestRecurring();
-
-  // Trigger recurring suggestion after preview is set
-  useEffect(() => {
-    if (!editedData) return;
-
-    const candidate = buildCandidateTransaction({
-      type: editedData.type,
-      amount: editedData.amount,
-      category: editedData.category,
-      description: editedData.description,
-      transactionDate: editedData.transactionDate,
-    });
-
-    const history = getRecentHistoryForSuggestion(
-      transactions,
-      editedData.transactionDate,
-    );
-
-    suggestRecurringMutation.mutate(
-      { candidate, history, language },
-      {
-        onSuccess: (data) => {
-          setSuggestion(data);
-          if (
-            data.recurring &&
-            data.recurringFreq &&
-            data.confidence !== "low"
-          ) {
-            setShowSuggestion(true);
-          } else {
-            setShowSuggestion(false);
-          }
-        },
-      },
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preview?.description, preview?.amount, preview?.transactionDate]);
 
   // Save mutation (unchanged - still uses Next.js API route)
   const saveMutation = useMutation({
@@ -169,8 +117,6 @@ export function SmartInput() {
       setText("");
       setPreview(null);
       setEditedData(null);
-      setSuggestion(null);
-      setShowSuggestion(false);
       // Clear image state
       if (imageUrlRef.current) {
         URL.revokeObjectURL(imageUrlRef.current);
@@ -256,8 +202,6 @@ export function SmartInput() {
   const handleReject = () => {
     setPreview(null);
     setEditedData(null);
-    setSuggestion(null);
-    setShowSuggestion(false);
     inputRef.current?.focus();
   };
 
@@ -455,34 +399,6 @@ export function SmartInput() {
               <X className="h-4 w-4" />
             </button>
           </div>
-
-          {/* Recurring suggestion banner */}
-          {showSuggestion && suggestion && (
-            <div className="mb-3 rounded-[3px] border border-primary/30 bg-primary/5 p-3">
-              <div className="flex items-start gap-2">
-                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <div>
-                  <p className="font-sans text-sm text-foreground">
-                    {t("recurringSuggestion")}
-                  </p>
-                  <p className="mt-1 font-sans text-xs text-muted">
-                    {suggestion.reason}
-                  </p>
-                  <p className="mt-1 font-sans text-xs text-muted">
-                    AI detected a possible recurring transaction. Review it and
-                    turn recurring on if you want to save it that way.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {suggestRecurringMutation.isPending && (
-            <div className="mb-3 flex items-center gap-2 text-muted">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              <span className="font-sans text-xs">{t("analyzingPattern")}</span>
-            </div>
-          )}
 
           <div className="space-y-4 rounded-[3px] border border-border bg-background p-3 sm:space-y-3 sm:p-4">
             {/* Row 1: Type toggle */}

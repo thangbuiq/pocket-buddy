@@ -1,11 +1,5 @@
 import type { ParsedExpense } from "@/lib/validations/parse";
-import type {
-  AnalyzeRequest,
-  AnalyzeResponse,
-  CandidateTransaction,
-  HistoricalTransaction,
-  RecurringSuggestion,
-} from "@/types";
+import type { AnalyzeRequest, AnalyzeResponse } from "@/types";
 
 const API_URL =
   typeof window === "undefined"
@@ -117,29 +111,6 @@ export async function parseBatchFile(
 
   const data = (await res.json()) as { transactions: ParsedExpense[] };
   return data.transactions;
-}
-
-/**
- * Ask the Python backend whether a candidate transaction should be recurring.
- * Sends the candidate plus a limited history (previous + current month).
- */
-export async function suggestRecurring(
-  candidate: CandidateTransaction,
-  history: HistoricalTransaction[],
-  language: "vi" | "en",
-): Promise<RecurringSuggestion> {
-  const res = await fetch(`${API_URL}/api/suggest-recurring`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ candidate, history, language }),
-  });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || "Failed to suggest recurrence");
-  }
-
-  return res.json() as Promise<RecurringSuggestion>;
 }
 
 /**

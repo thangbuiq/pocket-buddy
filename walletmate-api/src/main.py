@@ -15,7 +15,6 @@ from .routes import (
     parse_batch_router,
     parse_image_router,
     parse_text_router,
-    suggest_recurring_router,
 )
 
 load_dotenv()
@@ -39,7 +38,6 @@ app.include_router(health_router)
 app.include_router(parse_text_router)
 app.include_router(parse_image_router)
 app.include_router(parse_batch_router)
-app.include_router(suggest_recurring_router)
 app.include_router(analyze_router)
 
 

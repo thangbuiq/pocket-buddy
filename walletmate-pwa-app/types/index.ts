@@ -58,21 +58,6 @@ export interface HistoricalTransaction {
   transactionDate: string;
 }
 
-export interface CandidateTransaction {
-  type: TransactionType;
-  amount: number;
-  category: string;
-  description: string;
-  transactionDate: string;
-}
-
-export interface RecurringSuggestion {
-  recurring: boolean;
-  recurringFreq?: RecurringFrequency;
-  confidence: "high" | "medium" | "low";
-  reason: string;
-}
-
 export interface SpendingStreak {
   currentStreak: number;
   longestStreak: number;

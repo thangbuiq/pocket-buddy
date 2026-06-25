@@ -1,5 +1,4 @@
 import type {
-  CandidateTransaction,
   HistoricalTransaction,
   RecurringFrequency,
   SpendingStreak,
@@ -44,49 +43,9 @@ export function buildRecurringHistory(
   }));
 }
 
-export function buildCandidateTransaction(
-  input: Omit<CandidateTransaction, "type"> & { type?: "income" | "expense" },
-): CandidateTransaction {
-  return {
-    type: input.type ?? "expense",
-    amount: input.amount,
-    category: input.category,
-    description: input.description ?? "",
-    transactionDate: input.transactionDate,
-  };
-}
-
 function parseLocalDate(dateString: string): Date {
   const [year, month, day] = dateString.split("-").map(Number);
   return new Date(year, (month ?? 1) - 1, day ?? 1);
-}
-
-export function getRecentHistoryForSuggestion(
-  transactions: Transaction[],
-  candidateDate: string,
-): HistoricalTransaction[] {
-  const candidate = parseLocalDate(candidateDate);
-  const currentYear = candidate.getFullYear();
-  const currentMonth = candidate.getMonth();
-
-  let previousMonth = currentMonth - 1;
-  let previousYear = currentYear;
-  if (previousMonth < 0) {
-    previousMonth = 11;
-    previousYear -= 1;
-  }
-
-  const filtered = transactions.filter((t) => {
-    const d = parseLocalDate(t.transactionDate);
-    const year = d.getFullYear();
-    const month = d.getMonth();
-    return (
-      (year === currentYear && month === currentMonth) ||
-      (year === previousYear && month === previousMonth)
-    );
-  });
-
-  return buildRecurringHistory(filtered);
 }
 
 const FREQUENCY_MULTIPLIER: Record<RecurringFrequency, number> = {

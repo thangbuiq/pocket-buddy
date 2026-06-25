@@ -84,7 +84,6 @@ export const translations = {
     recurringYearly: "Hàng năm",
     recurringSummaryTitle: "Chi phí cố định/tháng",
     recurringTransactions: "giao dịch định kỳ",
-    recurringSuggestion: "Giao dịch này có vẻ lặp lại thường xuyên",
     recurringEndDate: "Ngày kết thúc (tùy chọn)",
     recurringActive: "Đang định kỳ",
     recurringEnded: "Đã kết thúc",
@@ -93,7 +92,6 @@ export const translations = {
     recurringLeft: "lần còn lại",
     recurringLeftPlural: "lần còn lại",
     activeRecurringTitle: "Định kỳ đang hoạt động",
-    analyzingPattern: "Đang phân tích mẫu giao dịch...",
     apply: "Áp dụng",
     dismiss: "Bỏ qua",
 
@@ -249,7 +247,6 @@ export const translations = {
     recurringYearly: "Yearly",
     recurringSummaryTitle: "Fixed monthly expenses",
     recurringTransactions: "recurring transactions",
-    recurringSuggestion: "This transaction looks like it repeats often",
     recurringEndDate: "End date (optional)",
     recurringActive: "Recurring",
     recurringEnded: "Ended",
@@ -258,7 +255,6 @@ export const translations = {
     recurringLeft: "recurrence left",
     recurringLeftPlural: "recurrences left",
     activeRecurringTitle: "Active recurring",
-    analyzingPattern: "Analyzing transaction pattern...",
     apply: "Apply",
     dismiss: "Dismiss",
 
